@@ -1,9 +1,5 @@
-# weweb-upload
+# weweb-cli
 
-To install :
+To serve :
 
-`npm install -g weweb-upload`
-
-or
-
-`yarn global add weweb-upload`
+`yarn weweb serve [port]`

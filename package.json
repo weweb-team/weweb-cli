@@ -1,15 +1,13 @@
 {
-    "name": "weweb-client",
-    "version": "1.1.17",
-    "description": "Weweb client",
+    "name": "@weweb/cli",
+    "version": "1.0.1",
+    "description": "Weweb CLI",
     "bin": {
-        "weweb-build": "bin/build.js",
-        "weweb-serve": "bin/build.js",
-        "weweb-config": "bin/create-config.js"
+        "weweb": "bin/weweb.js"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/WeWeb-Public/weweb-client.git"
+        "url": "git+https://github.com/getweweb/weweb-cli.git"
     },
     "keywords": [
         "WeWeb",
@@ -25,9 +23,9 @@
     "author": "WeWeb",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/WeWeb-Public/weweb-client/issues"
+        "url": "https://github.com/getweweb/weweb-cli/issues"
     },
-    "homepage": "https://github.com/WeWeb-Public/weweb-client#readme",
+    "homepage": "https://github.com/getweweb/weweb-cli#readme",
     "dependencies": {
         "@babel/core": "^7.9.0",
         "@babel/preset-env": "7.6.2",
