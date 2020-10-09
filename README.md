@@ -1,5 +1,14 @@
-# weweb-cli
+# WeWeb CLI
 
-To serve :
+#### Serve :
+> Default port is 8080.
 
-`yarn weweb serve [port]`
+`npm run weweb serve  [--port=port]`
+
+`yarn weweb serve [--port=port]`
+
+
+#### Build :
+`npm run weweb build  --name=name`
+
+`yarn weweb build --name=name`

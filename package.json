@@ -1,7 +1,7 @@
 {
     "name": "@weweb/cli",
-    "version": "1.1.0",
-    "description": "Weweb CLI",
+    "version": "1.1.1",
+    "description": "WeWeb CLI",
     "bin": {
         "weweb": "bin/weweb.js"
     },
