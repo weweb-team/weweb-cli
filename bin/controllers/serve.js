@@ -1,11 +1,11 @@
 // #! /usr/bin/env node
 
-const buildCore = require("../core/_build.js");
+const prebuildCore = require("../core/prebuild.js");
 
 const shell = require("shelljs");
 
 exports.serve = (port) => {
-    if (!buildCore.build(port)) {
+    if (!prebuildCore.prebuild({ port })) {
         console.log("BUILD ERROR");
     } else {
         shell.cd("node_modules/@weweb/cli/");

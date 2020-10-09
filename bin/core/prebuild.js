@@ -2,8 +2,8 @@
 
 const fs = require("fs");
 
-exports.build = (port) => {
-    const isDev = !!port;
+exports.prebuild = (options = {}) => {
+    const wwDev = !!options.port;
     /*=============================================m_ÔÔ_m=============================================\
         GET AND READ WW-CONFIG
     \================================================================================================*/
@@ -41,7 +41,7 @@ exports.build = (port) => {
         fs.unlinkSync(tempIndexJs);
     }
 
-    let indexContent = `import component from '../../../${componentPath}'
+    let indexContent = `import component from '../../../../${componentPath}'
 
         const name = "__NAME__";
         const version = '__VERSION__';
@@ -54,14 +54,17 @@ exports.build = (port) => {
                     config.name = name;
                 }
 
+                config.wwDev = ${wwDev},
+                config.port = ${options.port};
+
                 wwLib.wwComponents.register(config);
                 
                 window.vm.addComponent({
                     name: name,
                     version: version,
                     content: component,
-                    ${isDev ? `wwDev: true,` : ""}
-                    ${isDev ? `port: ${port},` : ""}
+                    wwDev: ${wwDev},
+                    port: ${options.port},
                 });
             
                 return true;
