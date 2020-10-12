@@ -38,8 +38,9 @@ switch (command) {
         break;
     case "build":
         const name = findArgv("name");
+        const type = findArgv("type");
 
-        buildCtrl.build(name);
+        buildCtrl.build(name, type);
         break;
     case "create-config":
         createConfigCtrl.createConfig();

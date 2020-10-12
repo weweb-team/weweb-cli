@@ -4,6 +4,7 @@ const fs = require("fs");
 
 exports.prebuild = (options = {}) => {
     const wwDev = !!options.port;
+    const type = options.type || null;
     /*=============================================m_ÔÔ_m=============================================\
         GET AND READ WW-CONFIG
     \================================================================================================*/
@@ -63,6 +64,7 @@ exports.prebuild = (options = {}) => {
                     name: name,
                     version: version,
                     content: component,
+                    type: ${type},
                     wwDev: ${wwDev},
                     port: ${options.port},
                 });

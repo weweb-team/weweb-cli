@@ -10,13 +10,17 @@ const fs = require("fs");
 // const shell = require("shelljs");
 const webpack = require("webpack");
 
-exports.build = (name) => {
+exports.build = (name, type) => {
     if (!name) {
         console.log("\x1b[41m Error : arg '--name=\"name\"' not specified. \x1b[0m");
         return;
     }
+    if (!type) {
+        console.log("\x1b[41m Error : arg '--type=\"type\"' not specified. Must be 'section', 'wwobject' or 'plugin'. \x1b[0m");
+        return;
+    }
 
-    if (!prebuildCore.prebuild()) {
+    if (!prebuildCore.prebuild({ type })) {
         console.log("BUILD ERROR");
     } else {
         const getPackageJson = function() {
