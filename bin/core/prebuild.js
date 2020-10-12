@@ -64,7 +64,7 @@ exports.prebuild = (options = {}) => {
                     name: name,
                     version: version,
                     content: component,
-                    type: ${type},
+                    type: '${type}',
                     wwDev: ${wwDev},
                     port: ${options.port},
                 });
