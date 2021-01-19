@@ -1,6 +1,6 @@
 {
     "name": "@weweb/cli",
-    "version": "1.1.4",
+    "version": "1.2.0",
     "description": "WeWeb CLI",
     "bin": {
         "weweb": "bin/weweb.js"
@@ -47,6 +47,7 @@
         "url-loader": "^2.3.0",
         "vue-loader": "^15.9.3",
         "vue-style-loader": "^4.1.2",
+        "vue": "^2.6.12",
         "vue-template-compiler": "^2.6.12",
         "webpack": "^4.44.2",
         "webpack-cli": "^3.3.12",
