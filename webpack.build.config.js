@@ -46,10 +46,21 @@ module.exports = {
     externals: {
         vue: "Vue",
         react: "React",
-        'react-dom': 'ReactDOM'
+        "react-dom": "ReactDOM",
     },
     module: {
         rules: [
+            {
+                test: /\.?(jsx|tsx)(\?.*)?$/,
+                exclude: /(node_modules|bower_components)/,
+                use: {
+                    loader: "babel-loader",
+                    options: {
+                        presets: ["@babel/preset-react"],
+                        plugins: ["@babel/transform-react-jsx"],
+                    },
+                },
+            },
             {
                 test: /\.vue$/,
                 loader: "vue-loader",
@@ -111,17 +122,6 @@ module.exports = {
                         },
                     },
                 ],
-            },
-            {
-                test: /\.?(jsx|tsx)(\?.*)?$/,
-                exclude: /(node_modules|bower_components)/,
-                use: {
-                    loader: "babel-loader",
-                    options: {
-                        presets: ["@babel/preset-react"],
-                        plugins: ["@babel/transform-react-jsx"],
-                    },
-                },
             },
         ],
     },
