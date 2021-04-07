@@ -53,6 +53,8 @@ module.exports = function() {
         mode: "development",
         externals: {
             vue: "Vue",
+            react: 'React',
+            'react-dom': 'ReactDOM'
         },
         devtool: "inline-source-map",
         devServer: {
@@ -69,12 +71,23 @@ module.exports = function() {
         },
         module: {
             rules: [
+                  {
+                    test: /\.?(jsx|tsx)(\?.*)?$/,
+                    exclude: /(node_modules|bower_components)/,
+                    use: {
+                        loader: "babel-loader",
+                        options: {
+                            presets: ["@babel/preset-react"],
+                            plugins: ["@babel/transform-react-jsx"],
+                        },
+                    },
+                },
                 {
                     test: /\.vue$/,
                     loader: "vue-loader",
                 },
                 {
-                    test: /\.(js|vue|css|scss)$/,
+                    test: /\.(js|vue|css|scss|jsx)$/,
                     loader: "weweb-strip-block",
                     options: {
                         blocks: [
