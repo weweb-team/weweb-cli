@@ -67,6 +67,7 @@ exports.prebuild = (options = {}) => {
                     type: '${type}',
                     wwDev: ${wwDev},
                     port: ${options.port},
+                    config,
                 });
             
                 return true;
