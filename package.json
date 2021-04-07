@@ -1,6 +1,6 @@
 {
     "name": "@weweb/cli",
-    "version": "1.1.4",
+    "version": "1.2.4",
     "description": "WeWeb CLI",
     "bin": {
         "weweb": "bin/weweb.js"
@@ -29,7 +29,6 @@
     "dependencies": {
         "@babel/core": "^7.11.6",
         "@babel/preset-env": "^7.11.5",
-        "@babel/preset-react": "^7.13.13",
         "@vue/cli-plugin-babel": "^3.12.1",
         "@vue/cli-plugin-eslint": "^3.12.1",
         "@vue/cli-service": "^3.12.1",
@@ -48,6 +47,7 @@
         "url-loader": "^2.3.0",
         "vue-loader": "^15.9.3",
         "vue-style-loader": "^4.1.2",
+        "vue": "^2.6.12",
         "vue-template-compiler": "^2.6.12",
         "webpack": "^4.44.2",
         "webpack-cli": "^3.3.12",
