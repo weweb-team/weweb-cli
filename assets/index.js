@@ -1,4 +1,4 @@
-import component from '../../.././src/wwSection.vue'
+import component from '../../test-react/./src/wwElement.jsx'
 
         const name = "__NAME__";
         const version = '__VERSION__';
@@ -6,10 +6,13 @@ import component from '../../.././src/wwSection.vue'
         const addComponent = function () {
             if (window.vm) {
 
-                const config = {"componentPath":"./src/wwSection.vue"};
+                const config = {"componentPath":"./src/wwElement.jsx","isReact":true,"editor":{"label":{"en":"My Element"},"styleOptions":{"textColor":{"label":{"en":"Text color"},"type":"Color"}}}};
                 if(name.indexOf('__') !== 0){
                     config.name = name;
                 }
+
+                config.wwDev = true,
+                config.port = 4040;
 
                 wwLib.wwComponents.register(config);
                 
@@ -17,8 +20,10 @@ import component from '../../.././src/wwSection.vue'
                     name: name,
                     version: version,
                     content: component,
+                    type: 'null',
                     wwDev: true,
-                    port: 8080,
+                    port: 4040,
+                    config,
                 });
             
                 return true;
