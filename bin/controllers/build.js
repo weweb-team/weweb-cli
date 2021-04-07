@@ -16,7 +16,9 @@ exports.build = (name, type) => {
         return;
     }
     if (!type) {
-        console.log("\x1b[41m Error : arg '--type=\"type\"' not specified. Must be 'section', 'wwobject' or 'plugin'. \x1b[0m");
+        console.log(
+            "\x1b[41m Error : arg '--type=\"type\"' not specified. Must be 'section', 'wwobject' or 'plugin'. \x1b[0m"
+        );
         return;
     }
 
@@ -46,7 +48,9 @@ exports.build = (name, type) => {
         const version = packageJSON.version;
         const versionRegex = /^[\d\.]*$/g;
         if (!versionRegex.test(version)) {
-            console.log("\x1b[41mError : package.json version must be an integer (got : " + packageJSON.version + ")\x1b[0m");
+            console.log(
+                "\x1b[41mError : package.json version must be an integer (got : " + packageJSON.version + ")\x1b[0m"
+            );
             return;
         }
 
@@ -64,6 +68,8 @@ exports.build = (name, type) => {
             mode: "production",
             externals: {
                 vue: "Vue",
+                react: "React",
+                "react-dom": "ReactDOM",
             },
             resolve: {
                 modules: [path.resolve(`${wewebCliPath}/node_modules`), "node_modules"],
@@ -75,6 +81,17 @@ exports.build = (name, type) => {
             },
             module: {
                 rules: [
+                    {
+                        test: /\.?(jsx|tsx)(\?.*)?$/,
+                        exclude: /(node_modules|bower_components)/,
+                        use: {
+                            loader: "babel-loader",
+                            options: {
+                                presets: ["@babel/preset-react"],
+                                plugins: ["@babel/transform-react-jsx"],
+                            },
+                        },
+                    },
                     {
                         test: /\.vue$/,
                         loader: "vue-loader",
@@ -163,7 +180,14 @@ exports.build = (name, type) => {
                 return this.console.error(info.errors);
             }
 
-            if (stats && stats.stats && stats.stats[0] && stats.stats[0].compilation && stats.stats[0].compilation.errors && stats.stats[0].compilation.errors.length) {
+            if (
+                stats &&
+                stats.stats &&
+                stats.stats[0] &&
+                stats.stats[0].compilation &&
+                stats.stats[0].compilation.errors &&
+                stats.stats[0].compilation.errors.length
+            ) {
                 console.log(stats.stats[0].compilation.errors);
                 return false;
             }
