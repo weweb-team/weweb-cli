@@ -1,6 +1,6 @@
 
         import component from '../../plugin-airtable/src/index.js'
-        import configuration from '../../plugin-airtable/ww-config.json'
+        import configuration from '../../plugin-airtable/ww-config.js'
 
         const name = "__NAME__";
         const version = '__VERSION__';
@@ -19,7 +19,7 @@
                     name,
                     version,
                     content: component,
-                    type: 'plugin',
+                    type: 'element',
                     wwDev: false,
                     port: undefined,
                     config,

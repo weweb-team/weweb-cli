@@ -157,7 +157,7 @@ exports.build = (name, type) => {
                 ],
             },
             output: {
-                path: path.join(__dirname, "../../../../../dist"),
+                path: path.join(process.cwd(), "dist"),
                 filename: "manager.js",
             },
             plugins: [
