@@ -8,19 +8,26 @@ exports.prebuild = (options = {}) => {
     /*=============================================m_ÔÔ_m=============================================\
         GET AND READ WW-CONFIG
     \================================================================================================*/
+    let config;
+    let fileExtension;
     // Get ww-config.json
-    if (!fs.existsSync("./ww-config.json")) {
-        console.log('\x1b[41mError : "./ww-config.json" was not found.\x1b[0m');
-        console.log('\x1b[44mTo create "./ww-config.json" use "weweb create-config".\x1b[0m');
-        return false;
-    }
+    if (fs.existsSync("./ww-config.json")) {
+        fileExtension = 'json';
+        config = fs.readFileSync("./ww-config.json");
+        try {
+            config = JSON.parse(config);
+        } catch (error) {
+            console.log('\x1b[41m Error : unable to parse "./ww-config.json". \x1b[0m');
+            return false;
+        }
 
-    let config = fs.readFileSync("./ww-config.json");
+    } else if (fs.existsSync("./ww-config.js")) {
+        fileExtension = 'js'
+        config = require('./ww-config.js')
 
-    try {
-        config = JSON.parse(config);
-    } catch (error) {
-        console.log('\x1b[41m Error : unable to parse "./ww-config.json". \x1b[0m');
+    } else {
+        console.log('\x1b[41mError : "./ww-config.js(on)" was not found.\x1b[0m');
+        console.log('\x1b[44mTo create "./ww-config.js(on)" use "weweb create-config".\x1b[0m');
         return false;
     }
 
@@ -42,34 +49,32 @@ exports.prebuild = (options = {}) => {
         fs.unlinkSync(tempIndexJs);
     }
 
-    let indexContent = `import component from '../../../../${componentPath}'
+    let indexContent = `
+        import component from '../../../../${componentPath}'
+        import configuration from '../../../../ww-config.${fileExtension}'
 
         const name = "__NAME__";
         const version = '__VERSION__';
 
-        const addComponent = function () {
+        const config = { ...configuration };
+        if (name.indexOf('__') !== 0){
+            config.name = name;
+        }
+        config.wwDev = ${wwDev},
+        config.port = ${options.port};
+
+        function addComponent() {
             if (window.vm) {
-
-                const config = ${JSON.stringify(config)};
-                if(name.indexOf('__') !== 0){
-                    config.name = name;
-                }
-
-                config.wwDev = ${wwDev},
-                config.port = ${options.port};
-
                 wwLib.wwComponents.register(config);
-                
                 window.vm.addComponent({
-                    name: name,
-                    version: version,
+                    name,
+                    version,
                     content: component,
                     type: '${type}',
                     wwDev: ${wwDev},
                     port: ${options.port},
                     config,
                 });
-            
                 return true;
             }
             return false;
