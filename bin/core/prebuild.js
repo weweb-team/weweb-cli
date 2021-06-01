@@ -10,8 +10,6 @@ const RELATIVE_PATH = path.relative(ASSETS_DIRECTORY, PACKAGE_DIRECTORY);
 const CONFIG_PATH = path.join(PACKAGE_DIRECTORY, 'ww-config');
 const TMP_INDEX_PATH = path.join(ASSETS_DIRECTORY, 'index.js');
 
-console.log({PACKAGE_DIRECTORY, ASSETS_DIRECTORY, CONFIG_PATH, TMP_INDEX_PATH, RELATIVE_PATH});
-
 exports.prebuild = (options = {}) => {
     const wwDev = !!options.port;
     const type = options.type || null;
@@ -46,8 +44,6 @@ exports.prebuild = (options = {}) => {
 
     const RELATIVE_COMPONENT_PATH = path.join(RELATIVE_PATH, componentPath).split(path.sep).join(path.posix.sep);;
     const RELATIVE_CONFIG_PATH = path.join(RELATIVE_PATH, `ww-config.${fileExtension}`).split(path.sep).join(path.posix.sep);
-
-    console.log({RELATIVE_COMPONENT_PATH, RELATIVE_CONFIG_PATH})
 
     let indexContent = `
         import component from '${RELATIVE_COMPONENT_PATH}'
