@@ -84,6 +84,10 @@ exports.prebuild = (options = {}) => {
             }, 10);
         }`;
 
+    if (!fs.existsSync(ASSETS_DIRECTORY)) {
+        fs.mkdirSync(ASSETS_DIRECTORY);
+    }
+
     fs.writeFileSync(TMP_INDEX_PATH, indexContent);
 
     return true;
