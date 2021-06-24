@@ -128,7 +128,6 @@ exports.build = (name, type) => {
                     {
                         test: /\.(css|scss)$/,
                         use: [
-                            "vue-style-loader",
                             "css-loader",
                             {
                                 loader: "postcss-loader",
