@@ -6,8 +6,6 @@ const path = require("path");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const autoprefixer = require("autoprefixer");
 const fs = require("fs");
-
-// const shell = require("shelljs");
 const webpack = require("webpack");
 
 exports.build = (name, type) => {

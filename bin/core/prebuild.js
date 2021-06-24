@@ -60,9 +60,8 @@ exports.prebuild = (options = {}) => {
         config.port = ${options.port};
 
         function addComponent() {
-            if (window.vm) {
-                wwLib.wwComponents.register(config);
-                window.vm.addComponent({
+            if (window.addWwComponent) {
+                window.addWwComponent({
                     name,
                     version,
                     content: component,
