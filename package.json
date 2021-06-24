@@ -7,7 +7,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/getweweb/weweb-cli.git"
+        "url": "git+https://github.com/weweb-team/weweb-cli.git"
     },
     "keywords": [
         "WeWeb",
