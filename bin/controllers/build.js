@@ -132,9 +132,11 @@ exports.build = (name, type) => {
                             {
                                 loader: "postcss-loader",
                                 options: {
-                                    plugins: function() {
-                                        return [autoprefixer];
-                                    },
+                                    postcssOptions: {
+                                        plugins: function() {
+                                            return [autoprefixer];
+                                        },
+                                    }
                                 },
                             },
                             "sass-loader",
