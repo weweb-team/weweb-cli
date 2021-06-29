@@ -80,6 +80,18 @@ exports.build = (name, type) => {
             module: {
                 rules: [
                     {
+                        test: /\.(js|css|scss)$/,
+                        loader: "weweb-strip-block",
+                        options: {
+                            blocks: [
+                                {
+                                    start: "wwFront:start",
+                                    end: "wwFront:end",
+                                },
+                            ],
+                        },
+                    },
+                    {
                         test: /\.?(jsx|tsx)(\?.*)?$/,
                         exclude: /(node_modules|bower_components)/,
                         use: {
@@ -92,30 +104,20 @@ exports.build = (name, type) => {
                     },
                     {
                         test: /\.vue$/,
-                        loader: "vue-loader",
-                    },
-                    {
-                        test: /\.(js|vue|css|scss)$/,
-                        loader: "weweb-strip-block",
-                        options: {
-                            blocks: [
-                                {
-                                    start: "wwFront:start",
-                                    end: "wwFront:end",
-                                },
-                            ],
-                        },
-                    },
-                    {
-                        test: /\.(js|vue)$/,
-                        loader: "string-replace-loader",
-                        options: {
-                            multiple: [
-                                { search: "__NAME__", replace: componentData.name },
-                                { search: "__VERSION__", replace: componentData.version },
-                                { search: "__COMPONENT_NAME__", replace: componentData.componentName },
-                            ],
-                        },
+                        use: [
+                            "vue-loader", 
+                            {
+                                loader: "weweb-strip-block",
+                                options: {
+                                    blocks: [
+                                        {
+                                            start: "wwFront:start",
+                                            end: "wwFront:end",
+                                        },
+                                    ],
+                                }
+                            }
+                        ],
                     },
                     // this will apply to both plain `.js` files
                     // AND `<script>` blocks in `.vue` files
