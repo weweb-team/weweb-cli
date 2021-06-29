@@ -23,7 +23,7 @@ exports.build = (name, type) => {
     if (!prebuildCore.prebuild({ type })) {
         console.log("BUILD ERROR");
     } else {
-        const getPackageJson = function() {
+        const getPackageJson = function () {
             try {
                 let packageJSON;
 
@@ -105,7 +105,7 @@ exports.build = (name, type) => {
                     {
                         test: /\.vue$/,
                         use: [
-                            "vue-loader", 
+                            "vue-loader",
                             {
                                 loader: "weweb-strip-block",
                                 options: {
@@ -115,9 +115,23 @@ exports.build = (name, type) => {
                                             end: "wwFront:end",
                                         },
                                     ],
-                                }
-                            }
+                                },
+                            },
                         ],
+                    },
+                    {
+                        test: /\.(js|vue)$/,
+                        loader: "string-replace-loader",
+                        options: {
+                            multiple: [
+                                { search: "__NAME__", replace: componentData.name },
+                                { search: "__VERSION__", replace: componentData.version },
+                                {
+                                    search: "__COMPONENT_NAME__",
+                                    replace: componentData.componentName,
+                                },
+                            ],
+                        },
                     },
                     // this will apply to both plain `.js` files
                     // AND `<script>` blocks in `.vue` files
@@ -135,10 +149,10 @@ exports.build = (name, type) => {
                                 loader: "postcss-loader",
                                 options: {
                                     postcssOptions: {
-                                        plugins: function() {
+                                        plugins: function () {
                                             return [autoprefixer];
                                         },
-                                    }
+                                    },
                                 },
                             },
                             "sass-loader",
@@ -167,7 +181,7 @@ exports.build = (name, type) => {
             ],
         };
 
-        webpack(webpackConfig, function(err, stats) {
+        webpack(webpackConfig, function (err, stats) {
             if (err) {
                 console.error(err, stats);
                 console.log("\x1b[41mError : build failed.\x1b[0m");
