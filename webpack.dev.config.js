@@ -136,6 +136,7 @@ module.exports = function() {
                 {
                     test: /\.(css|scss)$/,
                     use: [
+                        "vue-style-loader",
                         "css-loader",
                         {
                             loader: "postcss-loader",
