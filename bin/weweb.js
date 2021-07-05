@@ -2,7 +2,6 @@
 
 const serveCtrl = require("./controllers/serve.js");
 const buildCtrl = require("./controllers/build.js");
-const createConfigCtrl = require("./controllers/create-config.js");
 
 const command = process.argv[2];
 
@@ -42,9 +41,6 @@ switch (command) {
 
         buildCtrl.build(name, type);
         break;
-    case "create-config":
-        createConfigCtrl.createConfig();
-        break;
     default:
-        console.log(`Command not recognized or no specified.\nUse 'serve [--port=port]', 'build --name=name' or 'create-config'.`);
+        console.log(`Command not recognized or no specified.\nUse 'serve [--port=port]', 'build --name=name'.`);
 }

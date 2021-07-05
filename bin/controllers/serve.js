@@ -1,8 +1,7 @@
 // #! /usr/bin/env node
+const shell = require("shelljs");
 
 const prebuildCore = require("../core/prebuild.js");
-
-const shell = require("shelljs");
 
 exports.serve = (port) => {
     if (!prebuildCore.prebuild({ port })) {

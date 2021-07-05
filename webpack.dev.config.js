@@ -1,6 +1,6 @@
 // webpack.config.js
 const path = require("path");
-const VueLoaderPlugin = require("vue-loader/lib/plugin");
+const { VueLoaderPlugin } = require("vue-loader");
 const autoprefixer = require("autoprefixer");
 const fs = require("fs");
 
@@ -71,6 +71,18 @@ module.exports = function() {
         },
         module: {
             rules: [
+                 {
+                    test: /\.(js|css|scss|jsx)$/,
+                    loader: "weweb-strip-block",
+                    options: {
+                        blocks: [
+                            {
+                                start: "wwFront:start",
+                                end: "wwFront:end",
+                            },
+                        ],
+                    },
+                 },
                   {
                     test: /\.?(jsx|tsx)(\?.*)?$/,
                     exclude: /(node_modules|bower_components)/,
@@ -84,19 +96,20 @@ module.exports = function() {
                 },
                 {
                     test: /\.vue$/,
-                    loader: "vue-loader",
-                },
-                {
-                    test: /\.(js|vue|css|scss|jsx)$/,
-                    loader: "weweb-strip-block",
-                    options: {
-                        blocks: [
-                            {
-                                start: "wwFront:start",
-                                end: "wwFront:end",
-                            },
-                        ],
-                    },
+                    use: [
+                        "vue-loader", 
+                        {
+                            loader: "weweb-strip-block",
+                            options: {
+                                blocks: [
+                                    {
+                                        start: "wwFront:start",
+                                        end: "wwFront:end",
+                                    },
+                                ],
+                            }
+                        }
+                    ],
                 },
                 {
                     test: /\.(js|vue)$/,
@@ -128,9 +141,12 @@ module.exports = function() {
                         {
                             loader: "postcss-loader",
                             options: {
-                                plugins: function() {
-                                    return [autoprefixer];
-                                },
+                                postcssOptions: {
+                                    plugins: function() {
+                                        return [autoprefixer];
+                                    },
+                                }
+                                
                             },
                         },
                         "sass-loader",

@@ -3,11 +3,9 @@
 const prebuildCore = require("../core/prebuild.js");
 
 const path = require("path");
-const VueLoaderPlugin = require("vue-loader/lib/plugin");
+const { VueLoaderPlugin } = require("vue-loader");
 const autoprefixer = require("autoprefixer");
 const fs = require("fs");
-
-// const shell = require("shelljs");
 const webpack = require("webpack");
 
 exports.build = (name, type) => {
@@ -25,7 +23,7 @@ exports.build = (name, type) => {
     if (!prebuildCore.prebuild({ type })) {
         console.log("BUILD ERROR");
     } else {
-        const getPackageJson = function() {
+        const getPackageJson = function () {
             try {
                 let packageJSON;
 
@@ -82,6 +80,18 @@ exports.build = (name, type) => {
             module: {
                 rules: [
                     {
+                        test: /\.(js|css|scss)$/,
+                        loader: "weweb-strip-block",
+                        options: {
+                            blocks: [
+                                {
+                                    start: "wwFront:start",
+                                    end: "wwFront:end",
+                                },
+                            ],
+                        },
+                    },
+                    {
                         test: /\.?(jsx|tsx)(\?.*)?$/,
                         exclude: /(node_modules|bower_components)/,
                         use: {
@@ -94,19 +104,20 @@ exports.build = (name, type) => {
                     },
                     {
                         test: /\.vue$/,
-                        loader: "vue-loader",
-                    },
-                    {
-                        test: /\.(js|vue|css|scss)$/,
-                        loader: "weweb-strip-block",
-                        options: {
-                            blocks: [
-                                {
-                                    start: "wwFront:start",
-                                    end: "wwFront:end",
+                        use: [
+                            "vue-loader",
+                            {
+                                loader: "weweb-strip-block",
+                                options: {
+                                    blocks: [
+                                        {
+                                            start: "wwFront:start",
+                                            end: "wwFront:end",
+                                        },
+                                    ],
                                 },
-                            ],
-                        },
+                            },
+                        ],
                     },
                     {
                         test: /\.(js|vue)$/,
@@ -115,7 +126,10 @@ exports.build = (name, type) => {
                             multiple: [
                                 { search: "__NAME__", replace: componentData.name },
                                 { search: "__VERSION__", replace: componentData.version },
-                                { search: "__COMPONENT_NAME__", replace: componentData.componentName },
+                                {
+                                    search: "__COMPONENT_NAME__",
+                                    replace: componentData.componentName,
+                                },
                             ],
                         },
                     },
@@ -135,8 +149,10 @@ exports.build = (name, type) => {
                             {
                                 loader: "postcss-loader",
                                 options: {
-                                    plugins: function() {
-                                        return [autoprefixer];
+                                    postcssOptions: {
+                                        plugins: function () {
+                                            return [autoprefixer];
+                                        },
                                     },
                                 },
                             },
@@ -166,7 +182,7 @@ exports.build = (name, type) => {
             ],
         };
 
-        webpack(webpackConfig, function(err, stats) {
+        webpack(webpackConfig, function (err, stats) {
             if (err) {
                 console.error(err, stats);
                 console.log("\x1b[41mError : build failed.\x1b[0m");
