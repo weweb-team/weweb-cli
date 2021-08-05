@@ -46,7 +46,7 @@ exports.prebuild = (options = {}) => {
         return;
     }
 
-    let componentPath = packageJSON.weweb?.componentPath;
+    let componentPath = packageJSON.weweb && packageJSON.weweb.componentPath;
     if (!componentPath && type === "wwobject") {
         componentPath = "./src/wwElement.vue";
     } else if (!componentPath && type === "section") {
