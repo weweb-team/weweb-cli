@@ -8,6 +8,7 @@ const ASSETS_DIRECTORY = path.resolve(__dirname, '../../assets');
 const RELATIVE_PATH = path.relative(ASSETS_DIRECTORY, PACKAGE_DIRECTORY);
 
 const CONFIG_PATH = path.join(PACKAGE_DIRECTORY, 'ww-config');
+const PCK_PATH = path.join(PACKAGE_DIRECTORY, 'package.json');
 const TMP_INDEX_PATH = path.join(ASSETS_DIRECTORY, 'index.js');
 
 exports.prebuild = (options = {}) => {
@@ -25,14 +26,14 @@ exports.prebuild = (options = {}) => {
         return false;
     }
 
-    const config = require(CONFIG_PATH);
+    const package = require(PCK_PATH);
 
-    let componentPath = config.componentPath || "./src/wwComponent.vue";
+    let componentPath = config.weweb?.componentPath || "./src/wwElement.vue";
     console.log(`\x1b[44m Component Path : "${componentPath}" \x1b[0m`);
 
     if (!fs.existsSync(componentPath)) {
         console.log(
-            `\x1b[41m "${componentPath}" not found. Please check "componentPath" in "./ww-config.json". \x1b[0m`
+            `\x1b[41m "${componentPath}" not found. Please check "weweb.componentPath" in "./package.json". \x1b[0m`
         );
         return false;
     }
