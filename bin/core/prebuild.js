@@ -47,13 +47,16 @@ exports.prebuild = (options = {}) => {
     }
 
     let componentPath = packageJSON.weweb && packageJSON.weweb.componentPath;
-    if (!componentPath && type === "wwobject") {
-        componentPath = "./src/wwElement.vue";
-    } else if (!componentPath && type === "section") {
-        componentPath = "./src/wwSection.vue";
-    } else if (!componentPath && type === "plugin") {
-        componentPath = "./src/wwPlugin.js";
+    if (!componentPath) {
+        if (fs.existsSync('./src/wwElement.vue')) {
+            componentPath = './src/wwElement.vue'
+        } else if (fs.existsSync('./src/wwSection.vue')) {
+            componentPath = './src/wwSection.vue'
+        } else if (fs.existsSync('./src/wwPlugin.js'))
+            componentPath = './src/wwPlugin.js'
+        }
     }
+    
     console.log(`\x1b[44m Component Path : "${componentPath}" \x1b[0m`);
 
     if (!fs.existsSync(componentPath)) {
