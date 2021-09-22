@@ -52,7 +52,7 @@ exports.prebuild = (options = {}) => {
             componentPath = './src/wwElement.vue'
         } else if (fs.existsSync('./src/wwSection.vue')) {
             componentPath = './src/wwSection.vue'
-        } else if (fs.existsSync('./src/wwPlugin.js'))
+        } else if (fs.existsSync('./src/wwPlugin.js')) {
             componentPath = './src/wwPlugin.js'
         }
     }
