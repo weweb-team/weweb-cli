@@ -4,35 +4,64 @@ const fs = require("fs");
 const path = require("path");
 
 const PACKAGE_DIRECTORY = process.cwd();
-const ASSETS_DIRECTORY = path.resolve(__dirname, '../../assets');
+const ASSETS_DIRECTORY = path.resolve(__dirname, "../../assets");
 const RELATIVE_PATH = path.relative(ASSETS_DIRECTORY, PACKAGE_DIRECTORY);
 
-const CONFIG_PATH = path.join(PACKAGE_DIRECTORY, 'ww-config');
-const TMP_INDEX_PATH = path.join(ASSETS_DIRECTORY, 'index.js');
+const CONFIG_PATH = path.join(PACKAGE_DIRECTORY, "ww-config");
+const PCK_PATH = path.join(PACKAGE_DIRECTORY, "package.json");
+const TMP_INDEX_PATH = path.join(ASSETS_DIRECTORY, "index.js");
+
+const getPackageJson = function () {
+    try {
+        let packageJSON;
+
+        packageJSON = fs.readFileSync(PCK_PATH, "utf8");
+        packageJSON = JSON.parse(packageJSON);
+
+        return packageJSON;
+    } catch (error) {
+        console.log("\x1b[41mError : ./package.json not found or incorrect format.\x1b[0m", error);
+        return null;
+    }
+};
 
 exports.prebuild = (options = {}) => {
     const wwDev = !!options.port;
     const type = options.type || null;
 
-    let fileExtension
+    let fileExtension;
     if (fs.existsSync(`${CONFIG_PATH}.js`)) {
-        fileExtension = 'js'
+        fileExtension = "js";
     } else if (fs.existsSync(`${CONFIG_PATH}.json`)) {
-        fileExtension = 'json'
+        fileExtension = "json";
     } else {
         console.log('\x1b[41mError : "./ww-config.js(on)" was not found.\x1b[0m');
         console.log('\x1b[44mTo create "./ww-config.js(on)" use "weweb create-config".\x1b[0m');
         return false;
     }
 
-    const config = require(CONFIG_PATH);
+    const packageJSON = getPackageJson();
+    if (!packageJSON) {
+        console.log("\x1b[41mError : package.json not found\x1b[0m");
+        return;
+    }
 
-    let componentPath = config.componentPath || "./src/wwComponent.vue";
+    let componentPath = packageJSON.weweb && packageJSON.weweb.componentPath;
+    if (!componentPath) {
+        if (fs.existsSync('./src/wwElement.vue')) {
+            componentPath = './src/wwElement.vue'
+        } else if (fs.existsSync('./src/wwSection.vue')) {
+            componentPath = './src/wwSection.vue'
+        } else if (fs.existsSync('./src/wwPlugin.js')) {
+            componentPath = './src/wwPlugin.js'
+        }
+    }
+    
     console.log(`\x1b[44m Component Path : "${componentPath}" \x1b[0m`);
 
     if (!fs.existsSync(componentPath)) {
         console.log(
-            `\x1b[41m "${componentPath}" not found. Please check "componentPath" in "./ww-config.json". \x1b[0m`
+            `\x1b[41m "${componentPath}" not found. Please check "weweb.componentPath" in "./package.json". \x1b[0m`
         );
         return false;
     }
@@ -41,9 +70,11 @@ exports.prebuild = (options = {}) => {
         fs.unlinkSync(TMP_INDEX_PATH);
     }
 
-
-    const RELATIVE_COMPONENT_PATH = path.join(RELATIVE_PATH, componentPath).split(path.sep).join(path.posix.sep);;
-    const RELATIVE_CONFIG_PATH = path.join(RELATIVE_PATH, `ww-config.${fileExtension}`).split(path.sep).join(path.posix.sep);
+    const RELATIVE_COMPONENT_PATH = path.join(RELATIVE_PATH, componentPath).split(path.sep).join(path.posix.sep);
+    const RELATIVE_CONFIG_PATH = path
+        .join(RELATIVE_PATH, `ww-config.${fileExtension}`)
+        .split(path.sep)
+        .join(path.posix.sep);
 
     let indexContent = `
         import component from '${RELATIVE_COMPONENT_PATH}'
