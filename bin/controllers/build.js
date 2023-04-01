@@ -139,6 +139,11 @@ exports.build = (name, type) => {
                         test: /\.js$/,
                         loader: "babel-loader",
                     },
+                    {
+                        test: /\.mjs$/,
+                        include: /node_modules/,
+                        type: "javascript/auto"
+                    },
                     // this will apply to both plain `.css` files
                     // AND `<style>` blocks in `.vue` files
                     {
