@@ -3,8 +3,9 @@ const path = require("path");
 const { VueLoaderPlugin } = require("vue-loader");
 const autoprefixer = require("autoprefixer");
 const fs = require("fs");
+const webpack = require("webpack");
 
-const wewebClientVersion = "1.0.30";
+const wewebClientVersion = "1.0.40";
 
 const componentData = {
     name: "",
@@ -45,11 +46,9 @@ module.exports = function() {
 
     const configManager = {
         name: "manager",
-        entry: [
-            "webpack-dev-server/client?https://localhost:" + port, // WebpackDevServer host and port
-            "webpack/hot/only-dev-server", // "only" prevents reload on syntax errors
-            "./assets/index.js",
-        ],
+        entry: {
+            manager: "./assets/index.js",
+        },
         mode: "development",
         externals: {
             vue: "Vue",
@@ -58,8 +57,19 @@ module.exports = function() {
         },
         devtool: "inline-source-map",
         devServer: {
-            contentBase: "./assets",
+            https: true,
+            historyApiFallback: true,
+            static: "./assets",
             hot: true,
+            allowedHosts: "all",
+            client: {
+                webSocketURL: {
+                    hostname: '127.0.0.1',
+                    pathname: '/ws',
+                    port,
+                    protocol: 'wss',
+                },
+            },
             headers: {
                 "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
                 "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization",
@@ -172,7 +182,7 @@ module.exports = function() {
         },
         output: {
             path: path.join(__dirname, "dist"),
-            filename: "manager.js",
+            filename: "[name].js",
         },
         plugins: [
             // make sure to include the plugin for the magic
