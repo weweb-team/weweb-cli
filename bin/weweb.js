@@ -6,10 +6,8 @@ const buildCtrl = require("./controllers/build.js");
 const command = process.argv[2];
 
 const findArgv = (argvName) => {
-    // console.log(process);
-
     for (const argv of process.argv) {
-        const s = `--${argvName}=`;
+        const s = `${argvName}=`;
         if (argv.indexOf(s) === 0) {
             return argv.replace(s, "").replace(/["']/g, "");
         }
@@ -19,7 +17,7 @@ const findArgv = (argvName) => {
         const npm_config_argv = JSON.parse(process.env.npm_config_argv);
         const original = npm_config_argv.original;
         for (const argv of original) {
-            const s = `--${argvName}=`;
+            const s = `${argvName}=`;
 
             if (argv.indexOf(s) === 0) {
                 return argv.replace(s, "").replace(/["']/g, "");

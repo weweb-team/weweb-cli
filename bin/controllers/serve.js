@@ -9,7 +9,7 @@ exports.serve = (port) => {
     } else {
         shell.cd("node_modules/@weweb/cli/");
 
-        const cmd = `npx webpack-dev-server --config webpack.dev.config.js -d --inline --env=dev --hot --https --disableHostCheck=true --client-log-level=error --port=${port}`;
+        const cmd = `npx webpack-dev-server --config webpack.dev.config.js --env=dev --port=${port}`;
         const childProcess = shell.exec(cmd, { async: true });
 
         childProcess.stdout.on("data", (data) => {
