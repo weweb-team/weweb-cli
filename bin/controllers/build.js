@@ -10,12 +10,12 @@ const webpack = require("webpack");
 
 exports.build = (name, type) => {
     if (!name) {
-        console.log("\x1b[41m Error : arg '--name=\"name\"' not specified. \x1b[0m");
+        console.log("\x1b[41m Error : arg 'name=\"name\"' not specified. \x1b[0m");
         return;
     }
     if (!type) {
         console.log(
-            "\x1b[41m Error : arg '--type=\"type\"' not specified. Must be 'section', 'wwobject' or 'plugin'. \x1b[0m"
+            "\x1b[41m Error : arg 'type=\"type\"' not specified. Must be 'section', 'wwobject' or 'plugin'. \x1b[0m"
         );
         return;
     }

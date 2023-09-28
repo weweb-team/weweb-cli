@@ -40,5 +40,5 @@ switch (command) {
         buildCtrl.build(name, type);
         break;
     default:
-        console.log(`Command not recognized or no specified.\nUse 'serve [--port=port]', 'build --name=name'.`);
+        console.log(`Command not recognized or no specified.\nUse 'serve [-- port=port]', 'build -- name=name'.`);
 }
