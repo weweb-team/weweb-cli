@@ -64,7 +64,7 @@ module.exports = function() {
             allowedHosts: "all",
             client: {
                 webSocketURL: {
-                    hostname: '127.0.0.1',
+                    hostname: 'localhost',
                     pathname: '/ws',
                     port,
                     protocol: 'wss',
