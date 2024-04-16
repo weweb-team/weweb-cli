@@ -20,13 +20,13 @@ const packageJson = {
     type: "",
 };
 
-fs.writeFileSync("./assets/info.json", JSON.stringify(packageJson), function(err) {
+fs.writeFileSync("./assets/info.json", JSON.stringify(packageJson), function (err) {
     if (err) {
         throw new Error();
     }
 });
 
-module.exports = function() {
+module.exports = function () {
     function findPara(param) {
         let result = "";
         process.argv.forEach((argv) => {
@@ -52,8 +52,8 @@ module.exports = function() {
         mode: "development",
         externals: {
             vue: "Vue",
-            react: 'React',
-            'react-dom': 'ReactDOM'
+            react: "React",
+            "react-dom": "ReactDOM",
         },
         devtool: "inline-source-map",
         devServer: {
@@ -64,10 +64,10 @@ module.exports = function() {
             allowedHosts: "all",
             client: {
                 webSocketURL: {
-                    hostname: 'localhost',
-                    pathname: '/ws',
+                    hostname: "localhost",
+                    pathname: "/ws",
                     port,
-                    protocol: 'wss',
+                    protocol: "wss",
                 },
             },
             headers: {
@@ -81,7 +81,7 @@ module.exports = function() {
         },
         module: {
             rules: [
-                 {
+                {
                     test: /\.(js|css|scss|jsx)$/,
                     loader: "weweb-strip-block",
                     options: {
@@ -92,8 +92,8 @@ module.exports = function() {
                             },
                         ],
                     },
-                 },
-                  {
+                },
+                {
                     test: /\.?(jsx|tsx)(\?.*)?$/,
                     exclude: /(node_modules|bower_components)/,
                     use: {
@@ -107,7 +107,7 @@ module.exports = function() {
                 {
                     test: /\.vue$/,
                     use: [
-                        "vue-loader", 
+                        "vue-loader",
                         {
                             loader: "weweb-strip-block",
                             options: {
@@ -117,8 +117,8 @@ module.exports = function() {
                                         end: "wwFront:end",
                                     },
                                 ],
-                            }
-                        }
+                            },
+                        },
                     ],
                 },
                 {
@@ -144,7 +144,7 @@ module.exports = function() {
                 {
                     test: /\.mjs$/,
                     include: /node_modules/,
-                    type: "javascript/auto"
+                    type: "javascript/auto",
                 },
                 // this will apply to both plain `.css` files
                 // AND `<style>` blocks in `.vue` files
@@ -157,11 +157,10 @@ module.exports = function() {
                             loader: "postcss-loader",
                             options: {
                                 postcssOptions: {
-                                    plugins: function() {
+                                    plugins: function () {
                                         return [autoprefixer];
                                     },
-                                }
-                                
+                                },
                             },
                         },
                         "sass-loader",
@@ -185,6 +184,11 @@ module.exports = function() {
             filename: "[name].js",
         },
         plugins: [
+            new webpack.DefinePlugin({
+                __VUE_OPTIONS_API__: "true",
+                __VUE_PROD_DEVTOOLS__: "false",
+                __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: "false",
+            }),
             // make sure to include the plugin for the magic
             new VueLoaderPlugin(),
         ],
