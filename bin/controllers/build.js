@@ -142,7 +142,7 @@ exports.build = (name, type) => {
                     {
                         test: /\.mjs$/,
                         include: /node_modules/,
-                        type: "javascript/auto"
+                        type: "javascript/auto",
                     },
                     // this will apply to both plain `.css` files
                     // AND `<style>` blocks in `.vue` files
@@ -182,6 +182,11 @@ exports.build = (name, type) => {
                 filename: "manager.js",
             },
             plugins: [
+                new webpack.DefinePlugin({
+                    __VUE_OPTIONS_API__: "true",
+                    __VUE_PROD_DEVTOOLS__: "false",
+                    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: "false",
+                }),
                 // make sure to include the plugin for the magic
                 new VueLoaderPlugin(),
             ],
