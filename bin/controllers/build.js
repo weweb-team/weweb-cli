@@ -74,6 +74,7 @@ exports.build = (name, type) => {
             resolve: {
                 modules: ['node_modules', path.resolve(`${wewebCliPath}/node_modules`)],
                 descriptionFiles: ['package.json', path.resolve(`${wewebCliPath}/package.json`)],
+                fallback: { "buffer": require.resolve("buffer/") },
             },
             resolveLoader: {
                 modules: ['node_modules', path.resolve(`${wewebCliPath}/node_modules`)],
