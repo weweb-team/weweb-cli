@@ -1,16 +1,16 @@
 // #! /usr/bin/env node
 
-const prebuildCore = require("../core/prebuild.js");
+const prebuildCore = require('../core/prebuild.js');
 
-const path = require("path");
-const { VueLoaderPlugin } = require("vue-loader");
-const autoprefixer = require("autoprefixer");
-const fs = require("fs");
-const webpack = require("webpack");
+const path = require('path');
+const { VueLoaderPlugin } = require('vue-loader');
+const autoprefixer = require('autoprefixer');
+const fs = require('fs');
+const webpack = require('webpack');
 
 exports.build = (name, type) => {
     if (!name) {
-        console.log("\x1b[41m Error : arg 'name=\"name\"' not specified. \x1b[0m");
+        console.log('\x1b[41m Error : arg \'name="name"\' not specified. \x1b[0m');
         return;
     }
     if (!type) {
@@ -21,25 +21,25 @@ exports.build = (name, type) => {
     }
 
     if (!prebuildCore.prebuild({ type })) {
-        console.log("BUILD ERROR");
+        console.log('BUILD ERROR');
     } else {
         const getPackageJson = function () {
             try {
                 let packageJSON;
 
-                packageJSON = fs.readFileSync("./package.json", "utf8");
+                packageJSON = fs.readFileSync('./package.json', 'utf8');
                 packageJSON = JSON.parse(packageJSON);
 
                 return packageJSON;
             } catch (error) {
-                console.log("\x1b[41mError : ./package.json not found or incorrect format.\x1b[0m", error);
+                console.log('\x1b[41mError : ./package.json not found or incorrect format.\x1b[0m', error);
                 return null;
             }
         };
 
         const packageJSON = getPackageJson();
         if (!packageJSON) {
-            console.log("\x1b[41mError : package.json not found\x1b[0m");
+            console.log('\x1b[41mError : package.json not found\x1b[0m');
             return;
         }
 
@@ -47,7 +47,7 @@ exports.build = (name, type) => {
         const versionRegex = /^[\d\.]*$/g;
         if (!versionRegex.test(version)) {
             console.log(
-                "\x1b[41mError : package.json version must be an integer (got : " + packageJSON.version + ")\x1b[0m"
+                '\x1b[41mError : package.json version must be an integer (got : ' + packageJSON.version + ')\x1b[0m'
             );
             return;
         }
@@ -55,38 +55,40 @@ exports.build = (name, type) => {
         const componentData = {
             name,
             version: packageJSON.version,
-            componentName: "",
+            componentName: '',
         };
 
-        const wewebCliPath = "./node_modules/@weweb/cli";
+        const PACKAGE_DIRECTORY = process.cwd();
+        const TMP_BUILD_DIRECTORY = PACKAGE_DIRECTORY + '/tmp-build';
+        const TMP_INDEX_PATH = path.join(TMP_BUILD_DIRECTORY, 'index.js');
+
+        const wewebCliPath = __dirname + '/../..';
 
         const webpackConfig = {
-            name: "manager",
-            entry: `${wewebCliPath}/assets/index.js`,
-            mode: "production",
+            name: 'manager',
+            entry: TMP_INDEX_PATH,
+            mode: 'production',
             externals: {
-                vue: "Vue",
-                react: "React",
-                "react-dom": "ReactDOM",
+                vue: 'Vue',
             },
             resolve: {
-                modules: [path.resolve(`${wewebCliPath}/node_modules`), "node_modules"],
-                descriptionFiles: [`${wewebCliPath}/package.json`, "package.json"],
+                modules: ['node_modules', path.resolve(`${wewebCliPath}/node_modules`)],
+                descriptionFiles: ['package.json', path.resolve(`${wewebCliPath}/package.json`)],
             },
             resolveLoader: {
-                modules: [path.resolve(`${wewebCliPath}/node_modules`), "node_modules"],
-                descriptionFiles: [`${wewebCliPath}/package.json`, "package.json"],
+                modules: ['node_modules', path.resolve(`${wewebCliPath}/node_modules`)],
+                descriptionFiles: ['package.json', path.resolve(`${wewebCliPath}/package.json`)],
             },
             module: {
                 rules: [
                     {
                         test: /\.(js|css|scss)$/,
-                        loader: "weweb-strip-block",
+                        loader: 'weweb-strip-block',
                         options: {
                             blocks: [
                                 {
-                                    start: "wwFront:start",
-                                    end: "wwFront:end",
+                                    start: 'wwFront:start',
+                                    end: 'wwFront:end',
                                 },
                             ],
                         },
@@ -95,24 +97,24 @@ exports.build = (name, type) => {
                         test: /\.?(jsx|tsx)(\?.*)?$/,
                         exclude: /(node_modules|bower_components)/,
                         use: {
-                            loader: "babel-loader",
+                            loader: 'babel-loader',
                             options: {
-                                presets: ["@babel/preset-react"],
-                                plugins: ["@babel/transform-react-jsx"],
+                                presets: ['@babel/preset-react'],
+                                plugins: ['@babel/transform-react-jsx'],
                             },
                         },
                     },
                     {
                         test: /\.vue$/,
                         use: [
-                            "vue-loader",
+                            'vue-loader',
                             {
-                                loader: "weweb-strip-block",
+                                loader: 'weweb-strip-block',
                                 options: {
                                     blocks: [
                                         {
-                                            start: "wwFront:start",
-                                            end: "wwFront:end",
+                                            start: 'wwFront:start',
+                                            end: 'wwFront:end',
                                         },
                                     ],
                                 },
@@ -121,13 +123,13 @@ exports.build = (name, type) => {
                     },
                     {
                         test: /\.(js|vue)$/,
-                        loader: "string-replace-loader",
+                        loader: 'string-replace-loader',
                         options: {
                             multiple: [
-                                { search: "__NAME__", replace: componentData.name },
-                                { search: "__VERSION__", replace: componentData.version },
+                                { search: '__NAME__', replace: componentData.name },
+                                { search: '__VERSION__', replace: componentData.version },
                                 {
-                                    search: "__COMPONENT_NAME__",
+                                    search: '__COMPONENT_NAME__',
                                     replace: componentData.componentName,
                                 },
                             ],
@@ -137,22 +139,22 @@ exports.build = (name, type) => {
                     // AND `<script>` blocks in `.vue` files
                     {
                         test: /\.js$/,
-                        loader: "babel-loader",
+                        loader: 'babel-loader',
                     },
                     {
                         test: /\.mjs$/,
                         include: /node_modules/,
-                        type: "javascript/auto",
+                        type: 'javascript/auto',
                     },
                     // this will apply to both plain `.css` files
                     // AND `<style>` blocks in `.vue` files
                     {
                         test: /\.(css|scss)$/,
                         use: [
-                            "vue-style-loader",
-                            "css-loader",
+                            'vue-style-loader',
+                            'css-loader',
                             {
-                                loader: "postcss-loader",
+                                loader: 'postcss-loader',
                                 options: {
                                     postcssOptions: {
                                         plugins: function () {
@@ -161,14 +163,14 @@ exports.build = (name, type) => {
                                     },
                                 },
                             },
-                            "sass-loader",
+                            'sass-loader',
                         ],
                     },
                     {
                         test: /\.(png|jpg|gif|svg)$/i,
                         use: [
                             {
-                                loader: "url-loader",
+                                loader: 'url-loader',
                                 options: {
                                     limit: 8192,
                                 },
@@ -178,14 +180,14 @@ exports.build = (name, type) => {
                 ],
             },
             output: {
-                path: path.join(process.cwd(), "dist"),
-                filename: "manager.js",
+                path: path.join(process.cwd(), 'dist'),
+                filename: 'manager.js',
             },
             plugins: [
                 new webpack.DefinePlugin({
-                    __VUE_OPTIONS_API__: "true",
-                    __VUE_PROD_DEVTOOLS__: "false",
-                    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: "false",
+                    __VUE_OPTIONS_API__: 'true',
+                    __VUE_PROD_DEVTOOLS__: 'false',
+                    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
                 }),
                 // make sure to include the plugin for the magic
                 new VueLoaderPlugin(),
@@ -193,10 +195,13 @@ exports.build = (name, type) => {
         };
 
         webpack(webpackConfig, function (err, stats) {
+            fs.rmSync(TMP_INDEX_PATH);
+            fs.rmdirSync(TMP_BUILD_DIRECTORY);
+
             if (err) {
                 console.error(err, stats);
-                console.log("\x1b[41mError : build failed.\x1b[0m");
-                console.log("\x1b[41mMake sur that package.json version is in correct format (ex: 1.0.4)\x1b[0m");
+                console.log('\x1b[41mError : build failed.\x1b[0m');
+                console.log('\x1b[41mMake sur that package.json version is in correct format (ex: 1.0.4)\x1b[0m');
                 return;
             }
 

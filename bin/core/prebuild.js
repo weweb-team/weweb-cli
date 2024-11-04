@@ -1,26 +1,26 @@
 #! /usr/bin/env node
 
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
 const PACKAGE_DIRECTORY = process.cwd();
-const ASSETS_DIRECTORY = path.resolve(__dirname, "../../assets");
-const RELATIVE_PATH = path.relative(ASSETS_DIRECTORY, PACKAGE_DIRECTORY);
+const TMP_BUILD_DIRECTORY = PACKAGE_DIRECTORY + '/tmp-build';
+const RELATIVE_PATH = path.relative(TMP_BUILD_DIRECTORY, PACKAGE_DIRECTORY);
 
-const CONFIG_PATH = path.join(PACKAGE_DIRECTORY, "ww-config");
-const PCK_PATH = path.join(PACKAGE_DIRECTORY, "package.json");
-const TMP_INDEX_PATH = path.join(ASSETS_DIRECTORY, "index.js");
+const CONFIG_PATH = path.join(PACKAGE_DIRECTORY, 'ww-config');
+const PCK_PATH = path.join(PACKAGE_DIRECTORY, 'package.json');
+const TMP_INDEX_PATH = path.join(TMP_BUILD_DIRECTORY, 'index.js');
 
 const getPackageJson = function () {
     try {
         let packageJSON;
 
-        packageJSON = fs.readFileSync(PCK_PATH, "utf8");
+        packageJSON = fs.readFileSync(PCK_PATH, 'utf8');
         packageJSON = JSON.parse(packageJSON);
 
         return packageJSON;
     } catch (error) {
-        console.log("\x1b[41mError : ./package.json not found or incorrect format.\x1b[0m", error);
+        console.log('\x1b[41mError : ./package.json not found or incorrect format.\x1b[0m', error);
         return null;
     }
 };
@@ -31,9 +31,9 @@ exports.prebuild = (options = {}) => {
 
     let fileExtension;
     if (fs.existsSync(`${CONFIG_PATH}.js`)) {
-        fileExtension = "js";
+        fileExtension = 'js';
     } else if (fs.existsSync(`${CONFIG_PATH}.json`)) {
-        fileExtension = "json";
+        fileExtension = 'json';
     } else {
         console.log('\x1b[41mError : "./ww-config.js(on)" was not found.\x1b[0m');
         console.log('\x1b[44mTo create "./ww-config.js(on)" use "weweb create-config".\x1b[0m');
@@ -42,21 +42,21 @@ exports.prebuild = (options = {}) => {
 
     const packageJSON = getPackageJson();
     if (!packageJSON) {
-        console.log("\x1b[41mError : package.json not found\x1b[0m");
+        console.log('\x1b[41mError : package.json not found\x1b[0m');
         return;
     }
 
     let componentPath = packageJSON.weweb && packageJSON.weweb.componentPath;
     if (!componentPath) {
         if (fs.existsSync('./src/wwElement.vue')) {
-            componentPath = './src/wwElement.vue'
+            componentPath = './src/wwElement.vue';
         } else if (fs.existsSync('./src/wwSection.vue')) {
-            componentPath = './src/wwSection.vue'
+            componentPath = './src/wwSection.vue';
         } else if (fs.existsSync('./src/wwPlugin.js')) {
-            componentPath = './src/wwPlugin.js'
+            componentPath = './src/wwPlugin.js';
         }
     }
-    
+
     console.log(`\x1b[44m Component Path : "${componentPath}" \x1b[0m`);
 
     if (!fs.existsSync(componentPath)) {
@@ -114,8 +114,8 @@ exports.prebuild = (options = {}) => {
             }, 10);
         }`;
 
-    if (!fs.existsSync(ASSETS_DIRECTORY)) {
-        fs.mkdirSync(ASSETS_DIRECTORY);
+    if (!fs.existsSync(TMP_BUILD_DIRECTORY)) {
+        fs.mkdirSync(TMP_BUILD_DIRECTORY);
     }
 
     fs.writeFileSync(TMP_INDEX_PATH, indexContent);
