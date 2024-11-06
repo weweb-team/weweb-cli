@@ -4,7 +4,7 @@ const shell = require("shelljs");
 const prebuildCore = require("../core/prebuild.js");
 
 exports.serve = (port) => {
-    if (!prebuildCore.prebuild({ port })) {
+    if (!prebuildCore.prebuild("serve", { port })) {
         console.log("BUILD ERROR");
     } else {
         shell.cd("node_modules/@weweb/cli/");

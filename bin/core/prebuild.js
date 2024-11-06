@@ -4,12 +4,8 @@ const fs = require('fs');
 const path = require('path');
 
 const PACKAGE_DIRECTORY = process.cwd();
-const TMP_BUILD_DIRECTORY = PACKAGE_DIRECTORY + '/tmp-build';
-const RELATIVE_PATH = path.relative(TMP_BUILD_DIRECTORY, PACKAGE_DIRECTORY);
-
 const CONFIG_PATH = path.join(PACKAGE_DIRECTORY, 'ww-config');
 const PCK_PATH = path.join(PACKAGE_DIRECTORY, 'package.json');
-const TMP_INDEX_PATH = path.join(TMP_BUILD_DIRECTORY, 'index.js');
 
 const getPackageJson = function () {
     try {
@@ -25,7 +21,11 @@ const getPackageJson = function () {
     }
 };
 
-exports.prebuild = (options = {}) => {
+exports.prebuild = (mode, options = {}) => {
+    const TMP_BUILD_DIRECTORY = mode === "build" ? `${PACKAGE_DIRECTORY}/tmp-build` : path.resolve(__dirname, "../../assets");
+    const RELATIVE_PATH = path.relative(TMP_BUILD_DIRECTORY, PACKAGE_DIRECTORY);
+    const TMP_INDEX_PATH = path.join(TMP_BUILD_DIRECTORY, 'index.js');
+
     const wwDev = !!options.port;
     const type = options.type || null;
 

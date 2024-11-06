@@ -20,7 +20,7 @@ exports.build = (name, type) => {
         return;
     }
 
-    if (!prebuildCore.prebuild({ type })) {
+    if (!prebuildCore.prebuild("build", { type })) {
         console.log('BUILD ERROR');
     } else {
         const getPackageJson = function () {
@@ -59,7 +59,7 @@ exports.build = (name, type) => {
         };
 
         const PACKAGE_DIRECTORY = process.cwd();
-        const TMP_BUILD_DIRECTORY = PACKAGE_DIRECTORY + '/tmp-build';
+        const TMP_BUILD_DIRECTORY = `${PACKAGE_DIRECTORY}/tmp-build`;
         const TMP_INDEX_PATH = path.join(TMP_BUILD_DIRECTORY, 'index.js');
 
         const wewebCliPath = __dirname + '/../..';
