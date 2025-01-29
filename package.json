@@ -1,6 +1,6 @@
 {
     "name": "@weweb/cli",
-    "version": "3.8.13",
+    "version": "3.8.14",
     "description": "WeWeb CLI",
     "bin": {
         "weweb": "bin/weweb.js"
@@ -28,7 +28,7 @@
     "homepage": "https://github.com/getweweb/weweb-cli#readme",
     "dependencies": {
         "@babel/core": "7.22.1",
-        "@vue/compiler-sfc": "3.4.22",
+        "@vue/compiler-sfc": "3.5.13",
         "autoprefixer": "9.8.6",
         "babel-loader": "9.1.2",
         "css-loader": "6.8.1",
@@ -40,7 +40,7 @@
         "shelljs": "0.8.4",
         "string-replace-loader": "^3.1.0",
         "url-loader": "^4.1.1",
-        "vue": "3.4.22",
+        "vue": "3.5.13",
         "vue-loader": "17.4.2",
         "vue-style-loader": "4.1.3",
         "webpack": "5.86.0",
