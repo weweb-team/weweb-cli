@@ -3,12 +3,6 @@ name: Publish PR Preview
 on:
   pull_request:
     types: [opened, synchronize]
-  push:
-    branches:
-      - main
-      - "**"
-    tags:
-      - "!**"
 
 jobs:
   publish-preview:
