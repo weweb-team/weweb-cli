@@ -1,0 +1,8 @@
+on:
+  pull_request:
+
+jobs:
+  slack_notif:
+    uses: weweb-team/workflow-library/.github/workflows/dependabot-slack-notifs.yml@v4
+    secrets:
+      slack_dependabot_hook: ${{ secrets.SLACK_DEPENDABOT_HOOK }}
