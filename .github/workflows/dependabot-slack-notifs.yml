@@ -1,6 +1,10 @@
 on:
   pull_request:
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   slack_notif:
     if: startsWith(github.head_ref, 'dependabot/')
