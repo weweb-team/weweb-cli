@@ -3,6 +3,9 @@ on:
 
 jobs:
   slack_notif:
-    uses: weweb-team/workflow-library/.github/workflows/dependabot-slack-notifs.yml@v4
-    secrets:
-      slack_dependabot_hook: ${{ secrets.SLACK_DEPENDABOT_HOOK }}
+    if: startsWith(github.head_ref, 'dependabot/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Slack
+        run: |
+          curl -L -H "Accept: application/json" ${{ secrets.SLACK_DEPENDABOT_HOOK }} -d '{"pr_url":"${{ github.event.pull_request.html_url }}", "repo_name":"${{ github.repository }}", "pr_title":"${{ github.event.pull_request.title }}", "dependabot_url":"https://github.com/${{ github.repository }}/security/dependabot"}'
