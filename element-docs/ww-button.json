@@ -1,0 +1,105 @@
+{
+    "metadata": {
+        "name": "ww-button",
+        "description": "A configurable button element supporting styling, icons, and form submission. Inherits text properties.",
+        "keywords": [
+            "button",
+            "submit",
+            "cta",
+            "action"
+        ],
+        "features": [
+            "Submit and regular button types",
+            "Left and right icon slots",
+            "Disabled state",
+            "Focus, blur, keydown, keyup events",
+            "Form integration with submit type",
+            "Custom background color"
+        ],
+        "inherit": [
+            "ww-text"
+        ]
+    },
+    "properties": [
+        {
+            "name": "buttonType",
+            "description": "Button type: regular or form submit",
+            "type": "string",
+            "options": [
+                "button",
+                "submit"
+            ],
+            "defaultValue": "button"
+        },
+        {
+            "name": "disabled",
+            "description": "Whether the button is disabled",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "hasLeftIcon",
+            "description": "Show left icon slot",
+            "type": "boolean"
+        },
+        {
+            "name": "hasRightIcon",
+            "description": "Show right icon slot",
+            "type": "boolean"
+        }
+    ],
+    "states": [
+        {
+            "name": "focus",
+            "description": "Button has focus"
+        },
+        {
+            "name": "disabled",
+            "description": "Button is disabled"
+        },
+        {
+            "name": "active",
+            "description": "Button is active/pressed"
+        }
+    ],
+    "events": [
+        {
+            "name": "focus",
+            "description": "Triggered when the button receives focus"
+        },
+        {
+            "name": "blur",
+            "description": "Triggered when the button loses focus"
+        },
+        {
+            "name": "keydown",
+            "description": "Triggered on key down while focused"
+        },
+        {
+            "name": "keyup",
+            "description": "Triggered on key up while focused"
+        }
+    ],
+    "actions": [],
+    "slots": [
+        {
+            "name": "leftIcon",
+            "description": "Use a ww-icon for this icon element displayed on the left side of the button text",
+            "type": "object"
+        },
+        {
+            "name": "rightIcon",
+            "description": "Use a ww-icon for this icon element displayed on the right side of the button text",
+            "type": "object"
+        }
+    ],
+    "variables": [],
+    "specifications": [
+        "Inherits text properties from ww-text element",
+        "Submit type buttons should be used inside a ww-form-container",
+        "For form submission workflows, trigger them on the form container, not the submit button",
+        "You need to set margin values in icons to create spacing between the icon and text",
+        "Never forget the 'text' prop in the contents. The button will not display without it!"
+    ],
+    "examples": []
+}

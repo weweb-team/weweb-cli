@@ -1,0 +1,69 @@
+{
+    "metadata": {
+        "name": "ww-checkbox",
+        "description": "A visual checkbox icon component that displays a customizable check mark. Must be used within ww-input-checkbox for proper functionality. It automatically receives checked and readonly states from its parent component.",
+        "keywords": [
+            "checkbox",
+            "check",
+            "icon",
+            "form",
+            "input",
+            "selection"
+        ],
+        "features": [
+            "Customizable icon display (defaults to lucide/check)",
+            "Customizable icon color with state-based styling",
+            "Automatic state synchronization with parent ww-input-checkbox",
+            "Opacity-based visibility toggle (visible when checked, hidden when unchecked)",
+            "Placeholder icon display in editor mode",
+            "Does not handle click or toggle logic - must be placed inside ww-input-checkbox",
+            "Does not support standalone usage without a parent checkbox component"
+        ]
+    },
+    "properties": [
+        {
+            "name": "checkboxColor",
+            "wewebName": "color",
+            "description": "The color of the checkbox icon only (not the background). Use transparent (#00000000) for unchecked state and a visible color for checked state via state-based props.",
+            "type": "string",
+            "defaultValue": "#00000000",
+            "responsive": true
+        },
+        {
+            "name": "icon",
+            "description": "The icon to display as the check mark. Uses the format 'library/icon-name' (e.g., 'lucide/check').",
+            "type": "string",
+            "defaultValue": "lucide/check",
+            "responsive": true
+        }
+    ],
+    "states": [
+        {
+            "name": "checked",
+            "description": "Active when the checkbox is checked. Automatically synced with the parent ww-input-checkbox component's checked state."
+        },
+        {
+            "name": "readonly",
+            "description": "Active when the checkbox is in readonly mode. Automatically synced with the parent ww-input-checkbox component's readonly state."
+        }
+    ],
+    "events": [],
+    "localContext": [],
+    "actions": [],
+    "slots": [],
+    "variables": [],
+    "specifications": [
+        "Must be used within a ww-input-checkbox component for proper checkbox functionality.",
+        "Size is controlled by setting width and height styles on the component, not fontSize.",
+        "Icon visibility is controlled automatically using opacity (0 when unchecked, 1 when checked).",
+        "The color property ONLY affects the icon/checkmark color, NOT the background.",
+        "ALWAYS include the 'checked' state in the states array for state-based styling.",
+        "Default icon color should be transparent (#00000000) to hide the checkmark when unchecked.",
+        "Checked state icon color should contrast with the background (e.g., white #FFFFFF on a colored background).",
+        "Background styling (backgroundColor, border) should be applied via styles, NOT the color prop.",
+        "DO NOT set icon color the same as background color - the icon needs to be visible when checked.",
+        "Styles must use named CSS properties (e.g., backgroundColor, borderRadius). Never use numeric indices or array-like keys in style objects."
+    ],
+    "examples": [],
+    "dependencies": []
+}

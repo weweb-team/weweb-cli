@@ -1,0 +1,143 @@
+{
+    "metadata": {
+        "name": "ww-input-toggle",
+        "description": "A user-friendly toggle switch for enabling or disabling settings, featuring customizable colors and sizes. Renders as a button with a sliding selector that moves between off and on states.",
+        "keywords": [
+            "toggle",
+            "switch",
+            "checkbox",
+            "boolean",
+            "on/off"
+        ],
+        "features": [
+            "Boolean state management with customizable initial value",
+            "Customizable selector and background colors for both on and off states",
+            "Adjustable selector size (10-100%)",
+            "Read-only mode support",
+            "Required field validation for form integration",
+            "Custom validation formula support when used inside a form",
+            "Form integration with field naming",
+            "Does not support labels or text inside the toggle itself",
+            "Does not support intermediate/indeterminate state"
+        ]
+    },
+    "properties": [
+        {
+            "name": "value",
+            "description": "The initial boolean value of the toggle. true for on, false for off.",
+            "type": "boolean"
+        },
+        {
+            "name": "required",
+            "description": "Whether the toggle field is required in a form context.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "readonly",
+            "description": "When true, prevents user interaction with the toggle.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "selectorSize",
+            "description": "The size of the toggle selector knob as a percentage (10% to 100%).",
+            "type": "string",
+            "defaultValue": "100%",
+            "responsive": true
+        },
+        {
+            "name": "selectorColorOff",
+            "description": "The color of the toggle selector knob when the toggle is in the off state.",
+            "type": "string",
+            "responsive": true
+        },
+        {
+            "name": "selectorColorOn",
+            "description": "The color of the toggle selector knob when the toggle is in the on state.",
+            "type": "string",
+            "responsive": true
+        },
+        {
+            "name": "backgroundColorOff",
+            "description": "The background color of the toggle track when the toggle is in the off state.",
+            "type": "string",
+            "responsive": true
+        },
+        {
+            "name": "backgroundColorOn",
+            "description": "The background color of the toggle track when the toggle is in the on state.",
+            "type": "string",
+            "responsive": true
+        },
+        {
+            "name": "fieldName",
+            "description": "The field name used for form integration when the toggle is inside a form container. Inactive when the element is not placed inside a form container.",
+            "type": "string",
+            "defaultValue": "",
+            "inactiveProperty": {
+                "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy)."
+            }
+        },
+        {
+            "name": "customValidation",
+            "description": "Enable custom validation formula. Only relevant when toggle is inside a form. Inactive when the element is not placed inside a form container.",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy)."
+            }
+        },
+        {
+            "name": "validation",
+            "description": "A formula for custom validation logic. Only used when customValidation is enabled and the toggle is inside a form. Inactive when the element is not in a form container or when customValidation is false.",
+            "type": "formula",
+            "defaultValue": "",
+            "inactiveProperty": {
+                "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy) or when customValidation is false."
+            }
+        }
+    ],
+    "states": [
+        {
+            "name": "readonly",
+            "description": "Applied when the toggle is in read-only mode, preventing user interaction."
+        }
+    ],
+    "events": [
+        {
+            "name": "change",
+            "description": "Triggered when the user clicks the toggle to change its state.",
+            "payload": {
+                "domEvent": "object",
+                "value": "boolean"
+            }
+        },
+        {
+            "name": "initValueChange",
+            "description": "Triggered when the initial value property changes programmatically.",
+            "payload": {
+                "value": "boolean"
+            }
+        }
+    ],
+    "localContext": [],
+    "actions": [],
+    "slots": [],
+    "variables": [
+        {
+            "name": "value",
+            "description": "The current boolean state of the toggle. true when on, false when off.",
+            "type": "boolean",
+            "readonly": true
+        }
+    ],
+    "specifications": [
+        "CRITICAL: Do not forget to add border-radius to the toggle element for a good-looking rounded toggle appearance.",
+        "CRITICAL: Do not forget to add colors (selectorColorOff, selectorColorOn, backgroundColorOff, backgroundColorOn) or the toggle will be transparent and invisible to the user.",
+        "The toggle inherits its background styling from CSS, so the 'background' style property is ignored in favor of backgroundColorOff and backgroundColorOn properties.",
+        "The selector size is a percentage of the toggle height, controlling how large the knob appears relative to the track."
+    ],
+    "examples": [],
+    "dependencies": []
+}

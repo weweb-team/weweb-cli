@@ -5,6 +5,14 @@
     "bin": {
         "weweb": "bin/weweb.js"
     },
+    "files": [
+        "bin",
+        "templates",
+        "element-docs",
+        "assets",
+        "scripts",
+        "README.md"
+    ],
     "repository": {
         "type": "git",
         "url": "git+https://github.com/weweb-team/weweb-cli.git"

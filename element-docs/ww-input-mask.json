@@ -1,0 +1,371 @@
+{
+    "metadata": {
+        "name": "ww-input-mask",
+        "description": "A masked text input that enforces a formatting pattern on user input (phone numbers, dates, postal codes, card numbers, etc.) using the iMask library. Inherits from ww-text and integrates with ww-form-container for form submission and validation.",
+        "keywords": [
+            "input",
+            "mask",
+            "form",
+            "pattern",
+            "validation",
+            "formatting",
+            "phone",
+            "date",
+            "postal code"
+        ],
+        "features": [
+            "Pattern-based input masking via iMask (e.g. '{+1} (000) 000-0000', '00/00/0000')",
+            "Form validation and submission support when placed inside ww-form-container",
+            "Custom validation formula support",
+            "Optional mask placeholder characters",
+            "Debounced change events",
+            "Supports multiple underlying input types (text, email, password, number, tel, url, textarea, decimal)",
+            "Exposes both masked value and raw (unmasked) value"
+        ],
+        "inherit": [
+            "ww-text"
+        ]
+    },
+    "properties": [
+        {
+            "name": "placeholderColor",
+            "description": "Color of the placeholder text. Inactive when advancedPlaceholder is true.",
+            "type": "string",
+            "defaultValue": "#000000ad",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedPlaceholder is true."
+            }
+        },
+        {
+            "name": "advancedPlaceholder",
+            "description": "Enable the advanced floating-label placeholder behavior (animated placeholder that scales/repositions on focus or input).",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "forceAnimation",
+            "description": "Force the advanced placeholder animation to play continuously, regardless of input/focus state. Inactive when advancedPlaceholder is false.",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when advancedPlaceholder is false."
+            }
+        },
+        {
+            "name": "animationTrigger",
+            "description": "What triggers the advanced placeholder animation. 'focus' = on input focus; 'input' = on first character. Inactive when advancedPlaceholder is false.",
+            "type": "string",
+            "options": [
+                "focus",
+                "input"
+            ],
+            "defaultValue": "input",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedPlaceholder is false."
+            }
+        },
+        {
+            "name": "placeholderPosition",
+            "description": "Where the advanced placeholder lands once active. 'inside' stays inside the field; 'outside' floats above. Inactive when advancedPlaceholder is false.",
+            "type": "string",
+            "options": [
+                "inside",
+                "outside"
+            ],
+            "defaultValue": "outside",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedPlaceholder is false."
+            }
+        },
+        {
+            "name": "placeholderScaling",
+            "description": "Scale factor (0-1) applied to the advanced placeholder when active. Inactive when advancedPlaceholder is false.",
+            "type": "number",
+            "defaultValue": 0.8,
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedPlaceholder is false."
+            }
+        },
+        {
+            "name": "positioningAjustment",
+            "description": "Pixel offset adjustment for the active position of the advanced placeholder (e.g. '0px', '4px'). Inactive when advancedPlaceholder is false.",
+            "type": "string",
+            "defaultValue": "0px",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedPlaceholder is false."
+            }
+        },
+        {
+            "name": "transition",
+            "description": "Duration (in ms) of the advanced placeholder animation (e.g. '400ms'). Inactive when advancedPlaceholder is false.",
+            "type": "string",
+            "defaultValue": "400ms",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedPlaceholder is false."
+            }
+        },
+        {
+            "name": "timingFunction",
+            "description": "CSS timing function for the advanced placeholder animation. Inactive when advancedPlaceholder is false.",
+            "type": "string",
+            "options": [
+                "cubic-bezier(0, 1.08, 0.76, 1)",
+                "ease",
+                "ease-in",
+                "ease-out",
+                "ease-in-out",
+                "linear"
+            ],
+            "defaultValue": "cubic-bezier(0, 1.08, 0.76, 1)",
+            "inactiveProperty": {
+                "description": "Inactive when advancedPlaceholder is false."
+            }
+        },
+        {
+            "name": "value",
+            "description": "Initial value of the input.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "readonly",
+            "description": "Whether the input is read-only.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "required",
+            "description": "Whether the input is required for form validation to pass.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "placeholder",
+            "description": "Placeholder text shown when the input is empty. Supports multi-language object.",
+            "type": "object",
+            "defaultValue": {}
+        },
+        {
+            "name": "rows",
+            "description": "Number of rows for textarea type. Only applies when type is 'textarea'. Inactive when type is not 'textarea'.",
+            "type": "number",
+            "defaultValue": 4,
+            "inactiveProperty": {
+                "description": "Inactive when type is not 'textarea'."
+            }
+        },
+        {
+            "name": "resize",
+            "description": "Allow textarea resize. Only applies when type is 'textarea'. Inactive when type is not 'textarea'.",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when type is not 'textarea'."
+            }
+        },
+        {
+            "name": "min",
+            "description": "Minimum value for number type. Only applies when type is 'number'. Inactive when type is not 'number'.",
+            "type": "number",
+            "defaultValue": 0,
+            "inactiveProperty": {
+                "description": "Inactive when type is not 'number'."
+            }
+        },
+        {
+            "name": "max",
+            "description": "Maximum value for number type. Only applies when type is 'number'. Inactive when type is not 'number'.",
+            "type": "number",
+            "defaultValue": 10000,
+            "inactiveProperty": {
+                "description": "Inactive when type is not 'number'."
+            }
+        },
+        {
+            "name": "hideArrows",
+            "description": "Hide number input arrows. Only applies when type is 'number'. Inactive when type is not 'number'.",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when type is not 'number'."
+            }
+        },
+        {
+            "name": "debounce",
+            "description": "Enable debounce on value changes.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "debounceDelay",
+            "description": "Debounce delay (1-5000ms). Only applies when debounce is true. Inactive when debounce is false.",
+            "type": "string",
+            "defaultValue": "500ms",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when debounce is false."
+            }
+        },
+        {
+            "name": "pattern",
+            "description": "The iMask pattern string enforced on the input. Uses iMask syntax: '0' any digit, 'a' any letter, '*' any char, '[]' optional segment, '{}' fixed part included in the unmasked value. Examples: '{+1} (000) 000-0000', '0000 0000 0000 0000', '00/00/0000'.",
+            "type": "string",
+            "defaultValue": "{8}000000"
+        },
+        {
+            "name": "placeholderVisible",
+            "description": "Whether to display the mask placeholder characters inline while the user is typing.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "placeholderChar",
+            "description": "Character used for unfilled mask slots when placeholderVisible is true. Inactive when placeholderVisible is not true.",
+            "type": "string",
+            "defaultValue": "_",
+            "inactiveProperty": {
+                "description": "Inactive when placeholderVisible is not true."
+            }
+        },
+        {
+            "name": "fieldName",
+            "description": "Field name used for form data when inside a ww-form-container. Inactive when the element is not placed inside a form container.",
+            "type": "string",
+            "defaultValue": "",
+            "inactiveProperty": {
+                "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy)."
+            }
+        },
+        {
+            "name": "customValidation",
+            "description": "Enable custom validation formula. Inactive when the element is not placed inside a form container.",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy)."
+            }
+        },
+        {
+            "name": "validation",
+            "description": "Custom validation formula. Only applies when customValidation is true. Inactive when the element is not in a form container or when customValidation is false.",
+            "type": "formula",
+            "defaultValue": "",
+            "inactiveProperty": {
+                "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy) or when customValidation is false."
+            }
+        },
+        {
+            "name": "type",
+            "description": "Underlying input type inherited from ww-text. Controls which of the type-gated properties apply.",
+            "type": "string",
+            "options": [
+                "text",
+                "textarea",
+                "email",
+                "password",
+                "number",
+                "decimal",
+                "tel",
+                "url"
+            ],
+            "defaultValue": "text"
+        }
+    ],
+    "states": [
+        {
+            "name": "focus",
+            "description": "Active when the input has focus."
+        },
+        {
+            "name": "readonly",
+            "description": "Active when the input is in read-only mode."
+        }
+    ],
+    "events": [
+        {
+            "name": "change",
+            "description": "Triggered when the input value changes (after debounce if enabled).",
+            "payload": {
+                "value": "string"
+            }
+        },
+        {
+            "name": "initValueChange",
+            "description": "Triggered when the bound initial value changes programmatically.",
+            "payload": {
+                "value": "string"
+            }
+        },
+        {
+            "name": "onEnterKey",
+            "description": "Triggered when the Enter key is pressed while the input is focused.",
+            "payload": {
+                "value": "string"
+            }
+        },
+        {
+            "name": "characterAccept",
+            "description": "Triggered when iMask accepts a character.",
+            "payload": {
+                "value": "string",
+                "character": "string"
+            }
+        },
+        {
+            "name": "characterReject",
+            "description": "Triggered when iMask rejects a character that does not match the pattern.",
+            "payload": {
+                "value": "string",
+                "character": "string"
+            }
+        },
+        {
+            "name": "maskComplete",
+            "description": "Triggered when the mask pattern is completely filled.",
+            "payload": {
+                "value": "string"
+            }
+        },
+        {
+            "name": "focus",
+            "description": "Triggered when the input receives focus."
+        },
+        {
+            "name": "blur",
+            "description": "Triggered when the input loses focus."
+        }
+    ],
+    "localContext": [],
+    "actions": [],
+    "slots": [],
+    "variables": [
+        {
+            "name": "value",
+            "description": "The current masked value of the input (string for most types, number for 'number' and 'decimal' types).",
+            "type": "string",
+            "readonly": true
+        },
+        {
+            "name": "raw value",
+            "description": "The current unmasked (raw) value of the input, without fixed parts from the mask pattern.",
+            "type": "string",
+            "readonly": true
+        }
+    ],
+    "specifications": [
+        "Use ww-input-mask (not ww-input-basic) whenever the input needs to enforce a formatting pattern: phone numbers, dates, postal codes, credit card numbers, IBANs, social security numbers, etc.",
+        "When used as a form field, place the element inside a ww-form-container and set fieldName to the key used in the form payload.",
+        "The validation property only applies when customValidation is true.",
+        "The debounceDelay property only applies when debounce is true.",
+        "The type property selects the underlying HTML input mode and gates rows / resize (textarea) and min / max / hideArrows (number).",
+        "The pattern property uses iMask syntax. Common examples: US phone '{+1} (000) 000-0000', date '00/00/0000', credit card '0000 0000 0000 0000', postal code (US) '00000', postal code (CA) 'a0a 0a0'."
+    ],
+    "examples": [],
+    "dependencies": []
+}

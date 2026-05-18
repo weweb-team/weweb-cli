@@ -1,0 +1,209 @@
+{
+    "metadata": {
+        "name": "ww-timeline",
+        "description": "A timeline element for displaying chronological events, milestones, process steps, or history entries with repeated custom event content.",
+        "keywords": [
+            "timeline",
+            "events",
+            "chronology",
+            "history",
+            "milestones",
+            "steps",
+            "process",
+            "markers"
+        ],
+        "features": [
+            "Vertical and horizontal timeline layouts",
+            "Left, right, alternate, top, or bottom event alignment depending on layout",
+            "Repeatable timeline data",
+            "Custom event card content through the timelineElement slot",
+            "Circle or square markers",
+            "Optional marker icons",
+            "Custom marker and connector colors",
+            "Click events on event content and markers",
+            "Repeated slot context through context.item.data and context.item.index"
+        ]
+    },
+    "properties": [
+        {
+            "name": "markerShape",
+            "description": "Shape of the timeline markers.",
+            "type": "string",
+            "options": [
+                "circle",
+                "square"
+            ],
+            "defaultValue": "circle",
+            "responsive": true
+        },
+        {
+            "name": "markerIconOnOff",
+            "description": "Whether each marker should display a system icon.",
+            "type": "boolean",
+            "defaultValue": false,
+            "responsive": true
+        },
+        {
+            "name": "markerIcon",
+            "description": "System icon name displayed inside markers when markerIconOnOff is true.",
+            "type": "string",
+            "defaultValue": null,
+            "responsive": true
+        },
+        {
+            "name": "markerIconColor",
+            "description": "Color of the marker icon when markerIconOnOff is true.",
+            "type": "string",
+            "defaultValue": "#FFFFFF",
+            "responsive": true
+        },
+        {
+            "name": "markerIconSize",
+            "description": "CSS size of the marker icon when markerIconOnOff is true.",
+            "type": "string",
+            "defaultValue": "12px",
+            "responsive": true
+        },
+        {
+            "name": "markerSize",
+            "description": "CSS width and height of each timeline marker.",
+            "type": "string",
+            "defaultValue": "16px",
+            "responsive": true
+        },
+        {
+            "name": "markerBackgroundColor",
+            "description": "Background color of each timeline marker.",
+            "type": "string",
+            "defaultValue": "#4B5563",
+            "responsive": true
+        },
+        {
+            "name": "connectorColor",
+            "description": "Color of the connector line between timeline events.",
+            "type": "string",
+            "defaultValue": "#E5E7EB",
+            "responsive": true
+        },
+        {
+            "name": "connectorWidth",
+            "description": "CSS width of the connector line.",
+            "type": "string",
+            "defaultValue": "2px",
+            "responsive": true
+        },
+        {
+            "name": "timelineLayout",
+            "description": "Timeline orientation.",
+            "type": "string",
+            "options": [
+                "vertical",
+                "horizontal"
+            ],
+            "defaultValue": "vertical",
+            "responsive": true
+        },
+        {
+            "name": "eventsAlignment",
+            "description": "Event alignment. For vertical timelines use left, right, or alternate. For horizontal timelines use top or bottom.",
+            "type": "string",
+            "options": [
+                "left",
+                "right",
+                "alternate",
+                "top",
+                "bottom"
+            ],
+            "defaultValue": "left",
+            "responsive": true
+        },
+        {
+            "name": "data",
+            "description": "Array of event objects rendered by the timeline. Each object is exposed to the timelineElement slot as context.item.data.",
+            "type": "array",
+            "defaultValue": []
+        }
+    ],
+    "states": [],
+    "events": [
+        {
+            "name": "timeline:click",
+            "description": "Triggered when the user clicks an event content area.",
+            "payload": {
+                "value": {
+                    "date": "2026-01-15",
+                    "title": "Project kickoff",
+                    "description": "Initial milestone data object from the timeline data array."
+                }
+            }
+        },
+        {
+            "name": "timeline:markerClick",
+            "description": "Triggered when the user clicks an event marker.",
+            "payload": {
+                "value": {
+                    "date": "2026-01-15",
+                    "title": "Project kickoff",
+                    "description": "Initial milestone data object from the timeline data array."
+                }
+            }
+        }
+    ],
+    "localContext": [
+        {
+            "path": "context.item.data",
+            "type": "object",
+            "description": "The current event object from the data array, available inside the timelineElement slot.",
+            "content": {
+                "date": "2026-01-15",
+                "title": "Project kickoff",
+                "description": "Initial planning and alignment."
+            }
+        },
+        {
+            "path": "context.item.index",
+            "type": "number",
+            "description": "Zero-based index of the current repeated timeline event, available inside the timelineElement slot.",
+            "content": 0
+        }
+    ],
+    "actions": [],
+    "slots": [
+        {
+            "name": "timelineElement",
+            "description": "Required repeated content element rendered once for each item in data. Use a ww-div card with children bound to context.item.data fields.",
+            "type": "object",
+            "required": true,
+            "tag": "ww-div"
+        }
+    ],
+    "variables": [],
+    "specifications": [
+        "This element renders one timeline event for each object in the data array.",
+        "Always provide a non-empty data array for static examples; an empty data array renders no event cards.",
+        "Always provide a timelineElement slot child. Without it, the timeline markers can render with empty event content.",
+        "Use ww-div as the timelineElement slot child and add ww-text or ww-icon children inside that card.",
+        "Inside timelineElement children, bind text and styles to context.item.data and context.item.index. Common data fields are date, title, description, status, category, and icon.",
+        "For vertical timelines, eventsAlignment must be left, right, or alternate. Prefer alternate for showcase or milestone pages.",
+        "For horizontal timelines, eventsAlignment must be top or bottom. Use horizontal layout only when the parent has enough width or horizontal overflow.",
+        "Set markerIconOnOff to true only when markerIcon is also provided and the icon name exists in the project's installed icon sets.",
+        "Do not invent markerIcon values. Use only icon names that are known to exist in the current project. If no installed icon-set information is available, set markerIconOnOff to false and omit markerIcon.",
+        "When the phosphor-fill icon set is available, safe timeline marker examples include phosphor-fill/calendar-fill, phosphor-fill/check-fill, phosphor-fill/flag-fill, and phosphor-fill/seal-check-fill.",
+        "The timeline:click and timeline:markerClick events both return the clicked item as event.value.",
+        "Do not create separate sibling cards outside the timeline for each data item; event cards belong in the repeated timelineElement slot."
+    ],
+    "examples": [
+        {
+            "description": "Vertical alternate project timeline with repeated event cards.",
+            "example": "{\"uid\":\"project_timeline\",\"tag\":\"ww-timeline\",\"name\":\"Project Timeline\",\"content\":{\"default\":{\"data\":[{\"date\":\"Jan 2026\",\"title\":\"Discovery\",\"description\":\"Define goals and collect requirements.\",\"status\":\"done\"},{\"date\":\"Feb 2026\",\"title\":\"Prototype\",\"description\":\"Build the first interactive experience.\",\"status\":\"active\"},{\"date\":\"Mar 2026\",\"title\":\"Launch\",\"description\":\"Release the final project.\",\"status\":\"upcoming\"}],\"timelineLayout\":\"vertical\",\"eventsAlignment\":\"alternate\",\"markerShape\":\"circle\",\"markerSize\":\"28px\",\"markerBackgroundColor\":\"#2563EB\",\"connectorColor\":\"#BFDBFE\",\"connectorWidth\":\"3px\",\"markerIconOnOff\":true,\"markerIcon\":\"phosphor-fill/calendar-fill\",\"markerIconColor\":\"#FFFFFF\",\"markerIconSize\":\"14px\"}},\"style\":{\"default\":{\"width\":\"100%\",\"display\":\"block\"}},\"slots\":[{\"slotKey\":\"timelineElement\",\"elements\":[\"timeline_card\"]}]}{\"uid\":\"timeline_card\",\"tag\":\"ww-div\",\"name\":\"Timeline Card\",\"style\":{\"default\":{\"display\":\"flex\",\"flexDirection\":\"column\",\"gap\":\"8px\",\"padding\":\"20px\",\"backgroundColor\":\"#FFFFFF\",\"border\":\"1px solid #E5E7EB\",\"borderRadius\":\"16px\",\"boxShadow\":\"0 8px 24px rgba(15,23,42,0.08)\"}},\"slots\":[{\"slotKey\":\"children\",\"elements\":[\"timeline_date\",\"timeline_title\",\"timeline_description\"]}]}{\"uid\":\"timeline_date\",\"tag\":\"ww-text\",\"name\":\"Timeline Date\",\"content\":{\"default\":{\"tag\":\"p\",\"text\":{\"en\":{\"__wwtype\":\"f\",\"code\":\"context.item.data.date\"}}}},\"style\":{\"default\":{\"fontSize\":\"14px\",\"fontWeight\":\"600\",\"color\":\"#2563EB\"}}}{\"uid\":\"timeline_title\",\"tag\":\"ww-text\",\"name\":\"Timeline Title\",\"content\":{\"default\":{\"tag\":\"h3\",\"text\":{\"en\":{\"__wwtype\":\"f\",\"code\":\"context.item.data.title\"}}}},\"style\":{\"default\":{\"fontSize\":\"22px\",\"fontWeight\":\"700\",\"color\":\"#111827\"}}}{\"uid\":\"timeline_description\",\"tag\":\"ww-text\",\"name\":\"Timeline Description\",\"content\":{\"default\":{\"tag\":\"p\",\"text\":{\"en\":{\"__wwtype\":\"f\",\"code\":\"context.item.data.description\"}}}},\"style\":{\"default\":{\"fontSize\":\"15px\",\"lineHeight\":\"1.6\",\"color\":\"#4B5563\"}}}"
+        },
+        {
+            "description": "Horizontal process timeline with compact cards.",
+            "example": "{\"uid\":\"process_timeline\",\"tag\":\"ww-timeline\",\"name\":\"Process Timeline\",\"content\":{\"default\":{\"data\":[{\"step\":\"01\",\"title\":\"Submit\"},{\"step\":\"02\",\"title\":\"Review\"},{\"step\":\"03\",\"title\":\"Approve\"}],\"timelineLayout\":\"horizontal\",\"eventsAlignment\":\"top\",\"markerShape\":\"square\",\"markerSize\":\"24px\",\"markerBackgroundColor\":\"#111827\",\"connectorColor\":\"#D1D5DB\",\"connectorWidth\":\"2px\"}},\"style\":{\"default\":{\"width\":\"100%\",\"display\":\"block\",\"overflowX\":\"auto\"}},\"slots\":[{\"slotKey\":\"timelineElement\",\"elements\":[\"process_card\"]}]}{\"uid\":\"process_card\",\"tag\":\"ww-div\",\"name\":\"Process Card\",\"style\":{\"default\":{\"display\":\"flex\",\"flexDirection\":\"column\",\"minWidth\":\"180px\",\"gap\":\"4px\",\"padding\":\"16px\",\"backgroundColor\":\"#F9FAFB\",\"borderRadius\":\"12px\"}},\"slots\":[{\"slotKey\":\"children\",\"elements\":[\"process_step\",\"process_title\"]}]}{\"uid\":\"process_step\",\"tag\":\"ww-text\",\"name\":\"Process Step\",\"content\":{\"default\":{\"tag\":\"p\",\"text\":{\"en\":{\"__wwtype\":\"f\",\"code\":\"context.item.data.step\"}}}},\"style\":{\"default\":{\"fontSize\":\"12px\",\"fontWeight\":\"700\",\"color\":\"#6B7280\"}}}{\"uid\":\"process_title\",\"tag\":\"ww-text\",\"name\":\"Process Title\",\"content\":{\"default\":{\"tag\":\"p\",\"text\":{\"en\":{\"__wwtype\":\"f\",\"code\":\"context.item.data.title\"}}}},\"style\":{\"default\":{\"fontSize\":\"18px\",\"fontWeight\":\"700\",\"color\":\"#111827\"}}}"
+        }
+    ],
+    "dependencies": [
+        "ww-div",
+        "ww-text"
+    ]
+}

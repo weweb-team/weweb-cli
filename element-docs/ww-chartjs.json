@@ -1,0 +1,231 @@
+{
+    "metadata": {
+        "name": "ww-chartjs",
+        "description": "A unified Chart.js v4 element. The props mirror the Chart.js config object 1:1, so any docs snippet from chartjs.org can be pasted directly into the bindings. Renders eight chart types from a single component (bar, line, pie, doughnut, radar, polarArea, scatter, bubble) selected via the `type` prop. Supports three optional plugins (datalabels, annotation, zoom) gated by per-instance toggles. Always loads the date-fns adapter so `options.scales.x = { type: 'time' }` works out of the box.",
+        "keywords": [
+            "chart",
+            "chartjs",
+            "chart.js",
+            "graph",
+            "data visualization",
+            "bar",
+            "line",
+            "pie",
+            "doughnut",
+            "radar",
+            "polar area",
+            "scatter",
+            "bubble"
+        ],
+        "features": [
+            "Eight chart types from one element via the `type` prop",
+            "Free-form Chart.js `data` and `options` objects (paste docs snippets directly)",
+            "Optional datalabels plugin (chartjs-plugin-datalabels) via `enableDatalabels`",
+            "Optional annotation plugin (chartjs-plugin-annotation) via `enableAnnotation`",
+            "Optional zoom/pan plugin (chartjs-plugin-zoom) via `enableZoom`",
+            "Time-axis support via the always-loaded chartjs-adapter-date-fns",
+            "Mixed charts via dataset-level `type` override (no separate parent type needed)",
+            "Trigger events on click / hover / first-render",
+            "Exposes the last clicked point and a readiness flag as component variables",
+            "Does not provide a 'guided mode' (auto-mapping a collection to datasets) — bind via formulas instead",
+            "Does not render a container/dropzone — renders only the chart canvas",
+            "Chart canvas colors must be hex strings (or evaluate to hex via a `wwLib`-based JS binding) — never CSS `var(--…)` references. Chart.js paints to `<canvas>` and cannot resolve CSS custom properties."
+        ],
+        "advanced": true
+    },
+    "properties": [
+        {
+            "name": "type",
+            "description": "The Chart.js chart type. Maps to `config.type`. Note: scatter requires datasets[].data as `{x,y}` point objects; bubble requires `{x,y,r}`. Other types accept primitive numbers paired with root `labels`. Switching `type` at runtime while keeping the same `data` only works if the data shape is compatible (see specifications).",
+            "type": "string",
+            "options": [
+                "bar",
+                "line",
+                "pie",
+                "doughnut",
+                "radar",
+                "polarArea",
+                "scatter",
+                "bubble"
+            ],
+            "defaultValue": "bar"
+        },
+        {
+            "name": "data",
+            "description": "Chart.js `config.data` object: `{ labels: [...], datasets: [...] }`. Each dataset has at minimum a `data` array; common keys are `label`, `backgroundColor`, `borderColor`, `borderWidth`. For pie/doughnut/polarArea, `backgroundColor` should be an array (one color per slice). The most portable data shape across types is `datasets[].data = [{x, y}, ...]` paired with root `labels` — works for bar, line, pie, doughnut, polarArea, radar, scatter (only bubble requires `r`). Always set explicit per-dataset colors: `backgroundColor` for fills (single hex string for bar / line per-dataset, **array of hex strings** for pie / doughnut / polarArea slices) and `borderColor` for line / scatter / bubble / radar strokes. Prefer the project's design system color tokens (use the `searchTokens` tool to look them up); otherwise pick from a coherent palette of 4–8 hues.",
+            "type": "object",
+            "defaultValue": {
+                "labels": [
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June"
+                ],
+                "datasets": [
+                    {
+                        "label": "Revenue",
+                        "data": [12, 19, 3, 5, 2, 3],
+                        "backgroundColor": "#3b82f6",
+                        "borderColor": "#1d4ed8",
+                        "borderWidth": 1
+                    },
+                    {
+                        "label": "Expenses",
+                        "data": [8, 11, 5, 4, 6, 7],
+                        "backgroundColor": "#10b981",
+                        "borderColor": "#047857",
+                        "borderWidth": 1
+                    }
+                ]
+            }
+        },
+        {
+            "name": "options",
+            "description": "Chart.js `config.options` object (scales, plugins, animation, interaction, etc.). Keys that don't apply to the current chart type are silently ignored, so the same options object can be shared across types. `responsive: true` and `maintainAspectRatio: false` are merged in by default so the chart fills the element. Plugin-specific config goes under `plugins.<pluginName>` (e.g. `plugins.datalabels`, `plugins.annotation`, `plugins.zoom`).",
+            "type": "object",
+            "defaultValue": {
+                "responsive": true,
+                "maintainAspectRatio": false,
+                "plugins": {
+                    "legend": {
+                        "display": true,
+                        "position": "top"
+                    },
+                    "title": {
+                        "display": false,
+                        "text": ""
+                    }
+                }
+            }
+        },
+        {
+            "name": "enableDatalabels",
+            "description": "Toggles the chartjs-plugin-datalabels plugin for this chart instance. When true, the plugin renders dataset values directly on the chart; configure its appearance via `options.plugins.datalabels`. When false, the plugin is disabled for this chart even though it is registered globally.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "enableAnnotation",
+            "description": "Toggles the chartjs-plugin-annotation plugin for this chart instance. When true, the plugin renders annotations defined under `options.plugins.annotation.annotations` (line, box, label, point, ellipse, polygon). When false, the plugin is disabled for this chart even though it is registered globally.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "enableZoom",
+            "description": "Toggles the chartjs-plugin-zoom plugin for this chart instance. When true, the plugin enables wheel/pinch zoom and drag-to-pan as configured under `options.plugins.zoom`. When false, the plugin is disabled for this chart even though it is registered globally.",
+            "type": "boolean",
+            "defaultValue": false
+        }
+    ],
+    "states": [],
+    "events": [
+        {
+            "name": "chart:click",
+            "description": "Triggered when the user clicks on the chart canvas. Provides click coordinates relative to the canvas, the data points hit by the click, and (for charts with cartesian scales) the data-space x/y values under the click.",
+            "payload": {
+                "position": { "x": "number", "y": "number" },
+                "points": [
+                    {
+                        "datasetLabel": "string",
+                        "label": "string",
+                        "value": "number",
+                        "index": "number",
+                        "datasetIndex": "number"
+                    }
+                ],
+                "dataX": "number|string|null",
+                "dataY": "number|null"
+            }
+        },
+        {
+            "name": "chart:hover",
+            "description": "Triggered when the user hovers over the chart and the hover hits at least one data point. Same payload shape as `chart:click`. Does not fire when the hover misses every data point.",
+            "payload": {
+                "position": { "x": "number", "y": "number" },
+                "points": [
+                    {
+                        "datasetLabel": "string",
+                        "label": "string",
+                        "value": "number",
+                        "index": "number",
+                        "datasetIndex": "number"
+                    }
+                ],
+                "dataX": "number|string|null",
+                "dataY": "number|null"
+            }
+        },
+        {
+            "name": "chart:ready",
+            "description": "Triggered once after the Chart.js instance is created and rendered for the first time. Useful as a signal that the chart canvas exists and that follow-up workflows can safely interact with it. Empty payload.",
+            "payload": {}
+        }
+    ],
+    "localContext": [],
+    "actions": [],
+    "slots": [],
+    "variables": [
+        {
+            "name": "lastClickedPoint",
+            "description": "The most recent data point hit by `chart:click`. Updated to the first entry of the click payload's `points` array. Stays at the previous value if the click misses every point. Initial value is `null`.",
+            "type": "object",
+            "readonly": true,
+            "content": {
+                "datasetLabel": "string|null",
+                "label": "string|null",
+                "value": "number|any",
+                "index": "number",
+                "datasetIndex": "number"
+            }
+        },
+        {
+            "name": "isReady",
+            "description": "Boolean readiness flag. Set to `true` after the first successful render and back to `false` when the element is unmounted. Use this to gate workflows that depend on the chart instance existing.",
+            "type": "boolean",
+            "readonly": true
+        }
+    ],
+    "specifications": [
+        "Always set explicit colors on every dataset — never emit a chart without `backgroundColor` (and `borderColor` for line / radar / scatter / bubble). Pick a coherent palette of 4–8 hues. If the project's design system exposes brand color tokens (use the `searchTokens` tool to check), prefer those tokens' hex values (or read them via `globalContext.colors['<uid>']` inside a `__wwtype: 'js'` binding for dynamic tracking — see the canvas-color rule below). Otherwise use a tasteful default palette such as `#3b82f6` (blue), `#10b981` (emerald), `#f59e0b` (amber), `#ef4444` (red), `#8b5cf6` (violet), `#06b6d4` (cyan), `#f97316` (orange), `#ec4899` (pink). For pie / doughnut / polarArea, `backgroundColor` MUST be an array — one color per slice. Colors must be hex strings (or evaluate to hex via a JS binding); NEVER use raw `var(--…)` strings in the chart payload — see the dedicated rule below.",
+        "When setting `data` or `options` via `editElement`, the value MUST be wrapped as a JS binding: `{ \"__wwtype\": \"js\", \"code\": \"return { /* Chart.js config object */ }\", \"defaultValue\": {} }`. Plain object values without the `__wwtype` wrapper are silently dropped by the editor for these two bindable `RawObject` props — `editElement` returns success but the value does not persist. Any snippet from chartjs.org docs can go inside the `return { … }` body unchanged.",
+        "Why the wrapper is required only for `data` / `options`: these are bindable complex object props (WeWeb config type `RawObject`) and the editor only persists values shaped like a binding (`{__wwtype: 'js' | 'f', code, defaultValue}`). The other ww-chartjs props persist as raw values fine — a primitive string for `type` (e.g. `\"doughnut\"`) and primitive booleans for `enableDatalabels` / `enableAnnotation` / `enableZoom`. Do NOT wrap those primitive props in `__wwtype`; the wrapper rule applies only to `data` and `options`.",
+        "Chart colors are CANVAS, not CSS — Chart.js paints via `<canvas>` (`@kurkle/color`), which has no CSS engine and cannot resolve `var(--<uid>,#hex)` strings (they render transparent or black). Two acceptable forms for any `data.datasets[].*Color` or `options.*` color field: (1) a static hex string, or (2) a `__wwtype: 'js'` binding whose `code` reads tokens via `globalContext.colors['<uid>'] || '#fallback'` — see the elementEdit prompt's \"Inside JS bindings\" rule for the general pattern. This overrides the uiLayout system prompt's general `var(--…)` guidance for canvas color fields.",
+        "`type` is independent of `data` shape — switching types at runtime only works if the data shape is compatible. Primitive number arrays + root `labels` work for bar / line / radar / pie / doughnut / polarArea. `{x,y}` point objects work for bar / line / scatter (and pie/doughnut/radar/polarArea when paired with `labels`). `{x,y,r}` is required for bubble. The most portable shape across all non-bubble types is `datasets[].data = [{x, y}, ...]` paired with root `labels`.",
+        "For pie / doughnut / polarArea, `datasets[0].backgroundColor` MUST be an array (one color per slice) — a single color string makes every slice the same color, which is rarely the intent. Pair this with the global color rule at the top of the specifications list.",
+        "When using `type: 'scatter'`, set `options.scales.x.type` to `'linear'` (or `'time'`). The default `'category'` scale used for bar/line will not work for scatter and the chart renders blank.",
+        "Mixed charts (e.g. bar + line in the same chart) are produced by setting a parent `type` (commonly `'bar'`) and overriding per dataset via `datasets[].type`. There is no separate 'mixed' chart type.",
+        "`chart:click.dataX` and `chart:click.dataY` are `null` for charts that have no cartesian scales (pie, doughnut, radar, polarArea). Use `points[0]` instead to identify the hit slice.",
+        "The chartjs-adapter-date-fns adapter is always loaded. To plot a time axis, set `options.scales.x = { type: 'time', time: { unit: 'month' } }` (or any other unit) — no extra prop is required.",
+        "`enableDatalabels`, `enableAnnotation`, and `enableZoom` only register their plugins for this chart instance. Configure plugin behaviour under `options.plugins.datalabels`, `options.plugins.annotation`, or `options.plugins.zoom` respectively.",
+        "In editor mode, Chart.js animations are forced off internally to avoid a singleton-Animator race during rapid prop edits. In published pages, animations honour Chart.js defaults — set `options.animation = false` explicitly if you want animations off in production."
+    ],
+    "examples": [
+        {
+            "description": "editElement payload format for `data` / `options`. Both props MUST be wrapped as JS bindings — even when the contents are static. Raw plain objects on these two paths are silently dropped by the editor.",
+            "example": "// Two editElement edits, one per prop. Note the `__wwtype: 'js'` wrapper around the Chart.js config — without it, the value will not persist.\nedits: [\n  {\n    path: 'content.default.data',\n    value: {\n      __wwtype: 'js',\n      code: \"return { labels: ['Organic','Paid','Social','Referral'], datasets: [{ label: 'Users', data: [45, 30, 20, 5], backgroundColor: ['#0066FF','#10B981','#F59E0B','#6B7280'] }] }\",\n      defaultValue: {}\n    }\n  },\n  {\n    path: 'content.default.options',\n    value: {\n      __wwtype: 'js',\n      code: \"return { cutout: '60%', plugins: { legend: { position: 'bottom' } } }\",\n      defaultValue: {}\n    }\n  }\n]"
+        },
+        {
+            "description": "Dynamic design-system-token tracking for chart colors — chart-specific application of the elementEdit prompt's \"Inside JS bindings\" token rule: wrap `data` (or `options`) as a `__wwtype: 'js'` binding and read tokens via `globalContext.colors['<uid>']` with a hex fallback after `||`.",
+            "example": "// Single editElement edit on `content.default.data`. Replace each token UID with the value returned by `searchTokens` for the brand color you want. The hex strings after `||` are fallbacks if a token is missing/unset.\nedits: [{\n  path: 'content.default.data',\n  value: {\n    __wwtype: 'js',\n    code: \"return { labels: ['Organic','Paid','Social','Referral'], datasets: [{ label: 'Users', data: [45,30,20,5], backgroundColor: [globalContext.colors['fe35a464-...'] || '#0066FF', globalContext.colors['592f1669-...'] || '#10B981', globalContext.colors['cb3b023b-...'] || '#F59E0B', globalContext.colors['7eca1434-...'] || '#EF4444'] }] }\",\n    defaultValue: {}\n  }\n}]"
+        },
+        {
+            "description": "Minimal bar chart comparing two series — every dataset has explicit `backgroundColor` and `borderColor`.",
+            "example": "{ \"type\": \"bar\", \"data\": { \"labels\": [\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\"], \"datasets\": [{ \"label\": \"Sales\", \"data\": [12, 19, 3, 5, 2], \"backgroundColor\": \"#3b82f6\", \"borderColor\": \"#1d4ed8\", \"borderWidth\": 1 }, { \"label\": \"Returns\", \"data\": [2, 3, 1, 2, 1], \"backgroundColor\": \"#ef4444\", \"borderColor\": \"#b91c1c\", \"borderWidth\": 1 }] }, \"options\": { \"scales\": { \"y\": { \"beginAtZero\": true } } } }"
+        },
+        {
+            "description": "Multi-series line chart (trend / KPI style) with a coherent 3-color palette and translucent fills.",
+            "example": "{ \"type\": \"line\", \"data\": { \"labels\": [\"W1\", \"W2\", \"W3\", \"W4\", \"W5\", \"W6\", \"W7\", \"W8\"], \"datasets\": [{ \"label\": \"North\", \"data\": [120, 135, 160, 148, 172, 180, 195, 210], \"borderColor\": \"#3b82f6\", \"backgroundColor\": \"rgba(59,130,246,0.15)\", \"fill\": true, \"tension\": 0.3 }, { \"label\": \"South\", \"data\": [90, 98, 105, 118, 125, 140, 152, 168], \"borderColor\": \"#10b981\", \"backgroundColor\": \"rgba(16,185,129,0.15)\", \"fill\": true, \"tension\": 0.3 }, { \"label\": \"East\", \"data\": [60, 72, 80, 88, 95, 103, 118, 130], \"borderColor\": \"#f59e0b\", \"backgroundColor\": \"rgba(245,158,11,0.15)\", \"fill\": true, \"tension\": 0.3 }] }, \"options\": { \"plugins\": { \"legend\": { \"position\": \"top\" } }, \"scales\": { \"y\": { \"beginAtZero\": true } } } }"
+        },
+        {
+            "description": "Doughnut chart with the datalabels plugin enabled, drawing percentages on each slice. `backgroundColor` is an array — one color per slice.",
+            "example": "{ \"type\": \"doughnut\", \"enableDatalabels\": true, \"data\": { \"labels\": [\"Q1\", \"Q2\", \"Q3\", \"Q4\"], \"datasets\": [{ \"data\": [25, 30, 20, 25], \"backgroundColor\": [\"#3b82f6\", \"#10b981\", \"#f59e0b\", \"#ef4444\"] }] }, \"options\": { \"cutout\": \"60%\", \"plugins\": { \"datalabels\": { \"color\": \"#fff\", \"font\": { \"weight\": \"bold\", \"size\": 14 } } } } }"
+        },
+        {
+            "description": "Mixed chart (bar + line + scatter) using dataset-level `type` overrides on a parent `type: 'bar'`.",
+            "example": "{ \"type\": \"bar\", \"data\": { \"labels\": [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\"], \"datasets\": [{ \"type\": \"bar\", \"label\": \"Volume\", \"data\": [120, 150, 180, 130, 160, 200], \"backgroundColor\": \"#93c5fd\" }, { \"type\": \"line\", \"label\": \"Trend\", \"data\": [125, 140, 165, 145, 155, 180], \"borderColor\": \"#1d4ed8\", \"borderWidth\": 3, \"fill\": false, \"tension\": 0.3 }, { \"type\": \"scatter\", \"label\": \"Anomaly\", \"data\": [{ \"x\": \"Mar\", \"y\": 250 }, { \"x\": \"Jun\", \"y\": 240 }], \"backgroundColor\": \"#ef4444\", \"pointRadius\": 8 }] }, \"options\": { \"plugins\": { \"legend\": { \"position\": \"top\" } }, \"scales\": { \"y\": { \"beginAtZero\": true } } } }"
+        }
+    ],
+    "dependencies": []
+}

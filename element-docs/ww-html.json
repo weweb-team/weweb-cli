@@ -1,0 +1,67 @@
+{
+    "metadata": {
+        "name": "ww-html",
+        "description": "Renders an arbitrary HTML string as-is via Vue's `v-html` directive. Useful for injecting third-party snippets (embeds, widgets, script-based integrations) or any custom markup that can't be expressed with WeWeb elements. Scripts found in the source are extracted, loaded into the document `<head>`, and executed — this is a powerful but unsafe operation. ⚠️ SECURITY WARNING: the content is injected through `v-html`, which bypasses Vue's XSS protection. ANY HTML/JS inside `source` executes with the same privileges as the page. Never pass user-generated or untrusted content into `source` without server-side sanitization (DOMPurify, a template engine's auto-escape, etc.). Pasting untrusted content here leads directly to stored XSS.",
+        "keywords": [
+            "html",
+            "raw",
+            "embed",
+            "custom",
+            "snippet",
+            "script",
+            "v-html"
+        ],
+        "features": [
+            "Renders any HTML string as-is (including scripts)",
+            "Extracts and loads external `<script src=...>` tags into the document head (deduplicated per element UID)",
+            "Executes inline `<script>` content via `new Function()` after scripts have loaded",
+            "Optional `refreshOnResize` re-runs the full init path (good for embeds whose layout is computed on mount)",
+            "`source` is bindable — switch embeds dynamically from a variable or formula"
+        ]
+    },
+    "properties": [
+        {
+            "name": "source",
+            "description": "HTML string to render. Accepts a full structure: tags, attributes, inline styles, `<script src>` tags, inline `<script>` blocks. External scripts are deduplicated by element UID and loaded into the document head; inline scripts are executed once on mount (and again on resize if `refreshOnResize` is true).\n\n⚠️ TRUST BOUNDARY: whatever string you pass here becomes DOM + executed JS. Only pass content you control (static strings, sanitized server-side output, known third-party snippets). NEVER bind directly to user input.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "refreshOnResize",
+            "description": "When true, the HTML is re-rendered and scripts re-initialized on every window resize. Turn on for embeds that compute layout only on mount (legacy carousels, some chart libraries). Leave off otherwise — re-running scripts on each resize can re-register event handlers, leak memory, or visibly flash.",
+            "type": "boolean",
+            "defaultValue": false
+        }
+    ],
+    "states": [],
+    "events": [],
+    "localContext": [],
+    "actions": [],
+    "slots": [],
+    "variables": [],
+    "specifications": [
+        "⚠️ XSS RISK: the element uses Vue's `v-html`, which disables all automatic escaping. Any `<script>` / `<img onerror=...>` / event handler in the source runs with full page privileges. Sanitize aggressively (or never bind user input at all). This is the single most dangerous element in the library — treat `source` as executable code, not as content.",
+        "Script handling: the component parses the `source` string with regex, extracts `<script src=...>` tags, and loads each into `document.head` with attribute `ww-html-uid=<element-uid>` (used for cleanup/dedup on re-render). Inline `<script>` content is executed via `new Function(content)()` after external scripts resolve.",
+        "Script scope: inline scripts run in a function scope, NOT the module's. They can access `window`, `document`, and globals, but not `wwLib` unless you go through `window.wwLib`. Do not expect cross-script sharing of `var`/`const` — use `window.<name> = ...` if you need persistence.",
+        "When `source` is empty in the editor, a placeholder (`Edit HTML in settings`) is shown. In production (no editor), the element renders nothing visible — use v-if on the parent if you want to conditionally hide.",
+        "`refreshOnResize` triggers the full init path (removeScripts → loadScripts → executeJavascript) on every `resize` event. For scripts that leak listeners or re-register analytics pixels, this can cause duplication — test before enabling.",
+        "CSS reset inside the element: `iframe { width:100% !important; height:100% !important; }` is forced, `a { display: inline }`. Embeds that rely on their own iframe sizing may conflict.",
+        "For unsafe content (user-generated, anonymous authors), prefer `ww-iframe` with a `sandbox` attribute instead of `ww-html` — it isolates scripts in a separate origin with limited privileges.",
+        "The element has no events or variables — use it purely as a content sink."
+    ],
+    "examples": [
+        {
+            "description": "Render a small static HTML article (trusted author).",
+            "example": "{\"source\":\"<div class='article'><h1>This is a heading</h1><p>This is a paragraph.</p></div>\",\"refreshOnResize\":false}"
+        },
+        {
+            "description": "Embed a third-party widget that needs to recompute layout on resize. External script is loaded into the document head.",
+            "example": "{\"source\":\"<div id='widget'></div><script src='https://example.com/widget.js'></script>\",\"refreshOnResize\":true}"
+        },
+        {
+            "description": "A tracking pixel / analytics snippet from your own team (trusted source).",
+            "example": "{\"source\":\"<script>console.log('page-view', { path: location.pathname });</script>\",\"refreshOnResize\":false}"
+        }
+    ],
+    "dependencies": []
+}

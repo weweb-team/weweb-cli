@@ -1,0 +1,142 @@
+{
+    "metadata": {
+        "name": "ww-input-qr-code",
+        "description": "A camera-based QR code scanner input component that reads QR codes in real-time using the device camera. Integrates with the WeWeb form system so scanned values can be submitted and validated like any other form field.",
+        "keywords": [
+            "qr code",
+            "scanner",
+            "camera",
+            "barcode",
+            "mobile",
+            "form",
+            "input"
+        ],
+        "features": [
+            "Real-time QR code detection via device camera using html5-qrcode",
+            "Camera selection via facingMode ('environment', 'user') or a specific device by label/id ('custom')",
+            "Form integration with fieldName, required and custom formula validation",
+            "Debounced scanning: the same code repeated within 1 second does not re-fire the event",
+            "Responsive camera viewport that refreshes on element resize",
+            "Exposes scanning status, last scanned value, available cameras and camera availability as variables",
+            "No auto-reset: status stays 'success' after a successful scan until the next scan event"
+        ]
+    },
+    "properties": [
+        {
+            "name": "cameraSelection",
+            "description": "How the scanner picks which camera to use. 'environment' prefers the back camera, 'user' prefers the front camera, 'custom' uses the device matched by cameraName.",
+            "type": "string",
+            "options": [
+                "environment",
+                "user",
+                "custom"
+            ],
+            "defaultValue": "environment"
+        },
+        {
+            "name": "cameraName",
+            "description": "The label or device ID of a specific camera to use. Only considered when cameraSelection is 'custom'. Inactive when cameraSelection is not 'custom'.",
+            "type": "string",
+            "defaultValue": "",
+            "inactiveProperty": {
+                "description": "Inactive when cameraSelection is not 'custom'."
+            }
+        },
+        {
+            "name": "fieldName",
+            "description": "The field name used to identify this scanner's value in form submissions. Inactive when the element is not placed inside a form container.",
+            "type": "string",
+            "defaultValue": "",
+            "inactiveProperty": {
+                "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy)."
+            }
+        },
+        {
+            "name": "required",
+            "description": "Whether the scanner must have produced a scanned value before the enclosing form can be submitted. Inactive when the element is not placed inside a form container.",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy)."
+            }
+        },
+        {
+            "name": "customValidation",
+            "description": "Enable custom validation formula for this scanner's value. Inactive when the element is not placed inside a form container.",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy)."
+            }
+        },
+        {
+            "name": "validation",
+            "description": "Formula expression used for custom validation. Only used when customValidation is enabled. Must evaluate to a boolean. Inactive when the element is not in a form container or when customValidation is false.",
+            "type": "formula",
+            "defaultValue": "",
+            "inactiveProperty": {
+                "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy) or when customValidation is false."
+            }
+        }
+    ],
+    "states": [],
+    "events": [
+        {
+            "name": "scan",
+            "description": "Triggered when a QR code is successfully scanned. Debounced: the same code repeated within 1 second does not re-fire.",
+            "payload": {
+                "code": "string"
+            }
+        }
+    ],
+    "localContext": [
+        {
+            "path": "qrScanner",
+            "type": "object",
+            "description": "Scanner state available to this element and any children placed inside it.",
+            "content": {
+                "status": "string",
+                "value": "string",
+                "hasCamera": "boolean",
+                "cameras": "array"
+            }
+        }
+    ],
+    "actions": [],
+    "slots": [],
+    "variables": [
+        {
+            "name": "code",
+            "description": "The last scanned QR code value. Empty string until the first successful scan.",
+            "type": "string",
+            "readonly": true
+        },
+        {
+            "name": "cameras",
+            "description": "Array of available camera device labels.",
+            "type": "array",
+            "readonly": true
+        },
+        {
+            "name": "status",
+            "description": "Current scanning status: 'pending', 'scanning', 'success', or 'error'.",
+            "type": "string",
+            "readonly": true
+        },
+        {
+            "name": "hasCamera",
+            "description": "True when a camera is available and the current cameraSelection/cameraName configuration resolves to a usable camera.",
+            "type": "boolean",
+            "readonly": true
+        }
+    ],
+    "specifications": [
+        "Renders as a self-closing element with no children or slots; the video preview is injected by html5-qrcode into the element's container.",
+        "Must be wrapped in a ww-form-container when used as a form input — fieldName, required, customValidation and validation only take effect inside a form.",
+        "When using cameraSelection='custom', also set cameraName to a camera label or device ID. Leave cameraName empty for 'environment' or 'user'.",
+        "Do not rely on the 'status' variable auto-resetting — it stays 'success' after a successful scan until the next scan event.",
+        "Size the element via styles (width/height) — the scanner refreshes on element resize, and a 0-sized element will not start scanning."
+    ],
+    "examples": [],
+    "dependencies": []
+}

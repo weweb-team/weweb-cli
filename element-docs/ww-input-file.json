@@ -1,0 +1,133 @@
+{
+    "metadata": {
+        "name": "ww-input-file",
+        "id": "a823467c-bdc7-4cec-a38c-71875c4c214a",
+        "description": "A file upload component with drag-and-drop support, file type filtering, file size validation, and a built-in file list. The only valid element for file uploads in WeWeb.",
+        "keywords": ["file", "upload", "drag and drop", "file input", "image upload", "storage"],
+        "features": [
+            "Drag-and-drop file upload zone",
+            "Single or multiple file mode",
+            "File type filtering (image, video, audio, pdf, etc.)",
+            "File size validation (min/max per file, max total for multi)",
+            "Built-in file list display with remove buttons",
+            "Exposes a `value` variable (array of File objects)"
+        ],
+        "advanced": false
+    },
+    "properties": [
+        {
+            "name": "type",
+            "description": "Upload mode: 'single' for one file, 'multi' for multiple files.",
+            "type": "string",
+            "enum": ["single", "multi"],
+            "defaultValue": "single"
+        },
+        {
+            "name": "extensions",
+            "description": "Allowed file types.",
+            "type": "string",
+            "enum": ["any", "image", "video", "audio", "pdf", "csv", "excel", "word", "json", "custom"],
+            "defaultValue": "any"
+        },
+        {
+            "name": "customExtensions",
+            "description": "Comma-separated list of allowed file extensions when extensions is 'custom', e.g. '.jpg, .png'. Only used when extensions is 'custom'.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "maxFileSize",
+            "description": "Maximum file size in MB.",
+            "type": "number",
+            "defaultValue": 10
+        },
+        {
+            "name": "minFileSize",
+            "description": "Minimum file size in MB.",
+            "type": "number",
+            "defaultValue": 0
+        },
+        {
+            "name": "maxTotalFileSize",
+            "description": "Maximum total size for all files in MB. Only relevant when type is 'multi'.",
+            "type": "number",
+            "defaultValue": 50
+        },
+        {
+            "name": "maxFiles",
+            "description": "Maximum number of files allowed. Only relevant when type is 'multi'.",
+            "type": "number",
+            "defaultValue": 10
+        },
+        {
+            "name": "drop",
+            "description": "Enable drag-and-drop.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "required",
+            "description": "Makes the upload field required.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "readonly",
+            "description": "Makes the component read-only.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "labelMessage",
+            "description": "Label text shown in the upload zone.",
+            "type": "string",
+            "defaultValue": "Drop files here or click to upload"
+        }
+    ],
+    "events": [
+        {
+            "name": "change",
+            "description": "Triggered when files are added or removed.",
+            "payload": {
+                "value": "array of File objects"
+            }
+        },
+        {
+            "name": "error",
+            "description": "Triggered when file validation fails (wrong type, size exceeded, etc.).",
+            "payload": {
+                "code": "string (error code)",
+                "data": { "message": "string" }
+            }
+        }
+    ],
+    "variables": [
+        {
+            "name": "value",
+            "description": "Array of selected File objects. Each file has: name (string), size (number in bytes), type (MIME string), extension (string). Access path in workflow bindings: variables['{elementUid}-value'].",
+            "type": "array"
+        }
+    ],
+    "actions": [
+        {
+            "name": "clearFiles",
+            "description": "Clears all files from the component."
+        }
+    ],
+    "slots": [],
+    "localContext": [],
+    "specifications": [
+        "This is the ONLY valid element for file uploads. Never use ww-input-basic with type 'file'.",
+        "Add a separate ww-button to trigger the upload workflow. The file upload does NOT use form submit.",
+        "When calling an execute-backend-workflow action that expects a file parameter, bind the file parameter as a plain string '{elementUid}-value' — NOT a formula object. Example: {\"image\": \"a1b2c3d4-value\"}.",
+        "After a successful upload, re-fetch the relevant table view to display the newly uploaded file.",
+        "Do NOT enable exposeBase64 or exposeBinary for backend upload workflows — the backend receives the raw File object via the {elementUid}-value binding."
+    ],
+    "examples": [
+        {
+            "description": "Standalone file upload element for image uploads, paired with an upload button.",
+            "example": "{\"uid\":\"photo_upload\",\"tag\":\"ww-input-file\",\"name\":\"Photo Upload\",\"content\":{\"default\":{\"type\":\"single\",\"extensions\":\"image\",\"maxFileSize\":10,\"labelMessage\":\"Click or drop an image here\"}}}{\"uid\":\"upload_btn\",\"tag\":\"ww-button\",\"name\":\"Upload Photo\",\"content\":{\"default\":{\"text\":\"Upload\"}}}"
+        }
+    ],
+    "dependencies": []
+}

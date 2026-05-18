@@ -1,0 +1,36 @@
+{
+    "metadata": {
+        "name": "ww-section",
+        "description": "HTML div for flexible layout management. Requires display property in styles.",
+        "keywords": [
+            "html",
+            "section",
+            "display",
+            "flex",
+            "grid",
+            "layout"
+        ],
+        "inherit": [
+            "ww-layout",
+            "ww-background-video"
+        ]
+    },
+    "properties": [],
+    "actions": [],
+    "slots": [
+        {
+            "name": "wwObjects",
+            "description": "Children elements of the section.",
+            "type": "array"
+        }
+    ],
+    "events": [],
+    "variables": [],
+    "specifications": [
+        "IMPORTANT: The default value for flexDirection is row",
+        "Display must be one of: block, flex, grid, inline-block, inline-flex, inline-grid, none.",
+        "Do NOT use complex gridTemplateColumns formats like `repeat(auto-fill, minmax(300px, 1fr))` - not supported",
+        "To define responsive gridTemplateColumns, set it in desired breakpoints: `\"style\":{\"default\":{\"gridTemplateColumns\":\"repeat(3, 1fr)\"},\"tablet\":{\"gridTemplateColumns\":\"repeat(2, 1fr)\"},\"mobile\":{\"gridTemplateColumns\":\"1fr\"}}}`"
+    ],
+    "examples": []
+}

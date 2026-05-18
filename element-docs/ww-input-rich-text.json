@@ -1,0 +1,1012 @@
+{
+  "metadata": {
+    "name": "ww-input-rich-text",
+    "description": "A rich text / WYSIWYG editor input based on Tiptap. Outputs HTML or Markdown and can be used standalone or as a form input.",
+    "keywords": [
+      "rich text",
+      "wysiwyg",
+      "editor",
+      "tiptap",
+      "html",
+      "markdown",
+      "form field",
+      "mention"
+    ],
+    "features": [
+      "HTML or Markdown output",
+      "Configurable toolbar (bold, italic, headings, lists, alignment, tables, code, math, etc.)",
+      "Mention / @-tag support with dynamic list and custom id/label paths",
+      "Custom toolbar slot (customMenuElement) to replace the default menu",
+      "Read-only and autofocus modes",
+      "Debounced value updates",
+      "Custom validation formula",
+      "Form container integration via fieldName"
+    ]
+  },
+  "properties": [
+    {
+      "name": "readonly",
+      "description": "Whether the editor is read-only.",
+      "type": "boolean",
+      "defaultValue": false
+    },
+    {
+      "name": "customMenu",
+      "description": "Replace the default toolbar with the customMenuElement slot.",
+      "type": "boolean",
+      "defaultValue": false
+    },
+    {
+      "name": "initialValue",
+      "description": "Initial value of the editor. Bound to the `value` variable.",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "name": "output",
+      "description": "Format of the value emitted by the editor.",
+      "type": "string",
+      "options": [
+        "html",
+        "markdown"
+      ],
+      "defaultValue": "html"
+    },
+    {
+      "name": "debounce",
+      "description": "Enable debounce on value changes.",
+      "type": "boolean",
+      "defaultValue": false
+    },
+    {
+      "name": "debounceDelay",
+      "description": "Debounce delay (e.g. '500ms'). Only used when debounce is true. Inactive when debounce is false.",
+      "type": "string",
+      "defaultValue": "500ms",
+      "responsive": true,
+      "inactiveProperty": {
+        "description": "Inactive when debounce is false."
+      }
+    },
+    {
+      "name": "placeholder",
+      "description": "Placeholder text displayed when the editor is empty.",
+      "type": "string",
+      "defaultValue": "Type here..."
+    },
+    {
+      "name": "enableMention",
+      "description": "Enable @-mention support in the editor.",
+      "type": "boolean",
+      "defaultValue": false
+    },
+    {
+      "name": "mentionList",
+      "description": "Array of objects used to populate the mention suggestions. Typically bound to a collection. Inactive when enableMention is false.",
+      "type": "array",
+      "defaultValue": [],
+      "inactiveProperty": {
+        "description": "Inactive when enableMention is false."
+      }
+    },
+    {
+      "name": "mentionIdPath",
+      "description": "Path (in each mentionList item) to the unique id of the mention. Inactive when enableMention is false, or mentionList is not bound, or its first item is not an object.",
+      "type": "string",
+      "defaultValue": "",
+      "inactiveProperty": {
+        "description": "Inactive when enableMention is false, or mentionList is not bound (boundProps.mentionList is falsy), or the first mentionList item is not an object."
+      }
+    },
+    {
+      "name": "mentionLabelPath",
+      "description": "Path (in each mentionList item) to the label displayed for the mention. Inactive when enableMention is false, or mentionList is not bound, or its first item is not an object.",
+      "type": "string",
+      "defaultValue": "",
+      "inactiveProperty": {
+        "description": "Inactive when enableMention is false, or mentionList is not bound (boundProps.mentionList is falsy), or the first mentionList item is not an object."
+      }
+    },
+    {
+      "name": "mentionAllowSpaces",
+      "description": "Allow spaces inside a mention query. Inactive when enableMention is false.",
+      "type": "boolean",
+      "defaultValue": false,
+      "inactiveProperty": {
+        "description": "Inactive when enableMention is false."
+      }
+    },
+    {
+      "name": "mentionChar",
+      "description": "Character that triggers a mention suggestion. Inactive when enableMention is false.",
+      "type": "string",
+      "defaultValue": "@",
+      "inactiveProperty": {
+        "description": "Inactive when enableMention is false."
+      }
+    },
+    {
+      "name": "mentionListLength",
+      "description": "Number of mention suggestions shown in the dropdown (1-20). Inactive when enableMention is false.",
+      "type": "number",
+      "defaultValue": 5,
+      "inactiveProperty": {
+        "description": "Inactive when enableMention is false."
+      }
+    },
+    {
+      "name": "autofocus",
+      "description": "Focus the editor automatically on mount.",
+      "type": "boolean",
+      "defaultValue": false
+    },
+    {
+      "name": "editable",
+      "description": "Whether the editor content can be edited.",
+      "type": "boolean",
+      "defaultValue": true
+    },
+    {
+      "name": "hideMenu",
+      "description": "Hide the default toolbar entirely. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": false,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "wrapMenu",
+      "description": "Allow the toolbar to wrap onto multiple lines. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": false,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "menuColor",
+      "description": "Color of toolbar icons. Inactive when customMenu is true.",
+      "type": "string",
+      "defaultValue": "#000000ad",
+      "responsive": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "menuHoverColor",
+      "description": "Color of toolbar icons on hover. Inactive when customMenu is true.",
+      "type": "string",
+      "defaultValue": "#000000ad",
+      "responsive": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "menuBgColor",
+      "description": "Background color of toolbar buttons. Inactive when customMenu is true.",
+      "type": "string",
+      "defaultValue": "transparent",
+      "responsive": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "menuHoverBgColor",
+      "description": "Background color of toolbar buttons on hover. Inactive when customMenu is true.",
+      "type": "string",
+      "defaultValue": "rgb(245, 245, 245)",
+      "responsive": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "modalBgColor",
+      "description": "Background color of editor modals (link, image, math, etc.). Inactive when customMenu is true.",
+      "type": "string",
+      "defaultValue": "#ffffff",
+      "responsive": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "modalTextColor",
+      "description": "Text color inside editor modals. Inactive when customMenu is true.",
+      "type": "string",
+      "defaultValue": "#000000",
+      "responsive": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "modalPlaceholderColor",
+      "description": "Placeholder color inside editor modals. Inactive when customMenu is true.",
+      "type": "string",
+      "defaultValue": "#adb5bd",
+      "responsive": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "modalBorderColor",
+      "description": "Border color used inside editor modals. Inactive when customMenu is true.",
+      "type": "string",
+      "defaultValue": "#e5e5e5",
+      "responsive": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "modalFontSize",
+      "description": "Font size inside editor modals. Inactive when customMenu is true.",
+      "type": "string",
+      "defaultValue": "14px",
+      "responsive": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "modalApplyBgColor",
+      "description": "Background color of the modal 'Apply' button. Inactive when customMenu is true.",
+      "type": "string",
+      "defaultValue": "#000000",
+      "responsive": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "modalApplyColor",
+      "description": "Text color of the modal 'Apply' button. Inactive when customMenu is true.",
+      "type": "string",
+      "defaultValue": "#ffffff",
+      "responsive": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "modalCancelBgColor",
+      "description": "Background color of the modal 'Cancel' button. Inactive when customMenu is true.",
+      "type": "string",
+      "defaultValue": "transparent",
+      "responsive": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "modalCancelColor",
+      "description": "Text color of the modal 'Cancel' button. Inactive when customMenu is true.",
+      "type": "string",
+      "defaultValue": "#000000",
+      "responsive": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "h1",
+      "description": "Styling options for h1 heading tags inside the editor. Includes fontSize, fontFamily, fontWeight, textAlign, color, lineHeight, marginTop, marginBottom.",
+      "type": "object",
+      "defaultValue": {
+        "fontSize": "32px",
+        "fontFamily": "",
+        "fontWeight": "",
+        "textAlign": "",
+        "color": "",
+        "lineHeight": "",
+        "marginTop": "",
+        "marginBottom": ""
+      },
+      "responsive": true
+    },
+    {
+      "name": "h2",
+      "description": "Styling options for h2 heading tags inside the editor. Includes fontSize, fontFamily, fontWeight, textAlign, color, lineHeight, marginTop, marginBottom.",
+      "type": "object",
+      "defaultValue": {
+        "fontSize": "24px",
+        "fontFamily": "",
+        "fontWeight": "",
+        "textAlign": "",
+        "color": "",
+        "lineHeight": "",
+        "marginTop": "",
+        "marginBottom": ""
+      },
+      "responsive": true
+    },
+    {
+      "name": "h3",
+      "description": "Styling options for h3 heading tags inside the editor. Includes fontSize, fontFamily, fontWeight, textAlign, color, lineHeight, marginTop, marginBottom.",
+      "type": "object",
+      "defaultValue": {
+        "fontSize": "19px",
+        "fontFamily": "",
+        "fontWeight": "",
+        "textAlign": "",
+        "color": "",
+        "lineHeight": "",
+        "marginTop": "",
+        "marginBottom": ""
+      },
+      "responsive": true
+    },
+    {
+      "name": "h4",
+      "description": "Styling options for h4 heading tags inside the editor. Includes fontSize, fontFamily, fontWeight, textAlign, color, lineHeight, marginTop, marginBottom.",
+      "type": "object",
+      "defaultValue": {
+        "fontSize": "16px",
+        "fontFamily": "",
+        "fontWeight": "",
+        "textAlign": "",
+        "color": "",
+        "lineHeight": "",
+        "marginTop": "",
+        "marginBottom": ""
+      },
+      "responsive": true
+    },
+    {
+      "name": "h5",
+      "description": "Styling options for h5 heading tags inside the editor. Includes fontSize, fontFamily, fontWeight, textAlign, color, lineHeight, marginTop, marginBottom.",
+      "type": "object",
+      "defaultValue": {
+        "fontSize": "16px",
+        "fontFamily": "",
+        "fontWeight": "",
+        "textAlign": "",
+        "color": "",
+        "lineHeight": "",
+        "marginTop": "",
+        "marginBottom": ""
+      },
+      "responsive": true
+    },
+    {
+      "name": "h6",
+      "description": "Styling options for h6 heading tags inside the editor. Includes fontSize, fontFamily, fontWeight, textAlign, color, lineHeight, marginTop, marginBottom.",
+      "type": "object",
+      "defaultValue": {
+        "fontSize": "16px",
+        "fontFamily": "",
+        "fontWeight": "",
+        "textAlign": "",
+        "color": "",
+        "lineHeight": "",
+        "marginTop": "",
+        "marginBottom": ""
+      },
+      "responsive": true
+    },
+    {
+      "name": "p",
+      "description": "Styling options for paragraph tags inside the editor. Includes fontSize, fontFamily, fontWeight, textAlign, color, lineHeight, marginTop, marginBottom.",
+      "type": "object",
+      "defaultValue": {
+        "fontSize": "16px",
+        "fontFamily": "",
+        "fontWeight": "",
+        "textAlign": "",
+        "color": "",
+        "lineHeight": "",
+        "marginTop": "",
+        "marginBottom": ""
+      },
+      "responsive": true
+    },
+    {
+      "name": "mention",
+      "description": "Styling options for mention tags inside the editor. Includes fontSize, fontFamily, fontWeight, color, borderSize, borderRadius.",
+      "type": "object",
+      "defaultValue": {
+        "fontSize": "16px",
+        "fontFamily": "",
+        "fontFWeight": "",
+        "color": "#099AF2",
+        "borderSize": "1px",
+        "borderRadius": "6px"
+      },
+      "responsive": true
+    },
+    {
+      "name": "a",
+      "description": "Styling options for link (anchor) tags inside the editor. Includes fontSize, fontFamily, color, isUnderline.",
+      "type": "object",
+      "defaultValue": {
+        "fontSize": "16px",
+        "fontFamily": "",
+        "color": "",
+        "isUnderline": true
+      },
+      "responsive": true
+    },
+    {
+      "name": "blockquote",
+      "description": "Styling options for blockquote elements inside the editor. Includes color, borderColor, marginTop, marginBottom.",
+      "type": "object",
+      "defaultValue": {
+        "color": "rgb(153, 153, 153)",
+        "borderColor": "rgb(223, 226, 229)",
+        "marginTop": "6px",
+        "marginBottom": "6px"
+      },
+      "responsive": true
+    },
+    {
+      "name": "code",
+      "description": "Styling options for code block elements inside the editor. Includes fontSize, color, bgColor, borderRadius, paddingX, paddingY.",
+      "type": "object",
+      "defaultValue": {
+        "color": "#FFF",
+        "bgColor": "#0D0D0D",
+        "borderRadius": "8px",
+        "paddingX": "16px",
+        "paddingY": "12px",
+        "fontSize": "13px"
+      },
+      "responsive": true
+    },
+    {
+      "name": "img",
+      "description": "Styling options for image elements inside the editor. Includes maxWidth, maxHeight, inline.",
+      "type": "object",
+      "defaultValue": {
+        "maxWidth": "auto",
+        "maxHeight": "auto",
+        "inline": false
+      },
+      "responsive": true
+    },
+    {
+      "name": "checkbox",
+      "description": "Styling options for checkbox/task list items inside the editor. Includes accent color.",
+      "type": "object",
+      "defaultValue": {
+        "color": "#000"
+      },
+      "responsive": true
+    },
+    {
+      "name": "table",
+      "description": "Styling options for table elements inside the editor. Includes borderColor, borderWidth, headerBgColor, headerColor, pairCellBgColor, oddCellBgColor, cellColor, cellPaddingY, cellPaddingX.",
+      "type": "object",
+      "defaultValue": {
+        "borderColor": "#C7C7C7",
+        "borderWidth": "1px",
+        "headerBgColor": "#f5f5f5",
+        "headerColor": "#000",
+        "pairCellBgColor": "#fff",
+        "oddCellBgColor": "#FDFDFD",
+        "cellColor": "#000",
+        "cellPaddingY": "6px",
+        "cellPaddingX": "8px"
+      },
+      "responsive": true
+    },
+    {
+      "name": "parameterTextType",
+      "description": "Show the heading/paragraph type selector in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterBold",
+      "description": "Show the bold toggle in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterItalic",
+      "description": "Show the italic toggle in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterUnderline",
+      "description": "Show the underline toggle in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterStrike",
+      "description": "Show the strikethrough toggle in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterAlignLeft",
+      "description": "Show the align-left button in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": false,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterAlignCenter",
+      "description": "Show the align-center button in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": false,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterAlignRight",
+      "description": "Show the align-right button in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": false,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterAlignJustify",
+      "description": "Show the justify button in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": false,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterTextColor",
+      "description": "Show the text-color picker in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterBulletList",
+      "description": "Show the bullet-list button in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterOrderedList",
+      "description": "Show the ordered-list button in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterTaskList",
+      "description": "Show the task-list (checkbox list) button in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": false,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterTable",
+      "description": "Show the table button in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterLink",
+      "description": "Show the link button in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterImage",
+      "description": "Show the image button in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": false,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterCodeBlock",
+      "description": "Show the code-block button in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterQuote",
+      "description": "Show the blockquote button in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterInlineMath",
+      "description": "Show the inline-math button in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": false,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterBlockMath",
+      "description": "Show the block-math button in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": false,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterUndo",
+      "description": "Show the undo button in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "parameterRedo",
+      "description": "Show the redo button in the toolbar. Inactive when customMenu is true.",
+      "type": "boolean",
+      "defaultValue": true,
+      "inactiveProperty": {
+        "description": "Inactive when customMenu is true."
+      }
+    },
+    {
+      "name": "fieldName",
+      "description": "Field name used for form data when inside a ww-form-container. Inactive when the element is not placed inside a form container.",
+      "type": "string",
+      "defaultValue": "",
+      "inactiveProperty": {
+        "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy)."
+      }
+    },
+    {
+      "name": "customValidation",
+      "description": "Enable custom validation formula. Inactive when the element is not placed inside a form container.",
+      "type": "boolean",
+      "defaultValue": false,
+      "inactiveProperty": {
+        "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy)."
+      }
+    },
+    {
+      "name": "validation",
+      "description": "Custom validation formula (must evaluate to a truthy value for the input to be valid). Inactive when the element is not in a form container or when customValidation is false.",
+      "type": "formula",
+      "defaultValue": "",
+      "inactiveProperty": {
+        "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy) or when customValidation is false."
+      }
+    }
+  ],
+  "states": [
+    {
+      "name": "focus",
+      "description": "Editor is focused"
+    },
+    {
+      "name": "readonly",
+      "description": "Editor is read-only"
+    }
+  ],
+  "events": [
+    {
+      "name": "change",
+      "description": "Triggered when the editor content changes.",
+      "payload": {
+        "value": "string"
+      }
+    },
+    {
+      "name": "initValueChange",
+      "description": "Triggered when the bound initial value changes.",
+      "payload": {
+        "value": "string"
+      }
+    },
+    {
+      "name": "mention:click",
+      "description": "Triggered when the user clicks on a rendered mention.",
+      "payload": {
+        "mention": {
+          "id": "string",
+          "label": "string"
+        }
+      }
+    },
+    {
+      "name": "focus",
+      "description": "Triggered when the editor receives focus.",
+      "payload": {
+        "value": "string"
+      }
+    },
+    {
+      "name": "blur",
+      "description": "Triggered when the editor loses focus.",
+      "payload": {
+        "value": "string"
+      }
+    }
+  ],
+  "localContext": [],
+  "actions": [
+    {
+      "label": "Focus Rich text",
+      "actionName": "focusEditor",
+      "description": "Programmatically focus the editor."
+    },
+    {
+      "label": "Set Link",
+      "actionName": "setLink",
+      "description": "Wrap the current selection in a link.",
+      "args": [
+        {
+          "name": "url",
+          "type": "string",
+          "description": "Target URL of the link."
+        }
+      ]
+    },
+    {
+      "label": "Set Image",
+      "actionName": "setImage",
+      "description": "Insert an image at the current cursor position.",
+      "args": [
+        {
+          "name": "src",
+          "type": "string",
+          "description": "Image source URL."
+        },
+        {
+          "name": "alt",
+          "type": "string",
+          "description": "Alt text."
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "description": "Image title."
+        }
+      ]
+    },
+    {
+      "label": "Set Tag",
+      "actionName": "setTag",
+      "description": "Set the block tag of the current selection.",
+      "args": [
+        {
+          "name": "tag",
+          "type": "string",
+          "description": "Target tag: p, h1, h2, h3, h4, h5 or h6."
+        }
+      ]
+    },
+    {
+      "label": "Toggle Bold",
+      "actionName": "toggleBold",
+      "description": "Toggle bold on the current selection."
+    },
+    {
+      "label": "Toggle Italic",
+      "actionName": "toggleItalic",
+      "description": "Toggle italic on the current selection."
+    },
+    {
+      "label": "Toggle Underline",
+      "actionName": "toggleUnderline",
+      "description": "Toggle underline on the current selection."
+    },
+    {
+      "label": "Toggle Strike",
+      "actionName": "toggleStrike",
+      "description": "Toggle strikethrough on the current selection."
+    },
+    {
+      "label": "Set Text Align",
+      "actionName": "setTextAlign",
+      "description": "Set the text alignment of the current block.",
+      "args": [
+        {
+          "name": "align",
+          "type": "string",
+          "description": "Alignment: left, center, right or justify."
+        }
+      ]
+    },
+    {
+      "label": "Set Color",
+      "actionName": "setColor",
+      "description": "Set the text color of the current selection.",
+      "args": [
+        {
+          "name": "color",
+          "type": "string",
+          "description": "CSS color value."
+        }
+      ]
+    },
+    {
+      "label": "Toggle Bullet List",
+      "actionName": "toggleBulletList",
+      "description": "Toggle a bullet list on the current selection."
+    },
+    {
+      "label": "Toggle Ordered List",
+      "actionName": "toggleOrderedList",
+      "description": "Toggle an ordered list on the current selection."
+    },
+    {
+      "label": "Toggle Check List",
+      "actionName": "toggleTaskList",
+      "description": "Toggle a task (checkbox) list on the current selection."
+    },
+    {
+      "label": "Toggle Code Block",
+      "actionName": "toggleCodeBlock",
+      "description": "Toggle a code block on the current selection."
+    },
+    {
+      "label": "Toggle Blockquote",
+      "actionName": "toggleBlockquote",
+      "description": "Toggle a blockquote on the current selection."
+    },
+    {
+      "label": "Insert Inline Math",
+      "actionName": "insertInlineMath",
+      "description": "Insert an inline math expression.",
+      "args": [
+        {
+          "name": "latex",
+          "type": "string",
+          "description": "LaTeX expression."
+        }
+      ]
+    },
+    {
+      "label": "Insert Block Math",
+      "actionName": "insertBlockMath",
+      "description": "Insert a block math expression.",
+      "args": [
+        {
+          "name": "latex",
+          "type": "string",
+          "description": "LaTeX expression."
+        }
+      ]
+    },
+    {
+      "label": "Undo",
+      "actionName": "undo",
+      "description": "Undo the last editor action."
+    },
+    {
+      "label": "Redo",
+      "actionName": "redo",
+      "description": "Redo the last undone editor action."
+    },
+    {
+      "label": "Insert Table",
+      "actionName": "insertTable",
+      "description": "Insert a table at the current cursor position."
+    },
+    {
+      "label": "Insert Row",
+      "actionName": "insertRow",
+      "description": "Insert a row relative to the current cell.",
+      "args": [
+        {
+          "name": "position",
+          "type": "string",
+          "description": "Where to insert: before or after."
+        }
+      ]
+    },
+    {
+      "label": "Insert Column",
+      "actionName": "insertColumn",
+      "description": "Insert a column relative to the current cell.",
+      "args": [
+        {
+          "name": "position",
+          "type": "string",
+          "description": "Where to insert: before or after."
+        }
+      ]
+    },
+    {
+      "label": "Delete Row",
+      "actionName": "deleteRow",
+      "description": "Delete the current row."
+    },
+    {
+      "label": "Delete Column",
+      "actionName": "deleteColumn",
+      "description": "Delete the current column."
+    },
+    {
+      "label": "Delete Table",
+      "actionName": "deleteTable",
+      "description": "Delete the current table."
+    }
+  ],
+  "slots": [
+    {
+      "name": "customMenuElement",
+      "description": "Element rendered in place of the default toolbar when customMenu is true.",
+      "type": "object"
+    }
+  ],
+  "variables": [
+    {
+      "name": "value",
+      "description": "Current content of the editor (HTML or Markdown depending on `output`).",
+      "type": "string"
+    },
+    {
+      "name": "mentions",
+      "description": "Array of mentions currently present in the editor content.",
+      "type": "array",
+      "readonly": true
+    },
+    {
+      "name": "states",
+      "description": "Internal editor state snapshot (active marks, active node, etc.).",
+      "type": "object",
+      "readonly": true
+    }
+  ],
+  "specifications": [
+    "Default output is HTML; set `output` to 'markdown' to emit Markdown instead.",
+    "`initialValue` is the bound model (exposed to the AI as `value` via wewebName). The live value is available through the `value` variable.",
+    "When used inside a ww-form-container, set a unique `fieldName` so the submitted payload includes this field.",
+    "`readonly` disables editing while keeping the content visible and continues to emit the `readonly` state.",
+    "Mention support requires `enableMention: true` plus `mentionList`, `mentionIdPath` and `mentionLabelPath`.",
+    "Toolbar buttons are controlled individually by the `parameter*` boolean flags. Set `hideMenu: true` to hide the toolbar entirely, or `customMenu: true` with the `customMenuElement` slot to provide a completely custom toolbar.",
+    "Do not store the editor value in a separate variable — bind directly to the `value` variable."
+  ],
+  "examples": [],
+  "dependencies": []
+}

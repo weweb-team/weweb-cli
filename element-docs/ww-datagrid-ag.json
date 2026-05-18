@@ -1,0 +1,775 @@
+{
+    "metadata": {
+        "name": "ww-datagrid-ag",
+        "description": "A highly customizable data grid/table component that supports features like sorting, filtering, pagination, row selection, and custom actions. It's designed to handle large datasets efficiently with various data types and styling options. It is based on the AG Grid framework.",
+        "keywords": [
+            "datagrid",
+            "table",
+            "grid",
+            "aggrid"
+        ],
+        "features": [
+            "Multiple data types (text, numbers, dates, booleans, images, action buttons, custom)",
+            "Advanced filtering and sorting capabilities",
+            "Customizable pagination with page size selector",
+            "Single and multiple row selection modes",
+            "Custom action buttons with styling options",
+            "Responsive design with customizable column widths (fixed or flex)",
+            "Row hover and selection states",
+            "Alternate row coloring",
+            "Comprehensive header and cell styling options",
+            "Dynamic header styling via formulas",
+            "Column reordering and resizing",
+            "Row drag and reorder",
+            "Cell editing support",
+            "Column pinning (left/right)",
+            "Custom display label formulas for cells",
+            "Localization support (en, fr, es, de, pt, custom)",
+            "Does not support tree/hierarchical data",
+            "Does not support row grouping or pivoting",
+            "Does not support server-side data loading"
+        ],
+        "advanced": true
+    },
+    "properties": [
+        {
+            "name": "rowData",
+            "description": "Data to display in the grid.",
+            "type": "array<object>",
+            "defaultValue": []
+        },
+        {
+            "name": "idFormula",
+            "description": "Formula to generate unique IDs for each row. Always use 'context.mapping...'",
+            "type": "formula"
+        },
+        {
+            "name": "layout",
+            "description": "Layout mode for the grid. 'fixed' uses a fixed height, 'auto' adjusts height to content.",
+            "type": "string",
+            "options": [
+                "fixed",
+                "auto"
+            ],
+            "defaultValue": "fixed",
+            "responsive": true
+        },
+        {
+            "name": "height",
+            "description": "Height of the grid. Only used when layout is 'fixed'.",
+            "type": "string",
+            "defaultValue": "400px",
+            "responsive": true
+        },
+        {
+            "name": "textColor",
+            "description": "Color of all the text in the grid. Use more specific fields if needed (headerTextColor, cellColor, actionColor).",
+            "type": "string"
+        },
+        {
+            "name": "borderColor",
+            "description": "Color of grid borders.",
+            "type": "string"
+        },
+        {
+            "name": "wrapperBorderRadius",
+            "description": "Border radius of the grid wrapper.",
+            "type": "string"
+        },
+        {
+            "name": "headerBackgroundColor",
+            "description": "Background color of the header cells.",
+            "type": "string"
+        },
+        {
+            "name": "headerTextColor",
+            "description": "Text color of the header cells.",
+            "type": "string"
+        },
+        {
+            "name": "headerFontWeight",
+            "description": "Font weight of header text.",
+            "type": "number",
+            "options": [
+                100,
+                200,
+                300,
+                400,
+                500,
+                600,
+                700,
+                800,
+                900
+            ]
+        },
+        {
+            "name": "headerFontSize",
+            "description": "Font size of header text.",
+            "type": "string"
+        },
+        {
+            "name": "headerFontFamily",
+            "description": "Font family for header text.",
+            "type": "string"
+        },
+        {
+            "name": "headerHeightMode",
+            "description": "Set to 'auto' to have auto height on the header, or null/'fixed' for a fixed height.",
+            "type": "string",
+            "options": [
+                "auto"
+            ]
+        },
+        {
+            "name": "headerHeight",
+            "description": "If headerHeightMode is not 'auto', the header height (defaults to the 48px of the template).",
+            "type": "string"
+        },
+        {
+            "name": "useDynamicStyleHeader",
+            "description": "Enable dynamic style formulas for header. Then you can define one or several of the dynamic header properties.",
+            "type": "boolean"
+        },
+        {
+            "name": "dynamicHeaderBackgroundColor",
+            "description": "Compute a dynamic background color using the column information. Column information will be provided through an object context.mapping?.['name' | 'id' | 'type' | 'dataType']. You can return a nullable value to fallback to the default style. useDynamicStyleHeader should be true to use this. Example: wwFormulas.if(context.mapping?.['name'] == 'Total', '#f1f5f9', null).",
+            "type": "formula"
+        },
+        {
+            "name": "dynamicHeaderTextColor",
+            "description": "Compute a dynamic text color using the column information. Column information will be provided through an object context.mapping?.['name' | 'id' | 'type' | 'dataType']. You can return a nullable value to fallback to the default style. useDynamicStyleHeader should be true to use this. Example: wwFormulas.if(context.mapping?.['id'] == 'status', '#1f2937', null)",
+            "type": "formula"
+        },
+        {
+            "name": "dynamicHeaderFontWeight",
+            "description": "Compute a dynamic font weight using the column information. Column information will be provided through an object context.mapping?.['name' | 'id' | 'type' | 'dataType']. You can return a nullable value to fallback to the default style. useDynamicStyleHeader should be true to use this. Possible values: 100, 200, 300, 400, 500, 600, 700, 800, 900. Example: wwFormulas.if(context.mapping?.['id'] == 'priority', 700, null)",
+            "type": "formula"
+        },
+        {
+            "name": "dynamicHeaderFontSize",
+            "description": "Compute a dynamic font size using the column information. Column information will be provided through an object context.mapping?.['name' | 'id' | 'type' | 'dataType']. You can return a nullable value to fallback to the default style. useDynamicStyleHeader should be true to use this. Example: wwFormulas.if(context.mapping?.['name'] == 'Total', '16px', null)",
+            "type": "formula"
+        },
+        {
+            "name": "dynamicHeaderFontFamily",
+            "description": "Compute a dynamic font family using the column information. Column information will be provided through an object context.mapping?.['name' | 'id' | 'type' | 'dataType']. You can return a nullable value to fallback to the default style. useDynamicStyleHeader should be true to use this. Example: wwFormulas.if(context.mapping?.['dataType'] == 'number', 'Inter', null)",
+            "type": "formula"
+        },
+        {
+            "name": "rowBackgroundColor",
+            "description": "Background color for rows.",
+            "type": "string"
+        },
+        {
+            "name": "rowAlternateColor",
+            "description": "Background color for alternate rows. Be sure it works well with cell default text color, as the color is common.",
+            "type": "string"
+        },
+        {
+            "name": "rowHoverColor",
+            "description": "Background color when hovering over rows. Must be a semi transparent color, as it will be an overlay on top.",
+            "type": "string"
+        },
+        {
+            "name": "rowVerticalPaddingScale",
+            "description": "A number for scaling the vertical padding of cells. Use 2 to multiply it by 2 or a number between 0 and 1 to make it smaller.",
+            "type": "number",
+            "defaultValue": 1
+        },
+        {
+            "name": "columnHoverHighlight",
+            "description": "Enable column highlight on hover.",
+            "type": "boolean"
+        },
+        {
+            "name": "columnHoverColor",
+            "description": "If active, column hover highlight color. Must be a semi transparent color, as it will be an overlay on top.",
+            "type": "string"
+        },
+        {
+            "name": "cellColor",
+            "description": "Text color of grid cells.",
+            "type": "string"
+        },
+        {
+            "name": "cellFontFamily",
+            "description": "Font family for cell text.",
+            "type": "string"
+        },
+        {
+            "name": "cellFontSize",
+            "description": "Font size for cell text.",
+            "type": "string"
+        },
+        {
+            "name": "cellSelectionBorderColor",
+            "description": "Override the theme border color for cell selection.",
+            "type": "string"
+        },
+        {
+            "name": "cellAlignmentMode",
+            "description": "Whether to use inherited or custom cell alignment. Set to 'custom' to enable cellAlignment property.",
+            "type": "string",
+            "options": [
+                "inherit",
+                "custom"
+            ],
+            "defaultValue": "inherit"
+        },
+        {
+            "name": "cellAlignment",
+            "description": "Global cell text alignment. Only used when cellAlignmentMode is 'custom'.",
+            "type": "string",
+            "options": [
+                "left",
+                "center",
+                "right"
+            ],
+            "responsive": true
+        },
+        {
+            "name": "menuTextColor",
+            "description": "Text color for the filter menu.",
+            "type": "string"
+        },
+        {
+            "name": "menuBackgroundColor",
+            "description": "Background color for the filter menu.",
+            "type": "string"
+        },
+        {
+            "name": "selectedRowBackgroundColor",
+            "description": "Background color for selected rows. Must be a semi transparent color, as it will be an overlay on top.",
+            "type": "string"
+        },
+        {
+            "name": "selectionCheckboxColor",
+            "description": "Override the theme background color for selection checkboxes.",
+            "type": "string"
+        },
+        {
+            "name": "checkboxUncheckedBorderColor",
+            "description": "Override the border color for unchecked selection checkboxes.",
+            "type": "string"
+        },
+        {
+            "name": "focusShadow",
+            "description": "Box shadow for focused cells.",
+            "type": "string"
+        },
+        {
+            "name": "actionColor",
+            "description": "Text color for action buttons.",
+            "type": "string"
+        },
+        {
+            "name": "actionBackgroundColor",
+            "description": "Background color for action buttons.",
+            "type": "string"
+        },
+        {
+            "name": "actionPadding",
+            "description": "Padding for action buttons.",
+            "type": "string"
+        },
+        {
+            "name": "actionBorder",
+            "description": "Border style for action buttons.",
+            "type": "string"
+        },
+        {
+            "name": "actionBorderRadius",
+            "description": "Border radius for action buttons.",
+            "type": "string"
+        },
+        {
+            "name": "actionFont",
+            "description": "Typography shorthand for action buttons. When set, overrides individual actionFontSize, actionFontFamily, actionFontWeight, actionFontStyle, and actionLineHeight properties.",
+            "type": "string"
+        },
+        {
+            "name": "actionFontSize",
+            "description": "Font size of the button in action column. Only used when actionFont is not set.",
+            "type": "string"
+        },
+        {
+            "name": "actionFontFamily",
+            "description": "Font family of the button in action column. Only used when actionFont is not set.",
+            "type": "string"
+        },
+        {
+            "name": "actionFontWeight",
+            "description": "Font weight of the button in action column. Only used when actionFont is not set.",
+            "type": "string"
+        },
+        {
+            "name": "actionFontStyle",
+            "description": "Font style of the button in action column. Only used when actionFont is not set.",
+            "type": "string"
+        },
+        {
+            "name": "actionLineHeight",
+            "description": "Line height of the button in action column. Only used when actionFont is not set.",
+            "type": "string"
+        },
+        {
+            "name": "rowSelection",
+            "description": "Type of row selection.",
+            "type": "string",
+            "options": [
+                "none",
+                "single",
+                "multiple"
+            ],
+            "defaultValue": "none"
+        },
+        {
+            "name": "enableClickSelection",
+            "description": "True to enable selection on row click. Only available when rowSelection is not 'none'.",
+            "type": "boolean"
+        },
+        {
+            "name": "disableCheckboxes",
+            "description": "True to hide checkbox for selection. Only available when rowSelection is not 'none'.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "selectAll",
+            "description": "Behavior of select all button. Only available when rowSelection is 'multiple'.",
+            "type": "string",
+            "options": [
+                "all",
+                "filtered",
+                "currentPage"
+            ],
+            "defaultValue": "all"
+        },
+        {
+            "name": "movableColumns",
+            "description": "Enable column drag and drop reordering.",
+            "type": "boolean"
+        },
+        {
+            "name": "resizableColumns",
+            "description": "Enable column resizing by dragging column borders.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "rowReorder",
+            "description": "Enable row drag and drop reordering.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "pagination",
+            "description": "Enable/disable pagination.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "hasPaginationSelector",
+            "description": "Type of pagination page size selector. 'single' uses a fixed page size, 'multiple' shows a dropdown with page size options. Only available when pagination is enabled.",
+            "type": "string",
+            "options": [
+                "single",
+                "multiple"
+            ]
+        },
+        {
+            "name": "paginationPageSize",
+            "description": "Number of rows per page. Only used when pagination is enabled and hasPaginationSelector is 'single'.",
+            "type": "number",
+            "defaultValue": 10
+        },
+        {
+            "name": "paginationPageSizeSelector",
+            "description": "Array of page size options for the pagination dropdown. Only used when pagination is enabled and hasPaginationSelector is 'multiple'.",
+            "type": "object"
+        },
+        {
+            "name": "initialFilters",
+            "description": "An AG Grid object describing the initial filtering. Example: { id1: { filterType: \"number\", type: \"greaterThan\", filter: 50 } }",
+            "type": "object",
+            "defaultValue": null
+        },
+        {
+            "name": "initialSort",
+            "description": "Description of the initial sort column. Example: [{ colId: \"ID\", sort: \"asc\" }]",
+            "type": "object",
+            "defaultValue": null
+        },
+        {
+            "name": "initialColumnsOrder",
+            "description": "List of the column order, if different from columns definition order.",
+            "type": "object",
+            "defaultValue": null
+        },
+        {
+            "name": "lang",
+            "description": "Locale used for the interface. If 'custom', the property localeText should be provided.",
+            "type": "string",
+            "options": [
+                "en",
+                "fr",
+                "es",
+                "de",
+                "pt",
+                "custom"
+            ],
+            "defaultValue": "en"
+        },
+        {
+            "name": "localeText",
+            "description": "Only needed when lang is set to 'custom'. Must be an object provided to AG Grid for custom locale text.",
+            "type": "object",
+            "defaultValue": {}
+        },
+        {
+            "name": "columns",
+            "description": "Column configurations. Each object describes a column of the grid. useCustomLabel defaults to false, if true, displayLabelFormula is used to format the label. widthAlgo defaults to 'fixed'. width is only used if widthAlgo is 'fixed' and must be a string in the shape of {value}px. flex is only used if widthAlgo is 'flex' and must be an integer.",
+            "type": [
+                {
+                    "headerName": {
+                        "type": "string"
+                    },
+                    "field": {
+                        "type": "string",
+                        "availableCondition": "cellDataType is not 'action'"
+                    },
+                    "cellDataType": {
+                        "description": "The type of data that will be displayed in the column. Every type except 'action' is handled by the datagrid itself. If you see an existing cellDataType to 'custom', it's valid, but you will not be able to touch it. You don't support it for now.",
+                        "type": "string",
+                        "options": [
+                            "text",
+                            "number",
+                            "boolean",
+                            "dateString",
+                            "image",
+                            "action"
+                        ]
+                    },
+                    "useCustomLabel": {
+                        "type": "boolean",
+                        "availableCondition": "cellDataType is not action, image, or custom"
+                    },
+                    "displayLabelFormula": {
+                        "type": "formula",
+                        "availableCondition": "useCustomLabel is true and cellDataType is not action, image, or custom"
+                    },
+                    "widthAlgo": {
+                        "type": "string",
+                        "options": [
+                            "flex",
+                            "fixed"
+                        ],
+                        "defaultValue": "fixed"
+                    },
+                    "width": {
+                        "type": "string",
+                        "availableCondition": "widthAlgo is 'fixed'"
+                    },
+                    "flex": {
+                        "type": "number",
+                        "defaultValue": 1,
+                        "availableCondition": "widthAlgo is 'flex'"
+                    },
+                    "minWidth": {
+                        "type": "string"
+                    },
+                    "maxWidth": {
+                        "type": "string"
+                    },
+                    "headerAlignment": {
+                        "type": "string",
+                        "options": [
+                            "left",
+                            "center",
+                            "right"
+                        ],
+                        "defaultValue": "left"
+                    },
+                    "cellAlignment": {
+                        "type": "string",
+                        "options": [
+                            "left",
+                            "center",
+                            "right"
+                        ],
+                        "defaultValue": "left"
+                    },
+                    "pinned": {
+                        "type": "string",
+                        "options": [
+                            "none",
+                            "left",
+                            "right"
+                        ],
+                        "defaultValue": "none"
+                    },
+                    "hide": {
+                        "type": "boolean"
+                    },
+                    "editable": {
+                        "type": "boolean",
+                        "availableCondition": "cellDataType is not action, image, or custom"
+                    },
+                    "filter": {
+                        "type": "boolean",
+                        "defaultValue": false,
+                        "availableCondition": "cellDataType is not action or image"
+                    },
+                    "sortable": {
+                        "type": "boolean",
+                        "defaultValue": false,
+                        "availableCondition": "cellDataType is not action or image"
+                    },
+                    "actionName": {
+                        "type": "string",
+                        "availableCondition": "cellDataType is 'action'"
+                    },
+                    "actionLabel": {
+                        "type": "string",
+                        "availableCondition": "cellDataType is 'action'"
+                    },
+                    "imageWidth": {
+                        "type": "string",
+                        "availableCondition": "cellDataType is 'image'"
+                    },
+                    "imageHeight": {
+                        "type": "string",
+                        "availableCondition": "cellDataType is 'image'"
+                    }
+                }
+            ],
+            "defaultValue": []
+        }
+    ],
+    "states": [],
+    "events": [
+        {
+            "name": "action",
+            "description": "Triggered when clicking on an action cell.",
+            "payload": {
+                "actionName": "string",
+                "row": "object",
+                "id": "number",
+                "index": "number",
+                "displayIndex": "number"
+            }
+        },
+        {
+            "name": "cellValueChanged",
+            "description": "Triggered after a cell edition so that you can update the data source.",
+            "payload": {
+                "oldValue": "any",
+                "newValue": "any",
+                "columnId": "string",
+                "row": "object"
+            }
+        },
+        {
+            "name": "rowSelected",
+            "description": "Triggered when a row is selected.",
+            "payload": {
+                "row": "object"
+            }
+        },
+        {
+            "name": "rowDeselected",
+            "description": "Triggered when a row is deselected.",
+            "payload": {
+                "row": "object"
+            }
+        },
+        {
+            "name": "rowClicked",
+            "description": "Triggered when clicking on a row.",
+            "payload": {
+                "row": "object",
+                "id": "number",
+                "index": "number",
+                "displayIndex": "number"
+            }
+        },
+        {
+            "name": "rowDragStart",
+            "description": "Triggered when row drag is initiated.",
+            "payload": {
+                "row": "object",
+                "id": "number"
+            }
+        },
+        {
+            "name": "rowDragged",
+            "description": "Triggered when row drag is ended.",
+            "payload": {
+                "row": "object",
+                "id": "number",
+                "targetIndex": "number",
+                "rows": "array"
+            }
+        },
+        {
+            "name": "columnMoved",
+            "description": "Triggered when a column has been moved.",
+            "payload": {
+                "toIndex": "number",
+                "columnId": "string",
+                "columnsOrder": "array"
+            }
+        },
+        {
+            "name": "filterChanged",
+            "description": "Triggered when filters are applied or changed.",
+            "payload": "object"
+        },
+        {
+            "name": "sortChanged",
+            "description": "Triggered when sorting is applied or changed.",
+            "payload": "array"
+        }
+    ],
+    "localContext": [],
+    "actions": [
+        {
+            "label": "Reset filters",
+            "description": "Reset the filters of the grid.",
+            "actionName": "resetFilters"
+        },
+        {
+            "label": "Reset sort",
+            "description": "Reset the sort of the grid.",
+            "actionName": "resetSort"
+        },
+        {
+            "label": "Select all",
+            "description": "Select all rows of the grid.",
+            "actionName": "selectAll",
+            "args": [
+                {
+                    "name": "mode",
+                    "type": "select",
+                    "options": [
+                        {
+                            "value": null,
+                            "label": "Grid behavior",
+                            "default": true
+                        },
+                        {
+                            "value": "all",
+                            "label": "All rows"
+                        },
+                        {
+                            "value": "filtered",
+                            "label": "Filtered rows"
+                        },
+                        {
+                            "value": "currentPage",
+                            "label": "Current page rows"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "Deselect all",
+            "description": "Deselect all rows of the grid.",
+            "actionName": "deselectAll"
+        },
+        {
+            "label": "Select row",
+            "description": "Select a specific row of the grid.",
+            "actionName": "selectRow",
+            "args": [
+                {
+                    "name": "Row id",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "label": "Deselect row",
+            "description": "Deselect a specific row of the grid.",
+            "actionName": "deselectRow",
+            "args": [
+                {
+                    "name": "Row id",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "label": "Force Datagrid refresh",
+            "description": "Force the datagrid to refresh.",
+            "actionName": "refreshData"
+        }
+    ],
+    "slots": [],
+    "variables": [
+        {
+            "name": "selectedRows",
+            "description": "Array of currently selected rows.",
+            "type": "array<object>",
+            "readonly": true
+        },
+        {
+            "name": "filters",
+            "description": "Current filter state as an object containing active filters.",
+            "type": "object",
+            "readonly": true
+        },
+        {
+            "name": "sort",
+            "description": "Current sort state as an object containing sort configurations.",
+            "type": "object",
+            "readonly": true
+        },
+        {
+            "name": "columnOrder",
+            "description": "Current columns order state as an array of column ids.",
+            "type": "array",
+            "readonly": true
+        },
+        {
+            "name": "data",
+            "description": "Object containing computed data states of the grid including allData, total, sortedFilteredData, totalSortedFilteredData, perPageTotal, totalPages, displayedData, and totalDisplayedRecords.",
+            "type": "object",
+            "readonly": true,
+            "content": {
+                "allData": "array",
+                "total": "number",
+                "sortedFilteredData": "array",
+                "totalSortedFilteredData": "number",
+                "perPageTotal": "number",
+                "totalPages": "number",
+                "displayedData": "array",
+                "totalDisplayedRecords": "number"
+            }
+        }
+    ],
+    "specifications": [
+        "idFormula always uses javascript with context.mapping value 'context.mapping...'",
+        "CRITICAL: You have to perfectly style this datagrid according to the page.",
+        "Default theme is usually great, use other colors only if you need to be on brand.",
+        "Row reorder does not work well with pagination enabled at the same time.",
+        "The datagrid handles pagination entirely on the frontend. When binding a table view to the datagrid, that table view must NOT have a backend limit set — the datagrid needs all rows available. Never add a ww-paginator alongside a datagrid. Use the datagrid's built-in `pagination` and `paginationPageSize` properties instead.",
+        "The weweb datagrid does not support custom content in columns. If you see an existing cellDataType to 'custom', it's valid, but you will not be able to touch it. You don't support it for now."
+    ],
+    "examples": [
+        {
+            "description": "A user management table with avatar, text fields, a date column with custom formatting, and an edit action button",
+            "example": "{\"uid\":0,\"tag\":\"ww-datagrid-ag\",\"content\":{\"default\":{\"height\":\"400px\",\"columns\":[{\"field\":\"id\",\"width\":\"40px\",\"filter\":true,\"sortable\":true,\"headerName\":\"ID\",\"cellDataType\":\"number\"},{\"field\":\"avatar\",\"width\":\"60px\",\"filter\":false,\"sortable\":false,\"headerName\":\"Avatar\",\"imageWidth\":\"32px\",\"imageHeight\":\"32px\",\"cellDataType\":\"image\"},{\"field\":\"email\",\"filter\":true,\"minWidth\":\"200px\",\"sortable\":true,\"widthAlgo\":\"flex\",\"headerName\":\"Email\"},{\"field\":\"role\",\"filter\":true,\"minWidth\":\"100px\",\"sortable\":true,\"widthAlgo\":\"flex\",\"headerName\":\"Role\"},{\"field\":\"status\",\"filter\":true,\"minWidth\":\"100px\",\"sortable\":true,\"widthAlgo\":\"flex\",\"headerName\":\"Status\"},{\"field\":\"joinDate\",\"filter\":true,\"minWidth\":\"120px\",\"sortable\":true,\"widthAlgo\":\"flex\",\"headerName\":\"Join date\",\"cellDataType\":\"dateString\",\"useCustomLabel\":true,\"displayLabelFormula\":{\"__wwtype\":\"js\",\"code\":\"return new Date(context.mapping).toLocaleDateString('fr-FR')\"}},{\"field\":\"firstName\",\"filter\":true,\"minWidth\":\"100px\",\"sortable\":true,\"widthAlgo\":\"flex\",\"headerName\":\"First name\"},{\"field\":\"lastName\",\"filter\":true,\"minWidth\":\"100px\",\"sortable\":true,\"widthAlgo\":\"flex\",\"headerName\":\"Last name\"},{\"width\":\"100px\",\"pinned\":\"right\",\"actionName\":\"Edit\",\"headerName\":\"Action\",\"actionLabel\":\"Edit\",\"cellDataType\":\"action\"}],\"rowData\":{\"defaultValue\":[],\"__wwtype\":\"js\",\"code\":\"return variables['c3243c02-0872-48ef-bed5-5b81f37c140d']\"},\"idFormula\":{\"__wwtype\":\"js\",\"code\":\"return context.mapping?.['id']\"},\"pagination\":false,\"rowSelection\":\"multiple\",\"movableColumns\":true,\"resizableColumns\":true,\"paginationPageSize\":10,\"headerBackgroundColor\":\"#f8fafc\",\"headerTextColor\":\"#0f172a\",\"headerFontWeight\":600,\"headerFontSize\":\"14px\",\"borderColor\":\"#e2e8f0\",\"cellColor\":\"#334155\",\"cellFontSize\":\"14px\",\"rowBackgroundColor\":\"#ffffff\",\"rowAlternateColor\":\"#f8fafc\",\"rowHoverColor\":\"#3b82f60a\",\"rowVerticalPaddingScale\":1.2,\"selectedRowBackgroundColor\":\"#3b82f614\",\"columnHoverHighlight\":true,\"columnHoverColor\":\"#3b82f60a\",\"menuTextColor\":\"#334155\",\"menuBackgroundColor\":\"#ffffff\",\"actionColor\":\"#3b82f6\",\"actionPadding\":\"6px 12px\",\"actionBorderRadius\":\"6px\",\"actionFontSize\":\"14px\",\"actionFontWeight\":\"600\"}}}"
+        },
+        {
+            "description": "A simple paginated product table with sorting and filtering",
+            "example": "Set rowData to bind to your products array. Set idFormula to context.mapping?.['id']. Add columns for name (text, flex), price (number, fixed 100px), category (text, flex), and inStock (boolean, fixed 80px). Enable pagination with paginationPageSize 20. Set sortable and filter true on all columns. Use default styling."
+        },
+        {
+            "description": "A grid with multiple action buttons using the action event",
+            "example": "Add two action-type columns: one with actionName 'view' and actionLabel 'View', another with actionName 'delete' and actionLabel 'Delete'. In the workflow triggered by the 'action' event, use a conditional branch checking event.actionName to handle each action differently."
+        }
+    ],
+    "dependencies": []
+}

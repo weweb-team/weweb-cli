@@ -1,0 +1,51 @@
+{
+    "metadata": {
+        "name": "ww-div",
+        "description": "A flexible container element (Flexbox) for layout management. Supports flex, block, grid, and inline display modes with repeatable children.",
+        "keywords": [
+            "div",
+            "container",
+            "flexbox",
+            "layout",
+            "grid"
+        ],
+        "features": [
+            "Multiple display modes (flex, block, grid, inline variants)",
+            "Repeatable children for dynamic content",
+            "Background video support",
+            "Linkable",
+            "Lazy hydration for performance"
+        ],
+        "inherit": [
+            "ww-layout",
+            "ww-background-video"
+        ]
+    },
+    "properties": [
+        {
+            "name": "children",
+            "description": "Repeatable child elements. Bind a collection to repeat children for each item.",
+            "type": "array",
+            "defaultValue": []
+        }
+    ],
+    "states": [],
+    "events": [],
+    "actions": [],
+    "slots": [
+        {
+            "name": "children",
+            "description": "Child elements rendered inside the container. Can be repeated with bound data.",
+            "type": "array"
+        }
+    ],
+    "variables": [],
+    "specifications": [
+        "Default flexDirection is row",
+        "Display property must always be included in styles even when bound",
+        "Grid template only supports simplified formats: repeat(2,1fr) or 1fr 1fr",
+        "For responsive designs, define gridTemplateColumns across different breakpoints",
+        "Children slot must be present even if empty"
+    ],
+    "examples": []
+}

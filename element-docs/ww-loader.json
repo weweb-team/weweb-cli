@@ -1,0 +1,81 @@
+{
+    "metadata": {
+        "name": "ww-loader",
+        "description": "A pure-CSS spinner / loading indicator based on SpinKit. Pick one of 12 animation styles and customize color and size. Purely visual — no events, variables, actions, or interactions. Use conditional rendering (v-if based on a loading flag) to show/hide it.",
+        "keywords": [
+            "loader",
+            "spinner",
+            "loading",
+            "indicator",
+            "progress",
+            "spinkit"
+        ],
+        "features": [
+            "12 distinct animation styles covering minimalist, geometric, and rotating feels",
+            "Bindable and responsive color + size",
+            "Tiny (~2 KB CSS, no JS logic) — safe to use in dense lists without perf concerns"
+        ]
+    },
+    "properties": [
+        {
+            "name": "spinner",
+            "description": "Which SpinKit animation to render. Visual descriptions:\n- `plane` — a single 2D square that flips/rotates in 3D (default, minimalist)\n- `chase` — 6 small dots chasing each other in a circle\n- `bounce` — 2 dots bouncing against each other (classic 'double-bounce')\n- `wave` — 5 vertical bars pulsing up/down like an audio equalizer\n- `pulse` — a single circle scaling in and out\n- `flow` — 3 dots moving horizontally in a wave pattern\n- `swing` — 2 dots orbiting each other like a pendulum\n- `circle` — 12 small dots around a ring, fading in sequence\n- `circle-fade` — same 12 dots, fading more gradually / softer feel\n- `grid` — 3×3 grid of cubes bouncing in a cascading pattern\n- `fold` — 4 cubes folding into a 2×2 grid\n- `wander` — 3 cubes moving randomly in a small area",
+            "type": "string",
+            "options": [
+                "plane",
+                "chase",
+                "bounce",
+                "wave",
+                "pulse",
+                "flow",
+                "swing",
+                "circle",
+                "circle-fade",
+                "grid",
+                "fold",
+                "wander"
+            ],
+            "defaultValue": "plane"
+        },
+        {
+            "name": "color",
+            "description": "Spinner color (CSS color value: hex, rgb, hsl, named — e.g. `#3b82f6`, `rgb(59, 130, 246)`, `var(--ww-color-primary-500)`). Applied via the `--sk-color` CSS variable.",
+            "type": "string",
+            "responsive": true
+        },
+        {
+            "name": "size",
+            "description": "Spinner size as a CSS length in pixels (range 0–2000, e.g. `40px`, `80px`). Applied via the `--sk-size` CSS variable and controls the overall bounding box of the animation.",
+            "type": "string",
+            "responsive": true
+        }
+    ],
+    "states": [],
+    "events": [],
+    "localContext": [],
+    "actions": [],
+    "slots": [],
+    "variables": [],
+    "specifications": [
+        "Purely decorative — the element has no events, variables, or actions. To start/stop a loader, conditionally render it (v-if) based on a variable you control. There is no built-in pause/resume API.",
+        "The animation runs in an infinite CSS loop as soon as the element is mounted. Unmounting is the only way to stop it.",
+        "`color` and `size` are forwarded as CSS variables (`--sk-color`, `--sk-size`) and accept any valid CSS value.",
+        "For a contextually sized loader (e.g. inside a button), leave `size` unset and style via parent CSS — the animation scales with the container.",
+        "Recommendations by use case: `plane` for minimal / elegant loading states, `chase` or `circle` for generic app loading, `wave` or `pulse` for audio/media playback, `grid` or `fold` for playful / game-like feels, `bounce` or `flow` for brief inline loaders."
+    ],
+    "examples": [
+        {
+            "description": "A medium blue plane spinner for a generic page-load state.",
+            "example": "{\"spinner\":\"plane\",\"color\":\"#3b82f6\",\"size\":\"40px\"}"
+        },
+        {
+            "description": "A small chase spinner inside a button or inline with text.",
+            "example": "{\"spinner\":\"chase\",\"color\":\"currentColor\",\"size\":\"16px\"}"
+        },
+        {
+            "description": "A larger pulse spinner on a hero/empty state, tinted with the design-system primary color.",
+            "example": "{\"spinner\":\"pulse\",\"color\":\"var(--ww-color-primary-500)\",\"size\":\"80px\"}"
+        }
+    ],
+    "dependencies": []
+}

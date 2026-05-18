@@ -1,0 +1,404 @@
+{
+    "metadata": {
+        "advanced": true,
+        "name": "ww-chat-ai",
+        "description": "**Renders entirely from data — must be seeded with at least 1 user + 1 assistant demo message and given a `min-height` (500px) to be visible.** A role-based chat UI built for LLM assistants. Messages are tagged `role: 'user' | 'assistant'` (not `senderId` like `ww-chat`). Key feature is first-class **streaming** support: while the assistant is generating, set `isStreaming: true` and bind `streamingText` to the growing token string — a temporary assistant bubble renders that text live, and the final message is then pushed into `messages` once the stream ends. Also supports markdown rendering, attachments, and formula-based field mapping. No slots — the UI is fully rendered from data + style properties.",
+        "keywords": [
+            "chat",
+            "ai",
+            "assistant",
+            "llm",
+            "streaming",
+            "conversation",
+            "markdown",
+            "gpt",
+            "claude"
+        ],
+        "features": [
+            "Role-based messages (`user` vs `assistant`) with distinct alignment and styling",
+            "First-class streaming: `isStreaming` + `streamingText` render a live-updating assistant bubble",
+            "Markdown rendering toggle (`enableMarkdown`) — bold, italic, code, links, lists; markdown off preserves newlines literally",
+            "Optional attachments in the composer and on messages",
+            "Formula-based field mappings — bind any custom message / attachment shape",
+            "LocalContext `chat` with per-message `isOwn`, `isFirst`, `isLast` flags (for streak-aware styling)",
+            "Read-only `chatState` variable exposing the full conversation state",
+            "Action: programmatic scrollToBottom(smooth)",
+            "Events: messageSent, messageReceived, messageRightClick, attachmentClick, pendingAttachmentClick"
+        ]
+    },
+    "properties": [
+        {
+            "name": "messages",
+            "description": "Array of conversation messages. Standard shape: `{ id?, content, role: 'user' | 'assistant', timestamp?, attachments? }`. The `role` field drives alignment (user = right, assistant = left). Example message:\n```json\n{\n  \"id\": \"m-42\",\n  \"content\": \"Here's a quick summary:\",\n  \"role\": \"assistant\",\n  \"timestamp\": \"2026-04-23T10:30:00Z\",\n  \"attachments\": [\n    { \"id\": \"f1\", \"name\": \"chart.png\", \"type\": \"image/png\", \"size\": 204800, \"url\": \"https://...\" }\n  ]\n}\n```\nFor custom backend shapes, use the `mappingMessage*` formula properties.",
+            "type": "array",
+            "defaultValue": []
+        },
+        {
+            "name": "userLabel",
+            "description": "Label shown above user messages (e.g. 'You', 'Me').",
+            "type": "string",
+            "defaultValue": "You"
+        },
+        {
+            "name": "assistantLabel",
+            "description": "Label shown above assistant messages (e.g. 'Assistant', 'Claude', 'GPT', the product name).",
+            "type": "string",
+            "defaultValue": "Assistant"
+        },
+        {
+            "name": "disabled",
+            "description": "Disable the input area entirely. Messages still render and auto-scroll continues.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "enableMarkdown",
+            "description": "Render markdown in message content. Supports the core GFM subset: **bold**, _italic_, `inline code`, fenced code blocks with language hints, links, unordered / ordered lists, headings, blockquotes. Tables and task lists are NOT guaranteed. When false, content is rendered as plain text with newlines preserved (good for raw stream output during debugging).",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "allowAttachments",
+            "description": "Show a paperclip button in the input that lets users attach files. When false, `pendingAttachmentClick` never fires and the `messageSent` payload carries an empty `attachments`.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "autoScrollBehavior",
+            "description": "Scroll animation when new messages arrive or `scrollToBottom` fires.",
+            "type": "string",
+            "options": ["auto", "smooth"],
+            "defaultValue": "auto"
+        },
+        {
+            "name": "isStreaming",
+            "description": "Set to `true` while a token stream is coming in from your LLM API. Renders a temporary assistant bubble whose body is always the current `streamingText`. Set back to `false` when the stream ends and you've appended the final message to `messages`. See the streaming lifecycle in specifications.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "streamingText",
+            "description": "The live token buffer from your LLM API. Bind this to a variable that your stream handler writes to on every chunk. Only visible while `isStreaming` is `true`. Clear (empty string) when the stream finishes.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "messageShowTimestamp",
+            "description": "Show a timestamp below each assistant message.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "ownMessageShowTimestamp",
+            "description": "Show a timestamp below each user message.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "inputPlaceholder",
+            "description": "Placeholder text shown in the composer when empty (e.g. `Message...`, `Ask me anything...`).",
+            "type": "string",
+            "defaultValue": "Message..."
+        },
+        {
+            "name": "inputActionAlign",
+            "description": "Vertical alignment of the send / attachment buttons relative to the multi-line textarea.",
+            "type": "string",
+            "options": ["start", "end"],
+            "defaultValue": "end"
+        },
+        {
+            "name": "sendIcon",
+            "description": "Icon for the send button. System-icon name (e.g. `send`, `chevron-right`, `arrow-up`).",
+            "type": "string",
+            "defaultValue": "send"
+        },
+        {
+            "name": "attachmentIcon",
+            "description": "Icon for the attachment button. System-icon name (e.g. `paperclip`, `plus`, `image`).",
+            "type": "string",
+            "defaultValue": "paperclip"
+        },
+        {
+            "name": "removeIcon",
+            "description": "Icon shown on pending attachments to remove them before sending. System-icon name.",
+            "type": "string",
+            "defaultValue": "x"
+        },
+        {
+            "name": "fontFamily",
+            "description": "THEME TOKEN — font family applied to the entire chat (messages + input). CSS font-family string. Required to propagate the page's typography into the chat's isolated sub-components.",
+            "type": "string"
+        },
+        {
+            "name": "messagesAreaBgColor",
+            "description": "THEME TOKEN — background color of the scrolling messages area.",
+            "type": "string"
+        },
+        {
+            "name": "emptyMessageColor",
+            "description": "THEME TOKEN — text color of the empty-state label.",
+            "type": "string"
+        },
+        {
+            "name": "messageBgColor",
+            "description": "THEME TOKEN — background color of ASSISTANT message bubbles (left side).",
+            "type": "string"
+        },
+        {
+            "name": "messageTextColor",
+            "description": "THEME TOKEN — text color of assistant messages.",
+            "type": "string"
+        },
+        {
+            "name": "messageBorder",
+            "description": "THEME TOKEN — CSS border shorthand for assistant message bubbles (e.g. `1px solid #333`).",
+            "type": "string"
+        },
+        {
+            "name": "messageRadius",
+            "description": "THEME TOKEN — CSS border-radius for assistant message bubbles (e.g. `12px`, `4px 16px 16px 16px`).",
+            "type": "string"
+        },
+        {
+            "name": "ownMessageBgColor",
+            "description": "THEME TOKEN — background color of USER message bubbles (right side). Usually the accent color.",
+            "type": "string"
+        },
+        {
+            "name": "ownMessageTextColor",
+            "description": "THEME TOKEN — text color of user messages.",
+            "type": "string"
+        },
+        {
+            "name": "ownMessageBorder",
+            "description": "THEME TOKEN — CSS border shorthand for user message bubbles.",
+            "type": "string"
+        },
+        {
+            "name": "ownMessageRadius",
+            "description": "THEME TOKEN — CSS border-radius for user message bubbles.",
+            "type": "string"
+        },
+        {
+            "name": "inputBgColor",
+            "description": "THEME TOKEN — background color of the input area container.",
+            "type": "string"
+        },
+        {
+            "name": "inputTextColor",
+            "description": "THEME TOKEN — text color of the composer textarea.",
+            "type": "string"
+        },
+        {
+            "name": "inputPlaceholderColor",
+            "description": "THEME TOKEN — text color of the composer placeholder when empty.",
+            "type": "string"
+        },
+        {
+            "name": "inputAreaBorder",
+            "description": "THEME TOKEN — CSS border shorthand at the top of the input area (separator from messages list).",
+            "type": "string"
+        },
+        {
+            "name": "textareaBorder",
+            "description": "THEME TOKEN — CSS border around the textarea element itself.",
+            "type": "string"
+        },
+        {
+            "name": "textareaBorderFocus",
+            "description": "THEME TOKEN — CSS border around the textarea when focused (accent ring).",
+            "type": "string"
+        },
+        {
+            "name": "inputBorderRadius",
+            "description": "THEME TOKEN — border-radius of the textarea composer.",
+            "type": "string"
+        },
+        {
+            "name": "sendButtonBgColor",
+            "description": "THEME TOKEN — background color of the send button.",
+            "type": "string"
+        },
+        {
+            "name": "sendButtonHoverBgColor",
+            "description": "THEME TOKEN — background color of the send button on hover.",
+            "type": "string"
+        },
+        {
+            "name": "sendButtonBorder",
+            "description": "THEME TOKEN — CSS border shorthand for the send button (e.g. `1px solid #00FF41`, `none`).",
+            "type": "string"
+        },
+        {
+            "name": "sendButtonBorderRadius",
+            "description": "THEME TOKEN — border-radius of the send button (e.g. `4px` flat, `999px` circular).",
+            "type": "string"
+        },
+        {
+            "name": "sendButtonBoxShadow",
+            "description": "THEME TOKEN — CSS box-shadow on the send button. Set to `none` to flatten the default soft blue shadow on non-default themes.",
+            "type": "string"
+        },
+        {
+            "name": "sendIconColor",
+            "description": "THEME TOKEN — icon color inside the send button.",
+            "type": "string"
+        },
+        {
+            "name": "attachmentButtonBgColor",
+            "description": "THEME TOKEN — background color of the attachment button.",
+            "type": "string"
+        },
+        {
+            "name": "attachmentButtonHoverBgColor",
+            "description": "THEME TOKEN — background color of the attachment button on hover.",
+            "type": "string"
+        },
+        {
+            "name": "attachmentButtonBorder",
+            "description": "THEME TOKEN — CSS border shorthand for the attachment button.",
+            "type": "string"
+        },
+        {
+            "name": "attachmentButtonBorderRadius",
+            "description": "THEME TOKEN — border-radius of the attachment button.",
+            "type": "string"
+        },
+        {
+            "name": "attachmentButtonBoxShadow",
+            "description": "THEME TOKEN — CSS box-shadow on the attachment button. Set to `none` to flatten the default.",
+            "type": "string"
+        },
+        {
+            "name": "attachmentIconColor",
+            "description": "THEME TOKEN — icon color inside the attachment button.",
+            "type": "string"
+        }
+    ],
+    "states": [],
+    "events": [
+        {
+            "name": "messageSent",
+            "description": "Fires when the user submits the composer (Enter or send button). The message is NOT auto-appended to `messages` — you handle persistence. Typically the entry point of the streaming lifecycle: push the user message, then kick off the LLM request.",
+            "payload": {
+                "message": {
+                    "id": "string (client-generated)",
+                    "content": "string",
+                    "role": "'user'",
+                    "timestamp": "string (ISO)",
+                    "attachments": "array (File objects if allowAttachments was true)"
+                }
+            }
+        },
+        {
+            "name": "messageReceived",
+            "description": "Fires when a NEW message with `role: 'assistant'` appears at the end of the `messages` array. Does NOT fire during streaming (only on the final append). Use for sound / badge / post-processing.",
+            "payload": {
+                "message": "object (role: 'assistant')"
+            }
+        },
+        {
+            "name": "messageRightClick",
+            "description": "Fires on right-click (or long-press) of a message. Use for context menus (Copy, Regenerate, Edit). Coordinates are provided relative to the chat element and the viewport.",
+            "payload": {
+                "message": "object",
+                "position": {
+                    "elementX": "number",
+                    "elementY": "number",
+                    "viewportX": "number",
+                    "viewportY": "number"
+                }
+            }
+        },
+        {
+            "name": "attachmentClick",
+            "description": "Fires when an attachment on a sent message is clicked. Use to open a preview / trigger a download.",
+            "payload": {
+                "attachment": {
+                    "id": "string",
+                    "name": "string",
+                    "type": "string (MIME)",
+                    "size": "number (bytes)",
+                    "url": "string"
+                }
+            }
+        },
+        {
+            "name": "pendingAttachmentClick",
+            "description": "Fires when a pending (unsent) local-upload attachment is clicked. `attachment` is a raw `File` object — no `url` yet, use `URL.createObjectURL(file)` for an inline preview.",
+            "payload": {
+                "attachment": "File",
+                "index": "number"
+            }
+        }
+    ],
+    "localContext": [
+        {
+            "path": "chat",
+            "type": "object",
+            "description": "Exposes the resolved conversation state. Each message gets three positional flags you can use for streak-aware styling (collapse avatars within a same-role run, round only the first/last bubble of a streak, etc.).",
+            "content": {
+                "messages": {
+                    "type": "array",
+                    "description": "Resolved messages with extra fields: `isOwn` (role === 'user'), `isFirst` (first message of a same-role streak, OR position 0), `isLast` (last of a same-role streak, OR the final message)."
+                },
+                "utils": {
+                    "type": "object",
+                    "description": "`{ messageCount: number, isDisabled: boolean }`."
+                }
+            }
+        }
+    ],
+    "actions": [
+        {
+            "label": "Scroll to bottom",
+            "actionName": "scrollToBottom",
+            "description": "Scroll the messages area to the latest message. Call this after you append a streamed response to guarantee the user sees it.",
+            "args": [
+                { "name": "smooth", "type": "boolean", "description": "Use smooth animation (overrides `autoScrollBehavior` for this call)." }
+            ]
+        }
+    ],
+    "slots": [],
+    "variables": [
+        {
+            "name": "chatState",
+            "description": "Full computed state: `{ messages, utils }`. Read-only — kept in sync with `messages` and the field mappings.",
+            "type": "object",
+            "readonly": true
+        }
+    ],
+    "specifications": [
+        "MANDATORY SEED — never insert this element with an empty `messages` array (it renders as a blank box and looks broken). ALWAYS seed at least 1 user message + 1 assistant message with light placeholder content. The user replaces it with their own bindings. This applies even when the user only says 'add an AI chat'.",
+        "MANDATORY SIZING — set `min-height: 500px` on the element style at insertion. The chat has internal flex regions (scrollable messages / input) and collapses to 0 height inside flex/grid parents without an explicit minimum. Without this rule, the element is invisible even when seeded correctly.",
+        "MANDATORY THEMING (when page is non-default) — the chat's internal sub-components have ISOLATED CSS and do NOT inherit page-level color / background / font. As soon as the page is anything other than the default light/white theme (dark, terminal, brutalist, editorial, branded palette…), you MUST override the FULL token bundle below — partial theming always produces broken visuals (soft-blue send button in a dark chat, grey bubbles on a colored page, white input bleeding through a branded theme). Treat the bundle as all-or-nothing.\n  TOKENS by zone (copy every one that applies):\n  • Typography: `fontFamily`\n  • Messages area: `messagesAreaBgColor`, `emptyMessageColor`\n  • Assistant bubbles: `messageBgColor`, `messageTextColor`, `messageBorder`, `messageRadius`\n  • User bubbles: `ownMessageBgColor`, `ownMessageTextColor`, `ownMessageBorder`, `ownMessageRadius`\n  • Input area: `inputBgColor`, `inputTextColor`, `inputPlaceholderColor`, `inputAreaBorder`, `textareaBorder`, `textareaBorderFocus`, `inputBorderRadius`\n  • Send button: `sendButtonBgColor`, `sendButtonHoverBgColor`, `sendButtonBorder`, `sendButtonBorderRadius`, `sendButtonBoxShadow`, `sendIconColor`\n  • Attachment button: `attachmentButtonBgColor`, `attachmentButtonHoverBgColor`, `attachmentButtonBorder`, `attachmentButtonBorderRadius`, `attachmentButtonBoxShadow`, `attachmentIconColor`\n  Assistant-vs-user bubbles MUST be visually distinct (different bg color AND/OR radius) — otherwise the conversation is unreadable.",
+        "STREAMING LIFECYCLE — the key pattern this element is built for:\n  1. User types + hits Enter → `messageSent` fires with the user message.\n  2. Your handler: (a) generate an id, (b) push `{ id, content, role: 'user', timestamp }` into the bound `messages` array, (c) call your LLM API with stream: true.\n  3. Set `isStreaming: true`, initialize `streamingText: ''`.\n  4. For each chunk received → update `streamingText` (e.g. `streamingText += token`).\n  5. When the stream ends: push `{ id, content: streamingText, role: 'assistant', timestamp }` into `messages`, then set `isStreaming: false` and `streamingText: ''`.\n  6. Call `scrollToBottom({ smooth: true })` if the user was already at the bottom.\n  Order matters — flipping `isStreaming: false` BEFORE appending the final message will make the streaming bubble disappear with no replacement.",
+        "Messages model — uses `role: 'user' | 'assistant'`, NOT `senderId` like `ww-chat`. Do not mix the two schemas. If you need multi-user / group conversations, use `ww-chat` instead.",
+        "`messageReceived` is inferred from array changes — it only fires on the FINAL assistant append, not during streaming. To react to the stream itself, watch your `streamingText` variable.",
+        "Markdown rendering — `enableMarkdown: true` runs content through a GFM subset renderer (bold, italic, inline code, fenced code blocks with language hints, links, lists, headings, blockquotes). Tables and task lists are NOT guaranteed. HTML in content is escaped (no raw HTML injection). When false, newlines are preserved with `white-space: pre-wrap` but no other formatting is applied.",
+        "Keyboard in the input — `Enter` sends, `Shift+Enter` inserts a newline.",
+        "Attachment lifecycle — user picks files → they become `pendingAttachments` (raw `File` objects, clickable via `pendingAttachmentClick`) → user sends → attachments arrive in `messageSent.payload.message.attachments` as `File[]` → you upload and replace with `{ id, name, type, size, url }` before pushing to `messages`.",
+        "ICONS from project library — `sendIcon`, `attachmentIcon`, `removeIcon` MUST reference an icon present in the current project's icon library. ALWAYS look up the project's available icons before assigning a name; never invent names from generic libraries (Material, FontAwesome, Lucide…). If unsure, leave the property unset to use the element default.",
+        "CONSTRAINTS (what NOT to do):\n  • NO slots — the element renders its own messages / input. Do not try to add child elements.\n  • DO NOT inject custom CSS via `classes` or inline `styles`. The listed style properties ARE the full theming surface. Repeated class-based attempts trigger infinite edit loops.\n  • Textarea has NO min/max rows or height property — it auto-grows with content. Requests to constrain the typing area to N lines (e.g. 'min 4 max 6 lines') CANNOT be satisfied — acknowledge the limitation explicitly and stop, do NOT try to inject CSS.\n  • Mapping formulas (`mappingMessageId`, `mappingMessageText`, `mappingRole`, `mappingTimestamp`, `mappingAttachments`, `mappingAttachment*`) are advanced — only use when the backend shape differs from the default.\n  • The element does NOT call any LLM — it's a UI. Wire your own OpenAI / Anthropic / fetch-stream handler in a workflow / script and drive `messages` + `isStreaming` + `streamingText` from there."
+    ],
+    "examples": [
+        {
+            "description": "A basic Q&A with two messages and markdown enabled. Static — no streaming.",
+            "example": "{\"messages\":[{\"id\":\"m1\",\"content\":\"Hello!\",\"role\":\"user\",\"timestamp\":\"2026-04-23T09:00:00Z\"},{\"id\":\"m2\",\"content\":\"Hi! How can I help you today?\",\"role\":\"assistant\",\"timestamp\":\"2026-04-23T09:00:02Z\"}],\"userLabel\":\"You\",\"assistantLabel\":\"Claude\",\"enableMarkdown\":true,\"allowAttachments\":false}"
+        },
+        {
+            "description": "Mid-stream state — user just asked a question, assistant is generating. Note `isStreaming: true` and `streamingText` holding the partial response.",
+            "example": "{\"messages\":[{\"id\":\"m1\",\"content\":\"Explain quantum entanglement\",\"role\":\"user\",\"timestamp\":\"2026-04-23T09:10:00Z\"}],\"isStreaming\":true,\"streamingText\":\"Quantum entanglement is a phenomenon where two particles become linked so that the state of one instantly\",\"enableMarkdown\":true,\"assistantLabel\":\"Assistant\"}"
+        },
+        {
+            "description": "Empty conversation with attachments allowed and a friendly assistant label.",
+            "example": "{\"messages\":[],\"userLabel\":\"You\",\"assistantLabel\":\"Design AI\",\"allowAttachments\":true,\"enableMarkdown\":true}"
+        },
+        {
+            "description": "COMPLETE DARK TERMINAL PRESET — copy-paste this entire bundle as a reference for any dark theme. EVERY token must be set to avoid white/blue defaults bleeding through (send button shadow, bubble bg, input border).",
+            "example": "{\"messages\":[{\"id\":\"m1\",\"content\":\"> why is my pod crashlooping?\",\"role\":\"user\",\"timestamp\":\"2026-04-23T10:00:00Z\"},{\"id\":\"m2\",\"content\":\"OOMKilled — memory limit hit. Raise limits to 512Mi.\",\"role\":\"assistant\",\"timestamp\":\"2026-04-23T10:00:02Z\"}],\"userLabel\":\"user@prod\",\"assistantLabel\":\"claude-ops\",\"enableMarkdown\":true,\"inputPlaceholder\":\"$ ask claude…\",\"sendIcon\":\"send\",\"attachmentIcon\":\"paperclip\",\"fontFamily\":\"JetBrains Mono, monospace\",\"messagesAreaBgColor\":\"#0A0A0A\",\"emptyMessageColor\":\"#4A9960\",\"messageBgColor\":\"rgba(0,255,65,0.08)\",\"messageTextColor\":\"#00FF41\",\"messageBorder\":\"1px solid rgba(0,255,65,0.3)\",\"messageRadius\":\"2px\",\"ownMessageBgColor\":\"#00FF41\",\"ownMessageTextColor\":\"#0A0A0A\",\"ownMessageBorder\":\"1px solid #00FF41\",\"ownMessageRadius\":\"2px\",\"inputBgColor\":\"#0A0A0A\",\"inputTextColor\":\"#00FF41\",\"inputPlaceholderColor\":\"rgba(0,255,65,0.4)\",\"inputAreaBorder\":\"1px solid rgba(0,255,65,0.3)\",\"textareaBorder\":\"1px solid rgba(0,255,65,0.3)\",\"textareaBorderFocus\":\"1px solid #00FF41\",\"inputBorderRadius\":\"2px\",\"sendButtonBgColor\":\"#00FF41\",\"sendButtonHoverBgColor\":\"#4A9960\",\"sendButtonBorder\":\"none\",\"sendButtonBorderRadius\":\"2px\",\"sendButtonBoxShadow\":\"none\",\"sendIconColor\":\"#0A0A0A\",\"attachmentButtonBgColor\":\"transparent\",\"attachmentButtonHoverBgColor\":\"rgba(0,255,65,0.1)\",\"attachmentButtonBorder\":\"1px solid rgba(0,255,65,0.3)\",\"attachmentButtonBorderRadius\":\"2px\",\"attachmentButtonBoxShadow\":\"none\",\"attachmentIconColor\":\"#00FF41\"}"
+        }
+    ],
+    "dependencies": []
+}

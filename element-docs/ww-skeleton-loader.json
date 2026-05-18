@@ -1,0 +1,59 @@
+{
+    "metadata": {
+        "name": "ww-skeleton-loader",
+        "description": "An animated placeholder block that indicates content is loading. Renders as a single `<div>` with a CSS animation applied — the element itself exposes only the animation type. Size, shape, and background color are controlled via standard style (width, height, border-radius, background-color). Intended to be rendered conditionally while data is loading, then swapped for the real content once `isLoading` is false.",
+        "keywords": [
+            "skeleton",
+            "placeholder",
+            "loading",
+            "shimmer",
+            "pulse",
+            "wave",
+            "empty-state"
+        ],
+        "features": [
+            "3 visually distinct animation styles: wave, pulse, shimmer",
+            "Bindable `animationType` (swap animation at runtime)",
+            "Zero runtime cost: no JS, just a `<div>` with a CSS animation",
+            "Shape fully controlled by style — use multiple skeletons to mimic lines / cards / avatars"
+        ]
+    },
+    "properties": [
+        {
+            "name": "animationType",
+            "description": "The animation applied to the placeholder. Visual descriptions:\n- `pulse` — the whole box fades between ~60% and 100% opacity in a slow heartbeat (the most subtle / least distracting, good for dense lists)\n- `wave` — a subtle translucent bar sweeps horizontally across the box every 1.5s (most 'skeleton-UI' feel, good for card placeholders)\n- `shimmer` — a diagonal gradient light sweep from left to right every 2s (most premium / polished feel, good for hero/empty states)",
+            "type": "string",
+            "options": ["wave", "pulse", "shimmer"],
+            "defaultValue": "wave"
+        }
+    ],
+    "states": [],
+    "events": [],
+    "localContext": [],
+    "actions": [],
+    "slots": [],
+    "variables": [],
+    "specifications": [
+        "The element renders an empty `<div>` — its width, height, border-radius, and background color MUST come from style (or design-system classes). Without a visible size and a background color, nothing is visible.",
+        "To toggle the skeleton on/off during loading, wrap in a v-if based on a loading variable you control — e.g. render `ww-skeleton-loader` when `isLoading`, render the real content when `!isLoading`. There is no built-in start/stop action.",
+        "`wave` and `shimmer` rely on a `::after` pseudo-element overlay and work best when the skeleton has a visible solid background color — pick a grey/light-grey to make the sweep visible.",
+        "`pulse` works on any background since it animates the opacity of the element itself; use it when you don't want the 'sweep' effect.",
+        "Common usage pattern: to mock a card, stack multiple skeletons — one tall rectangle (image), several short rectangles of decreasing width (title + body lines). Keep the skeleton layout close to the final content's layout so the swap feels seamless.",
+        "Set `border-radius` to `999px` for circular avatar placeholders, a small radius for text-line placeholders, a medium radius for card/image placeholders."
+    ],
+    "examples": [
+        {
+            "description": "A text-line skeleton placeholder bound to a loading flag. Style separately: width 100%, height 16px, radius 4px, bg grey-200.",
+            "example": "{\"animationType\":\"wave\"}"
+        },
+        {
+            "description": "A hero image placeholder with the shimmer animation (feels premium). Style separately: width 100%, height 240px, radius 12px, bg grey-200.",
+            "example": "{\"animationType\":\"shimmer\"}"
+        },
+        {
+            "description": "A dense list of skeleton items with the subtle pulse animation (less distracting than wave/shimmer when many are visible at once).",
+            "example": "{\"animationType\":\"pulse\"}"
+        }
+    ],
+    "dependencies": []
+}

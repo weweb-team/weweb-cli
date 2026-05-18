@@ -1,0 +1,164 @@
+{
+    "metadata": {
+        "name": "ww-form-container",
+        "description": "A form container component that manages form inputs, validation, and submission handling. It serves as a wrapper for form elements and manages their state and interactions.",
+        "keywords": [
+            "form",
+            "container",
+            "validation",
+            "submit",
+            "inputs"
+        ],
+        "features": [
+            "Form validation on submit or on input change",
+            "Debounce delay for change-based validation",
+            "Browser autocomplete support",
+            "Form state management (submitting, submitted, valid)",
+            "Form reset with optional initial values",
+            "Tracks individual field values and validity states",
+            "Does not support file upload inputs",
+            "Does not support nested forms"
+        ],
+        "inherit": [
+            "ww-layout"
+        ]
+    },
+    "properties": [
+        {
+            "name": "validation",
+            "description": "Controls when form validation occurs. 'submit' validates only on form submission, 'change' validates on every input change with a debounce delay.",
+            "type": "string",
+            "options": [
+                "submit",
+                "change"
+            ],
+            "defaultValue": "submit"
+        },
+        {
+            "name": "debounceDelay",
+            "description": "Delay in milliseconds before validation triggers when validation is set to 'change'. Only applicable when validation is 'change'. Range: 1-5000ms.",
+            "type": "number",
+            "defaultValue": 500,
+            "responsive": true
+        },
+        {
+            "name": "autocomplete",
+            "description": "Enables or disables browser autocomplete functionality on the form.",
+            "type": "boolean",
+            "defaultValue": true
+        }
+    ],
+    "states": [],
+    "events": [
+        {
+            "name": "submit",
+            "description": "Triggered when the form is submitted. Requires a submit button inside the form to work."
+        },
+        {
+            "name": "submit-validation-error",
+            "description": "Triggered when form validation fails on submission."
+        }
+    ],
+    "localContext": [
+        {
+            "path": "form",
+            "type": "object",
+            "description": "The form object containing all form state and data.",
+            "content": {
+                "formData": {
+                    "type": "object",
+                    "description": "An object containing all current form field values. Keys are the field names and values are the current input values.",
+                    "content": {}
+                },
+                "fields": {
+                    "type": "object",
+                    "description": "A record containing all form input names with their values and validation states. Each key is a field name, and the value is an object with 'isValid' (boolean) and 'value' (any) properties.",
+                    "content": {
+                        "fieldName": {
+                            "isValid": "boolean",
+                            "value": "any"
+                        }
+                    }
+                },
+                "isSubmitting": "boolean",
+                "isSubmitted": "boolean",
+                "isValid": "boolean"
+            }
+        }
+    ],
+    "actions": [
+        {
+            "label": "Set form state",
+            "actionName": "setFormState",
+            "description": "Manually set the form's submitting and submitted states. Useful for controlling form state during async operations.",
+            "args": [
+                {
+                    "name": "isSubmitting",
+                    "type": "boolean"
+                },
+                {
+                    "name": "isSubmitted",
+                    "type": "boolean"
+                }
+            ]
+        },
+        {
+            "label": "Submit form",
+            "actionName": "submitForm",
+            "description": "Programmatically trigger form submission."
+        },
+        {
+            "label": "Reset form",
+            "actionName": "resetForm",
+            "description": "Reset all form fields. Optionally provide initial values to reset fields to specific values instead of empty.",
+            "args": [
+                {
+                    "name": "initialValues",
+                    "type": "object"
+                }
+            ]
+        }
+    ],
+    "slots": [
+        {
+            "name": "formContent",
+            "description": "The content of the form container. Place form input elements and a submit button inside this slot.",
+            "type": "array"
+        }
+    ],
+    "variables": [
+        {
+            "name": "form",
+            "description": "Object containing the full form state including fields (with their values and validity), isSubmitting, isSubmitted, and isValid flags. Accessed via variables['formId-form'].",
+            "type": "object",
+            "readonly": true,
+            "content": {
+                "fields": {
+                    "fieldName": {
+                        "isValid": "boolean",
+                        "value": "any"
+                    }
+                },
+                "isSubmitting": "boolean",
+                "isSubmitted": "boolean",
+                "isValid": "boolean"
+            }
+        }
+    ],
+    "specifications": [
+        "A submit button must be placed inside the form for the 'on submit' event to trigger.",
+        "Do not disable the submit button when the form is invalid. The form handles validation errors on its own.",
+        "For inputs that need custom validation, set 'customValidation': true in the input's props.",
+        "The 'isValid' local context checks all inputs including hidden ones, so avoid relying on it for multi-step or dynamic forms.",
+        "The debounceDelay property is only relevant when validation is set to 'change'."
+    ],
+    "examples": [],
+    "dependencies": [
+        "ww-input-basic",
+        "ww-input-checkbox",
+        "ww-input-toggle",
+        "ww-input-range",
+        "ww-input-radio",
+        "ww-button"
+    ]
+}

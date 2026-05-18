@@ -1,0 +1,93 @@
+{
+    "metadata": {
+        "name": "ww-input-recaptcha",
+        "description": "A Google reCAPTCHA v2 widget used inside forms to verify that the user is human. Exposes the verification status as a variable so it can be sent with form submissions.",
+        "keywords": [
+            "recaptcha",
+            "captcha",
+            "google",
+            "verification",
+            "form",
+            "human",
+            "anti-bot",
+            "security"
+        ],
+        "features": [
+            "theme (light/dark)",
+            "size (normal/compact)",
+            "include response in form submit",
+            "change event with verification payload"
+        ]
+    },
+    "properties": [
+        {
+            "name": "theme",
+            "description": "Visual theme of the reCAPTCHA widget.",
+            "type": "string",
+            "options": [
+                "light",
+                "dark"
+            ],
+            "defaultValue": "light"
+        },
+        {
+            "name": "size",
+            "description": "Size of the reCAPTCHA widget.",
+            "type": "string",
+            "options": [
+                "normal",
+                "compact"
+            ],
+            "defaultValue": "normal"
+        },
+        {
+            "name": "key",
+            "description": "Google reCAPTCHA v2 site key. Required — without it the widget is not rendered on the published site.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "sendResponse",
+            "description": "When true, the enclosing form container includes this widget's verification value in the form submission payload.",
+            "type": "boolean",
+            "defaultValue": false
+        }
+    ],
+    "states": [],
+    "events": [
+        {
+            "name": "change",
+            "description": "Emitted when the user completes or expires the reCAPTCHA challenge.",
+            "payload": {
+                "value": {
+                    "validate": "boolean",
+                    "code": "string | null"
+                }
+            }
+        }
+    ],
+    "localContext": [],
+    "actions": [],
+    "slots": [],
+    "variables": [
+        {
+            "name": "value",
+            "description": "Current verification result as { validate, code }. `validate` is true when the user has completed the challenge; `code` is the response token to verify server-side against Google's API.",
+            "type": "object",
+            "readonly": false,
+            "content": {
+                "validate": false,
+                "code": null
+            }
+        }
+    ],
+    "specifications": [
+        "Requires a Google reCAPTCHA v2 site key (`key` property). Without it, nothing is rendered on the live site.",
+        "Place inside `ww-form-container` when gating form submission on successful verification.",
+        "Enable `sendResponse` to include the verification payload in the form submission; the server must verify the token against Google's API.",
+        "Access verification state via the `value` variable — bind to `value` directly rather than copying it into a separate variable.",
+        "The domains hosting the form must be authorized in the Google reCAPTCHA admin console (including `editor.weweb.io` while editing)."
+    ],
+    "examples": [],
+    "dependencies": []
+}

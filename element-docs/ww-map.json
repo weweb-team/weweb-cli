@@ -1,0 +1,316 @@
+{
+    "metadata": {
+        "name": "ww-map",
+        "description": "An interactive Google Maps element with configurable map type, styles, controls, markers, marker tooltips, and map or marker events.",
+        "keywords": [
+            "map",
+            "google map",
+            "google maps",
+            "location",
+            "marker",
+            "geography",
+            "address",
+            "directions"
+        ],
+        "features": [
+            "Google Maps JavaScript API integration",
+            "Roadmap, satellite, hybrid, and terrain map types",
+            "Built-in Google map style presets and custom JSON styles",
+            "Static or bound marker arrays",
+            "Custom marker icons with optional fixed dimensions",
+            "Marker tooltip display on hover or click",
+            "Automatic bounds fitting around multiple markers",
+            "Map click and marker mouse/click events",
+            "Configurable Google Maps controls"
+        ]
+    },
+    "properties": [
+        {
+            "name": "defaultMapType",
+            "description": "Google map type to display.",
+            "type": "string",
+            "options": [
+                "roadmap",
+                "satellite",
+                "hybrid",
+                "terrain"
+            ],
+            "defaultValue": "roadmap"
+        },
+        {
+            "name": "mapStyle",
+            "description": "Visual style preset for non-satellite maps. Ignored when defaultMapType is satellite.",
+            "type": "string",
+            "options": [
+                null,
+                "silver",
+                "retro",
+                "dark",
+                "night",
+                "aubergine",
+                "custom"
+            ],
+            "defaultValue": "dark"
+        },
+        {
+            "name": "markersIcon",
+            "description": "Whether markers should use custom icon images instead of the default Google marker.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "markersAutoSize",
+            "description": "Whether custom marker icons should keep their natural image size. Only used when markersIcon is true.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "defaultMarkerUrl",
+            "description": "Fallback custom marker icon URL. Used when markersIcon is true and an individual marker does not provide its own icon URL.",
+            "type": "string"
+        },
+        {
+            "name": "defaultMarkerWidth",
+            "description": "Fallback custom marker icon width in pixels when markersIcon is true and markersAutoSize is false.",
+            "type": "number",
+            "defaultValue": 40
+        },
+        {
+            "name": "defaultMarkerHeight",
+            "description": "Fallback custom marker icon height in pixels when markersIcon is true and markersAutoSize is false.",
+            "type": "number",
+            "defaultValue": 40
+        },
+        {
+            "name": "mapStyleJSON",
+            "description": "Custom Google Maps style object with a code field containing JSON. Only used when mapStyle is custom and defaultMapType is not satellite.",
+            "type": "object"
+        },
+        {
+            "name": "googleKey",
+            "description": "Google Maps JavaScript API key. The map shows a placeholder until a valid key matching the Google API key format is provided.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "lat",
+            "description": "Initial center latitude as a string.",
+            "type": "string",
+            "defaultValue": "40.712784"
+        },
+        {
+            "name": "lng",
+            "description": "Initial center longitude as a string.",
+            "type": "string",
+            "defaultValue": "-74.005941"
+        },
+        {
+            "name": "zoom",
+            "description": "Initial Google Maps zoom level from 0 to 20.",
+            "type": "number",
+            "defaultValue": 11
+        },
+        {
+            "name": "markers",
+            "description": "Array of marker objects. By default each marker should expose name, lat, and lng fields; when custom icons are enabled, url, width, and height can also be used.",
+            "type": "array",
+            "defaultValue": [
+                {
+                    "name": "New York",
+                    "lat": 40.712784,
+                    "lng": -74.005941
+                },
+                {
+                    "name": "Brooklin",
+                    "lat": 40.650002,
+                    "lng": -73.949997
+                }
+            ]
+        },
+        {
+            "name": "nameField",
+            "description": "Object property path used as marker tooltip content when markers are bound from custom data. Defaults to name when empty.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "latField",
+            "description": "Object property path used as marker latitude when markers are bound from custom data. Defaults to lat when empty.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "lngField",
+            "description": "Object property path used as marker longitude when markers are bound from custom data. Defaults to lng when empty.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "urlField",
+            "description": "Object property path used as marker icon URL when markers are bound from custom data and markersIcon is true. Defaults to url when empty.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "widthField",
+            "description": "Object property path used as marker icon width when markers are bound from custom data, markersIcon is true, and markersAutoSize is false. Defaults to width when empty.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "heightField",
+            "description": "Object property path used as marker icon height when markers are bound from custom data, markersIcon is true, and markersAutoSize is false. Defaults to height when empty.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "markerTooltipTrigger",
+            "description": "How marker tooltips are opened. Use null to disable marker tooltips.",
+            "type": "string",
+            "options": [
+                null,
+                "hover",
+                "click"
+            ],
+            "defaultValue": "hover"
+        },
+        {
+            "name": "fixedBounds",
+            "description": "Whether the map should automatically fit its viewport around all markers when at least two markers exist.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "zoomControl",
+            "description": "Whether to show the Google Maps zoom control.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "scaleControl",
+            "description": "Whether to show the Google Maps scale control.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "rotateControl",
+            "description": "Whether to show the Google Maps rotate control.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "streetViewControl",
+            "description": "Whether to show the Google Maps Street View control.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "fullscreenControl",
+            "description": "Whether to show the Google Maps fullscreen control.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "mapTypeControl",
+            "description": "Whether to show the Google Maps map type control.",
+            "type": "boolean",
+            "defaultValue": true
+        }
+    ],
+    "states": [],
+    "events": [
+        {
+            "name": "map:click",
+            "description": "Triggered when the user clicks the map.",
+            "payload": {
+                "latLng": {
+                    "lat": 48.84872727506581,
+                    "lng": 2.351657694024656
+                },
+                "domEvent": {},
+                "pixel": {
+                    "x": 474,
+                    "y": 196
+                },
+                "xb": {
+                    "x": 129.67228991575087,
+                    "y": 88.07977939599527
+                }
+            }
+        },
+        {
+            "name": "marker:mouseover",
+            "description": "Triggered when the mouse enters a marker.",
+            "payload": {
+                "marker": {
+                    "content": "Paris",
+                    "position": {
+                        "lat": 48.84872727506581,
+                        "lng": 2.351657694024656
+                    },
+                    "rawData": {}
+                },
+                "domEvent": {
+                    "x": 128,
+                    "y": 156,
+                    "target": null
+                }
+            }
+        },
+        {
+            "name": "marker:mouseout",
+            "description": "Triggered when the mouse leaves a marker.",
+            "payload": {
+                "marker": {
+                    "content": "Paris",
+                    "position": {
+                        "lat": 48.84872727506581,
+                        "lng": 2.351657694024656
+                    },
+                    "rawData": {}
+                },
+                "domEvent": {
+                    "x": 128,
+                    "y": 156,
+                    "target": null
+                }
+            }
+        },
+        {
+            "name": "marker:click",
+            "description": "Triggered when the user clicks a marker.",
+            "payload": {
+                "marker": {
+                    "content": "Paris",
+                    "position": {
+                        "lat": 48.84872727506581,
+                        "lng": 2.351657694024656
+                    },
+                    "rawData": {}
+                },
+                "domEvent": {
+                    "x": 128,
+                    "y": 156,
+                    "target": null
+                }
+            }
+        }
+    ],
+    "localContext": [],
+    "actions": [],
+    "slots": [],
+    "variables": [],
+    "specifications": [
+        "This element renders as a single standalone tag and has no slots or child elements.",
+        "A valid Google Maps JavaScript API key is required for the actual map to render; without it, the component displays its built-in API key placeholder.",
+        "Use lat and lng as strings for the map center because the component parses them with parseFloat.",
+        "Marker objects should contain numeric lat and lng values, plus a name string when marker tooltips are needed.",
+        "When binding markers from data with different field names, set nameField, latField, lngField, urlField, widthField, or heightField to the matching object property paths.",
+        "Set fixedBounds to true when displaying multiple markers so the map fits all marker positions; set it to false when the chosen center and zoom must be preserved.",
+        "Only use mapStyleJSON when mapStyle is custom. Its value must be an object with a code string containing valid JSON accepted by the Google Maps styles option.",
+        "Do not set mapStyle when defaultMapType is satellite; the component clears mapStyle for satellite maps.",
+        "Use markerTooltipTrigger null when markers should not show info windows, hover for desktop-oriented hover tooltips, and click for mobile-friendly tooltips."
+    ],
+    "examples": [],
+    "dependencies": []
+}

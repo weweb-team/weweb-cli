@@ -1,0 +1,259 @@
+{
+    "metadata": {
+        "name": "ww-slider",
+        "description": "A carousel/slider component built on the Swiper library. Supports multiple transition effects (slide, fade, coverflow, flip, cards), navigation arrows, pagination bullets, autoplay, loop mode, and mousewheel control. Ideal for image galleries, testimonials, feature showcases, and any content that needs horizontal sliding navigation.",
+        "keywords": [
+            "slider",
+            "carousel",
+            "swiper",
+            "slideshow",
+            "gallery"
+        ],
+        "features": [
+            "Multiple transition effects: slide, fade, coverflow, flip, cards",
+            "Configurable number of slides per view",
+            "Navigation arrows (previous/next)",
+            "Pagination bullets",
+            "Loop mode for infinite scrolling",
+            "Autoplay with configurable timing",
+            "Linear transition option for continuous autoplay",
+            "Mousewheel control with sensitivity, axis lock, and invert options",
+            "Configurable space between slides",
+            "Configurable transition duration",
+            "Image loading state tracking per slide",
+            "Does not support vertical sliding direction",
+            "Does not support thumbnails navigation natively",
+            "Does not support lazy loading configuration"
+        ],
+        "advanced": true
+    },
+    "properties": [
+        {
+            "name": "slidesPerView",
+            "description": "Number of slides visible at the same time. Minimum 1, maximum is the total number of slides.",
+            "type": "number",
+            "defaultValue": 1,
+            "responsive": true
+        },
+        {
+            "name": "spaceBetween",
+            "description": "Space between each slide in pixels. Must be a string with 'px' unit, e.g. '10px'.",
+            "type": "string",
+            "responsive": true
+        },
+        {
+            "name": "effect",
+            "description": "Transition effect used when switching slides.",
+            "type": "string",
+            "options": ["slide", "fade", "coverflow", "flip", "cards"],
+            "responsive": true
+        },
+        {
+            "name": "transitionDuration",
+            "description": "Duration of the slide transition in milliseconds. Must be a string with 'ms' unit, e.g. '300ms'.",
+            "type": "string",
+            "responsive": true
+        },
+        {
+            "name": "navigation",
+            "description": "Show or hide the previous/next navigation arrows.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "pagination",
+            "description": "Show or hide the pagination bullets below the slider.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "loop",
+            "description": "Enable infinite loop mode so the slider wraps around from the last slide back to the first.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "automatic",
+            "description": "Enable autoplay to automatically advance slides.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "automaticTiming",
+            "description": "Time interval between automatic slide transitions. Must be a string with 's' unit, e.g. '3s'. Only applies when automatic is true.",
+            "type": "string",
+            "defaultValue": "3s"
+        },
+        {
+            "name": "linearTransition",
+            "description": "Use a linear timing function for transitions instead of the default easing. Only applies when automatic is true.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "mousewheel",
+            "description": "Enable mousewheel/trackpad control to navigate slides by scrolling.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "mousewheelForceToAxis",
+            "description": "When enabled, mousewheel navigation only responds to scrolling along the slider axis. Only applies when mousewheel is true.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "mousewheelInvert",
+            "description": "Invert the mousewheel scroll direction. Only applies when mousewheel is true.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "mousewheelSensitivity",
+            "description": "Sensitivity multiplier for mousewheel navigation. Higher values make scrolling more responsive. Only applies when mousewheel is true.",
+            "type": "number",
+            "defaultValue": 1
+        }
+    ],
+    "states": [
+        {
+            "name": "Not Current Slide",
+            "description": "Applied to slides that are not the currently active slide. Use this to style inactive slides differently."
+        },
+        {
+            "name": "Current Slide",
+            "description": "Applied to the pagination bullet icon of the currently active slide."
+        },
+        {
+            "name": "active",
+            "description": "Applied to the pagination bullet icon of the currently active slide (alias for Current Slide)."
+        }
+    ],
+    "events": [],
+    "localContext": [
+        {
+            "path": "sliderIndex",
+            "type": "number",
+            "description": "The current active slide index (0-based).",
+            "content": 0
+        },
+        {
+            "path": "nbOfSlides",
+            "type": "number",
+            "description": "The total number of slides in the slider.",
+            "content": 3
+        },
+        {
+            "path": "slidesPerView",
+            "type": "number",
+            "description": "The current number of slides visible at once.",
+            "content": 1
+        },
+        {
+            "path": "showLeftNav",
+            "type": "boolean",
+            "description": "Whether the left (previous) navigation arrow is currently visible.",
+            "content": false
+        },
+        {
+            "path": "showRightNav",
+            "type": "boolean",
+            "description": "Whether the right (next) navigation arrow is currently visible.",
+            "content": true
+        },
+        {
+            "path": "numberOfBullets",
+            "type": "number",
+            "description": "The total number of pagination bullets displayed.",
+            "content": 3
+        },
+        {
+            "path": "slideImageStates",
+            "type": "object",
+            "description": "Object tracking the loading state of images in each slide, including per-slide details and aggregate statistics.",
+            "content": {}
+        },
+        {
+            "path": "allImagesLoaded",
+            "type": "boolean",
+            "description": "Whether all images across all slides have finished loading.",
+            "content": true
+        }
+    ],
+    "actions": [
+        {
+            "label": "Slide to",
+            "actionName": "slideTo",
+            "description": "Navigate to a specific slide by index.",
+            "args": [
+                {
+                    "name": "Index",
+                    "type": "number"
+                }
+            ]
+        },
+        {
+            "label": "Slide Next",
+            "actionName": "slideNext",
+            "description": "Navigate to the next slide."
+        },
+        {
+            "label": "Slide Prev",
+            "actionName": "slidePrev",
+            "description": "Navigate to the previous slide."
+        }
+    ],
+    "slots": [
+        {
+            "name": "mainLayoutContent",
+            "description": "The repeatable slot containing the slide elements. Each item in this array represents one slide. Can be bound to a data collection to dynamically generate slides.",
+            "type": "array"
+        },
+        {
+            "name": "navigationIcons",
+            "description": "The two navigation arrow icons (previous and next). Contains exactly two icon elements.",
+            "type": "array",
+            "tag": ["ww-icon", "ww-icon"],
+            "required": true
+        },
+        {
+            "name": "bulletsIcons",
+            "description": "The pagination bullet icon element. A single element used as template for all pagination dots.",
+            "tag": "ww-icon",
+            "required": true
+        }
+    ],
+    "variables": [
+        {
+            "name": "slideImageStates",
+            "description": "Object tracking the loading state of images in each slide, with per-slide details and aggregate statistics.",
+            "type": "any",
+            "readonly": true
+        },
+        {
+            "name": "allImagesLoaded",
+            "description": "Boolean indicating whether all images across all slides have finished loading.",
+            "type": "boolean",
+            "readonly": true
+        }
+    ],
+    "specifications": [
+        "CRITICAL: If the ww-slider is a child (or sub-child) of a ww-div using CSS Grid layout, set 'overflow: hidden' on the DIRECT CHILD of the grid that contains the slider.",
+        "The effect property only works properly when slidesPerView is 1 for fade, flip, and cards effects.",
+        "spaceBetween must include the 'px' unit suffix (e.g. '16px').",
+        "automaticTiming must include the 's' unit suffix (e.g. '3s').",
+        "transitionDuration must include the 'ms' unit suffix (e.g. '300ms').",
+        "When using loop mode, ensure there are enough slides for the loop to work properly (at least 2x slidesPerView).",
+        "The slider uses the Swiper library internally"
+    ],
+    "examples": [
+        {
+            "description": "A basic image carousel with 3 slides, navigation arrows, and coverflow effect",
+            "example": "{ \"slidesPerView\": 1, \"effect\": \"coverflow\", \"navigation\": true, \"pagination\": true, \"loop\": true, \"spaceBetween\": \"20px\", \"transitionDuration\": \"300ms\" }"
+        },
+        {
+            "description": "An auto-playing testimonial slider showing 2 slides at once",
+            "example": "{ \"slidesPerView\": 2, \"effect\": \"slide\", \"navigation\": false, \"pagination\": true, \"loop\": true, \"automatic\": true, \"automaticTiming\": \"5s\", \"spaceBetween\": \"16px\" }"
+        }
+    ]
+}

@@ -1,0 +1,151 @@
+{
+    "metadata": {
+        "name": "ww-video-weweb",
+        "description": "A native HTML video player for videos uploaded to or served by WeWeb, with poster image, playback controls, events, actions, and playback state variables.",
+        "keywords": ["video", "weweb video", "media", "player", "uploaded video"],
+        "features": [
+            "WeWeb-hosted video playback",
+            "Optional preview poster image",
+            "Autoplay, muted, loop, controls, and preload settings",
+            "Playback events for play, pause, and end",
+            "Programmatic play, pause, and seek actions",
+            "Read-only variables for playing state and current time"
+        ]
+    },
+    "properties": [
+        {
+            "name": "file",
+            "description": "The video file URL or WeWeb video asset path to play.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "previewImage",
+            "description": "Poster image URL or WeWeb image asset path displayed before playback.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "videoStartTime",
+            "description": "Initial playback position in seconds. Always include this property and use 0 by default; omitting it makes the video fail during mount.",
+            "type": "number",
+            "defaultValue": 0
+        },
+        {
+            "name": "autoplay",
+            "description": "Whether the video should automatically start playing outside editor mode. Autoplay generally requires muted to be true in browsers.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "muted",
+            "description": "Whether the video audio is muted.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "loop",
+            "description": "Whether the video should restart automatically when it reaches the end.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "controls",
+            "description": "Whether native browser video controls are displayed.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "preload",
+            "description": "Whether the browser should preload video data.",
+            "type": "boolean",
+            "defaultValue": true
+        }
+    ],
+    "states": [],
+    "events": [
+        {
+            "name": "play",
+            "description": "Triggered when playback starts or resumes.",
+            "payload": {
+                "value": "Current playback time in seconds."
+            }
+        },
+        {
+            "name": "pause",
+            "description": "Triggered when playback is paused.",
+            "payload": {
+                "value": "Current playback time in seconds."
+            }
+        },
+        {
+            "name": "end",
+            "description": "Triggered when playback reaches the end.",
+            "payload": {
+                "value": "Current playback time in seconds."
+            }
+        }
+    ],
+    "localContext": [],
+    "actions": [
+        {
+            "label": "Play video",
+            "actionName": "playVideo",
+            "description": "Start or resume playback."
+        },
+        {
+            "label": "Pause video",
+            "actionName": "pauseVideo",
+            "description": "Pause playback."
+        },
+        {
+            "label": "Seek to",
+            "actionName": "seekTo",
+            "description": "Move playback to a specific time in seconds.",
+            "args": [
+                {
+                    "name": "Time",
+                    "type": "number"
+                }
+            ]
+        }
+    ],
+    "slots": [],
+    "variables": [
+        {
+            "name": "Is Playing",
+            "description": "Whether the video is currently playing.",
+            "type": "boolean",
+            "readonly": true,
+            "content": false
+        },
+        {
+            "name": "Current time",
+            "description": "Current playback time in seconds.",
+            "type": "number",
+            "readonly": true,
+            "content": 0
+        }
+    ],
+    "specifications": [
+        "Use this element for videos uploaded to or served by WeWeb. For YouTube, Vimeo, Twitch, or Dailymotion embeds, use their dedicated video elements instead.",
+        "Set file to a valid video URL or WeWeb video asset path; the element renders no useful media without it.",
+        "Use previewImage when a poster image should appear before playback.",
+        "Always include videoStartTime, even when the video should start at the beginning. Use 0 by default. The component expects a finite number during mount.",
+        "When autoplay is true, set muted to true to satisfy browser autoplay restrictions.",
+        "The video fills its element box, so set an explicit height or aspectRatio in style for predictable layout.",
+        "The play, pause, and end events expose the current playback time under event.value.",
+        "Use the playVideo, pauseVideo, and seekTo actions for workflow-driven playback control."
+    ],
+    "examples": [
+        {
+            "description": "Basic WeWeb-hosted video with controls.",
+            "example": "{\"uid\":\"video_1\",\"tag\":\"ww-video-weweb\",\"name\":\"Product Video\",\"content\":{\"default\":{\"file\":\"https://cdn.weweb.app/designs/project/video.mp4\",\"previewImage\":\"\",\"videoStartTime\":0,\"autoplay\":false,\"muted\":false,\"loop\":false,\"controls\":true,\"preload\":true}},\"style\":{\"default\":{\"width\":\"100%\",\"aspectRatio\":\"16/9\"}}}"
+        },
+        {
+            "description": "Autoplaying muted hero video with a poster image.",
+            "example": "{\"uid\":\"hero_video\",\"tag\":\"ww-video-weweb\",\"name\":\"Hero Video\",\"content\":{\"default\":{\"file\":\"https://cdn.weweb.app/designs/project/hero-video.mp4\",\"previewImage\":\"https://cdn.weweb.app/designs/project/hero-poster.jpg\",\"videoStartTime\":0,\"autoplay\":true,\"muted\":true,\"loop\":true,\"controls\":false,\"preload\":true}},\"style\":{\"default\":{\"width\":\"100%\",\"height\":\"100%\",\"minHeight\":\"520px\"}}}"
+        }
+    ],
+    "dependencies": []
+}

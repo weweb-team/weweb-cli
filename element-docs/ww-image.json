@@ -1,0 +1,75 @@
+{
+    "metadata": {
+        "name": "ww-image",
+        "description": "An image element with customizable sizing, overlays, filters, and lazy loading support.",
+        "keywords": [
+            "image",
+            "picture",
+            "photo",
+            "img"
+        ],
+        "features": [
+            "Object-fit modes (fill, cover, contain)",
+            "Color/gradient overlay",
+            "CSS filter effects",
+            "Lazy and eager loading",
+            "Multi-language alt text",
+            "Responsive styling"
+        ]
+    },
+    "properties": [
+        {
+            "name": "url",
+            "description": "Image source URL",
+            "type": "string",
+            "defaultValue": "https://cdn.weweb.app/public/images/no_image_selected.png"
+        },
+        {
+            "name": "objectFit",
+            "description": "How the image should fit its container. Use cover by default to prevent stretching.",
+            "type": "string",
+            "options": [
+                "cover",
+                "contain"
+            ]
+        },
+        {
+            "name": "overlay",
+            "description": "CSS color or gradient overlay on the image",
+            "type": "string"
+        },
+        {
+            "name": "filter",
+            "description": "CSS filter effects (blur, contrast, etc.)",
+            "type": "string"
+        },
+        {
+            "name": "alt",
+            "description": "Alternative text for accessibility. Supports multiple languages.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "loading",
+            "description": "Image loading strategy",
+            "type": "string",
+            "options": [
+                "lazy",
+                "eager"
+            ],
+            "defaultValue": "lazy"
+        }
+    ],
+    "states": [],
+    "events": [],
+    "actions": [],
+    "slots": [],
+    "variables": [],
+    "specifications": [
+        "Use valid Unsplash URLs for image sources when needed",
+        "Optimize image dimensions to 2000x2000px or smaller",
+        "Set objectFit to cover by default to prevent stretched images",
+        "Alt text should always be provided for accessibility"
+    ],
+    "examples": []
+}

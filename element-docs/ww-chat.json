@@ -1,0 +1,454 @@
+{
+    "metadata": {
+        "advanced": true,
+        "name": "ww-chat",
+        "description": "**Renders entirely from data — must be seeded with at least one current-user participant + 2-3 demo messages and given a `min-height` (500px) to be visible.** A full-featured chat UI with header, scrolling messages area, and input with attachments. Messages and participants are two separate data sources linked by IDs: each `messages[].senderId` must match one `participants[].id`. The chat auto-renders from that data and does NOT accept child elements (no slots). Built-in support for group chats, date separators, read-only mode, attachment uploads, 40+ locales, and formula-based field mapping for custom backend shapes.",
+        "keywords": [
+            "chat",
+            "messaging",
+            "conversation",
+            "thread",
+            "discussion",
+            "group",
+            "attachments"
+        ],
+        "features": [
+            "Header with name/avatar/location/status (auto-switches to a group label when 2+ participants)",
+            "Messages list with auto-scroll, date separators, and attachment thumbnails",
+            "Input area: textarea + send button + optional attachment button",
+            "Keyboard: `Enter` sends the message, `Shift+Enter` inserts a newline",
+            "Participants model with `isCurrentUser` flag — drives own-message vs other-message styling",
+            "Attachments: uploaded files become `pendingAttachments` until send; sent attachments appear in `messages[].attachments`",
+            "Formula-based field mappings for custom message/participant/attachment shapes (optional — defaults match the standard shape)",
+            "40+ locales for date/time formatting via date-fns",
+            "Read-only `chatState` variable exposing the fully resolved state",
+            "LocalContext `chat` for children to read messages, conversation metadata, current user",
+            "Events: messageSent, messageReceived, messageRightClick, attachmentClick, pendingAttachmentClick, close",
+            "Action: programmatic scrollToBottom(smooth)"
+        ]
+    },
+    "properties": [
+        {
+            "name": "messages",
+            "description": "Array of message objects. Default shape: `{ id, text, senderId, userName, timestamp, attachments? }`. The `senderId` MUST match one of the `participants[].id` — this is how the chat decides whether a message is shown as 'own' (right-aligned) or 'other' (left-aligned). Example message:\n```json\n{\n  \"id\": \"msg-1\",\n  \"text\": \"Hello!\",\n  \"senderId\": \"user-1\",\n  \"userName\": \"Alice\",\n  \"timestamp\": \"2026-04-23T10:30:00Z\",\n  \"attachments\": [\n    { \"id\": \"f1\", \"name\": \"photo.png\", \"type\": \"image/png\", \"size\": 204800, \"url\": \"https://...\" }\n  ]\n}\n```",
+            "type": "array",
+            "defaultValue": []
+        },
+        {
+            "name": "participants",
+            "description": "Array of participants. Default shape: `{ id, name, avatar, location, status, isCurrentUser? }`. Status is one of `online | offline | away | busy`. Exactly ONE participant should have `isCurrentUser: true` — this is the local user whose messages are aligned right. If none is marked, every message is styled as 'other'. Every `senderId` in `messages` should match a participant `id`. Example participant:\n```json\n{\n  \"id\": \"user-1\",\n  \"name\": \"Alice\",\n  \"avatar\": \"https://i.pravatar.cc/80?u=alice\",\n  \"location\": \"Paris, FR\",\n  \"status\": \"online\",\n  \"isCurrentUser\": false\n}\n```",
+            "type": "array",
+            "defaultValue": []
+        },
+        {
+            "name": "groupChatText",
+            "description": "Custom header text for group chats (2+ participants). If empty, falls back to the auto-generated `Group Chat (X participants)` label.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "groupChatAvatar",
+            "description": "Image URL used as the group avatar when there are 2+ participants. Falls back to auto-generated initials if empty.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "allowAttachments",
+            "description": "Show a paperclip button in the input that lets users attach files. When false, `pendingAttachmentClick` never fires and the `messageSent` payload will have an empty `attachments` array.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "disabled",
+            "description": "Disable the input area entirely (textarea + send + attachment buttons). Incoming messages still render and auto-scroll continues to work.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "autoScrollBehavior",
+            "description": "Scroll animation when new messages arrive or `scrollToBottom` fires.",
+            "type": "string",
+            "options": ["smooth", "auto"],
+            "defaultValue": "auto"
+        },
+        {
+            "name": "emptyMessageText",
+            "description": "Placeholder text shown in the messages area when `messages` is empty.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "headerShowCloseButton",
+            "description": "Show a close (×) button in the header. When clicked, it fires the `close` event — you're responsible for hiding / unmounting the chat in response.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "locale",
+            "description": "Locale used for date/time formatting (date-fns locale code). Common values: `enUS`, `enGB`, `fr`, `de`, `es`, `it`, `pt`, `ptBR`, `ja`, `zh`, `ko`, `ar`, `hi`, `nl`, `sv`, `tr`, `pl`. 40+ locales available — full list: https://date-fns.org/v2/docs/I18n.",
+            "type": "string",
+            "defaultValue": "enUS"
+        },
+        {
+            "name": "timeFormat",
+            "description": "Format for displayed times using a date-fns pattern. Common values: `h:mm a` (12h, e.g. `9:05 PM`), `HH:mm` (24h, e.g. `21:05`), `h:mm:ss a` (with seconds).",
+            "type": "string",
+            "defaultValue": "h:mm a"
+        },
+        {
+            "name": "todayText",
+            "description": "Label used in the date separator for today's messages.",
+            "type": "string",
+            "defaultValue": "Today"
+        },
+        {
+            "name": "yesterdayText",
+            "description": "Label used in the date separator for yesterday's messages.",
+            "type": "string",
+            "defaultValue": "Yesterday"
+        },
+        {
+            "name": "justNowText",
+            "description": "Label used for messages sent within the last minute.",
+            "type": "string",
+            "defaultValue": "Just now"
+        },
+        {
+            "name": "inputPlaceholder",
+            "description": "Placeholder text shown in the composer textarea when empty (e.g. `Type a message...`, `Say something...`).",
+            "type": "string",
+            "defaultValue": "Type a message..."
+        },
+        {
+            "name": "inputActionAlign",
+            "description": "Vertical alignment of the action buttons (send, attachment) relative to the multi-line textarea.",
+            "type": "string",
+            "options": ["start", "center", "end"],
+            "defaultValue": "end"
+        },
+        {
+            "name": "sendIcon",
+            "description": "Icon for the send button. System-icon name (e.g. `send`, `chevron-right`, `arrow-up`).",
+            "type": "string",
+            "defaultValue": "send"
+        },
+        {
+            "name": "attachmentIcon",
+            "description": "Icon for the attachment button. System-icon name (e.g. `paperclip`, `plus`, `image`). Only visible when `allowAttachments` is true.",
+            "type": "string",
+            "defaultValue": "paperclip"
+        },
+        {
+            "name": "removeIcon",
+            "description": "Icon shown on pending attachments to remove them before sending. System-icon name (e.g. `x`, `trash`).",
+            "type": "string",
+            "defaultValue": "x"
+        },
+        {
+            "name": "fontFamily",
+            "description": "THEME TOKEN — font family applied to the entire chat (header, messages, input). CSS font-family string, e.g. `Inter, sans-serif` or `JetBrains Mono, monospace`. Required to propagate the page's typography into the chat's internal sub-components.",
+            "type": "string"
+        },
+        {
+            "name": "headerBgColor",
+            "description": "THEME TOKEN — background color of the chat header bar (name, avatar, status line).",
+            "type": "string"
+        },
+        {
+            "name": "headerTextColor",
+            "description": "THEME TOKEN — text color in the header (name, location, participant count).",
+            "type": "string"
+        },
+        {
+            "name": "headerBorder",
+            "description": "THEME TOKEN — CSS border shorthand for the bottom edge of the header, e.g. `1px solid #00FF41`.",
+            "type": "string"
+        },
+        {
+            "name": "groupChatAvatarColor",
+            "description": "THEME TOKEN — background color of the group chat avatar initials circle.",
+            "type": "string"
+        },
+        {
+            "name": "messagesAreaBgColor",
+            "description": "THEME TOKEN — background color of the scrolling messages area (between header and input).",
+            "type": "string"
+        },
+        {
+            "name": "emptyMessageColor",
+            "description": "THEME TOKEN — text color for the empty-state label shown when `messages` is empty.",
+            "type": "string"
+        },
+        {
+            "name": "dateSeparatorTextColor",
+            "description": "THEME TOKEN — text color of the date separator labels (Today / Yesterday / dates). Targets the DOM element with class `ww-message-list__date-separator`. This is the ONLY way to set this color — custom CSS classes or selectors will NOT override it.",
+            "type": "string"
+        },
+        {
+            "name": "dateSeparatorLineColor",
+            "description": "THEME TOKEN — color of the horizontal line flanking each date separator (DOM class `ww-message-list__date-separator`). The ONLY way to set this color — custom CSS will NOT override it.",
+            "type": "string"
+        },
+        {
+            "name": "dateSeparatorBgColor",
+            "description": "THEME TOKEN — background color of the centered date-separator PILL (DOM class `ww-message-list__date-separator`). CRITICAL: left at default (white) on a dark page produces a visible white pill floating in your dark chat. Always set to match `messagesAreaBgColor` or a darker variant. The ONLY way to set this background — custom CSS will NOT override it.",
+            "type": "string"
+        },
+        {
+            "name": "dateSeparatorBorderRadius",
+            "description": "THEME TOKEN — border-radius of the date-separator pill (DOM class `ww-message-list__date-separator`), e.g. `4px`, `999px`. The ONLY way to set this radius — custom CSS will NOT override it.",
+            "type": "string"
+        },
+        {
+            "name": "messageBgColor",
+            "description": "THEME TOKEN — background color of OTHER participants' message bubbles (left side).",
+            "type": "string"
+        },
+        {
+            "name": "messageTextColor",
+            "description": "THEME TOKEN — text color of OTHER participants' messages.",
+            "type": "string"
+        },
+        {
+            "name": "messageBorder",
+            "description": "THEME TOKEN — CSS border shorthand for OTHER messages' bubbles (e.g. `1px solid rgba(0,255,65,0.3)`).",
+            "type": "string"
+        },
+        {
+            "name": "messageRadius",
+            "description": "THEME TOKEN — border-radius of OTHER messages' bubbles (e.g. `12px`, `2px`, `16px 16px 16px 4px`).",
+            "type": "string"
+        },
+        {
+            "name": "ownMessageBgColor",
+            "description": "THEME TOKEN — background color of the CURRENT user's message bubbles (right side). Usually the accent/primary color.",
+            "type": "string"
+        },
+        {
+            "name": "ownMessageTextColor",
+            "description": "THEME TOKEN — text color of the current user's messages.",
+            "type": "string"
+        },
+        {
+            "name": "ownMessageBorder",
+            "description": "THEME TOKEN — CSS border shorthand for current-user bubbles.",
+            "type": "string"
+        },
+        {
+            "name": "ownMessageRadius",
+            "description": "THEME TOKEN — border-radius of current-user bubbles.",
+            "type": "string"
+        },
+        {
+            "name": "inputBgColor",
+            "description": "THEME TOKEN — background color of the input area (wraps the textarea + send button).",
+            "type": "string"
+        },
+        {
+            "name": "inputTextColor",
+            "description": "THEME TOKEN — text color inside the textarea composer.",
+            "type": "string"
+        },
+        {
+            "name": "inputPlaceholderColor",
+            "description": "THEME TOKEN — text color of the input placeholder when empty.",
+            "type": "string"
+        },
+        {
+            "name": "inputAreaBorder",
+            "description": "THEME TOKEN — CSS border shorthand at the top of the input area (separator from messages list).",
+            "type": "string"
+        },
+        {
+            "name": "textareaBorder",
+            "description": "THEME TOKEN — CSS border around the textarea element itself.",
+            "type": "string"
+        },
+        {
+            "name": "textareaBorderFocus",
+            "description": "THEME TOKEN — CSS border around the textarea when focused.",
+            "type": "string"
+        },
+        {
+            "name": "inputBorderRadius",
+            "description": "THEME TOKEN — border-radius of the textarea composer.",
+            "type": "string"
+        },
+        {
+            "name": "sendButtonBgColor",
+            "description": "THEME TOKEN — background color of the send button.",
+            "type": "string"
+        },
+        {
+            "name": "sendButtonHoverBgColor",
+            "description": "THEME TOKEN — background color of the send button on hover.",
+            "type": "string"
+        },
+        {
+            "name": "sendButtonBorder",
+            "description": "THEME TOKEN — CSS border shorthand for the send button (e.g. `1px solid #00FF41`).",
+            "type": "string"
+        },
+        {
+            "name": "sendButtonBorderRadius",
+            "description": "THEME TOKEN — border-radius of the send button (e.g. `4px` for flat/square, `999px` for circular).",
+            "type": "string"
+        },
+        {
+            "name": "sendButtonBoxShadow",
+            "description": "THEME TOKEN — CSS box-shadow on the send button. Set to `none` to flatten the default soft blue shadow in non-default themes.",
+            "type": "string"
+        },
+        {
+            "name": "sendIconColor",
+            "description": "THEME TOKEN — icon color inside the send button.",
+            "type": "string"
+        },
+        {
+            "name": "attachmentIconColor",
+            "description": "THEME TOKEN — icon color inside the attachment button.",
+            "type": "string"
+        }
+    ],
+    "states": [],
+    "events": [
+        {
+            "name": "messageSent",
+            "description": "Fires when the current user sends a message (Enter or send button). The message is NOT auto-appended to `messages` — handle it yourself (push to the array, POST to your API, etc.). The payload's `senderId` will be the `id` of the participant marked `isCurrentUser: true`.",
+            "payload": {
+                "message": {
+                    "id": "string (client-generated)",
+                    "text": "string",
+                    "senderId": "string (matches participants[].id of the current user)",
+                    "userName": "string",
+                    "timestamp": "string (ISO)",
+                    "attachments": "array (File objects if allowAttachments was true)"
+                }
+            }
+        },
+        {
+            "name": "messageReceived",
+            "description": "Fires when a new message appears in `messages` with a `senderId` that is NOT the current user. Inferred from array changes — does NOT fire on initial load or when the current user sends. Useful to play a sound / badge an unread count.",
+            "payload": {
+                "message": "object (same shape as messageSent.message)"
+            }
+        },
+        {
+            "name": "messageRightClick",
+            "description": "Fires on right-click (or long-press on touch) of a message. Use for context menus (Copy, Delete, React). Includes coordinates relative to the chat element (for positioning an in-chat menu) and relative to the viewport (for a fixed-position menu).",
+            "payload": {
+                "message": "object",
+                "position": {
+                    "elementX": "number",
+                    "elementY": "number",
+                    "viewportX": "number",
+                    "viewportY": "number"
+                }
+            }
+        },
+        {
+            "name": "attachmentClick",
+            "description": "Fires when an attachment inside a sent message is clicked. Use to open a lightbox / trigger a download.",
+            "payload": {
+                "attachment": {
+                    "id": "string",
+                    "name": "string",
+                    "type": "string (MIME)",
+                    "size": "number (bytes)",
+                    "url": "string"
+                }
+            }
+        },
+        {
+            "name": "pendingAttachmentClick",
+            "description": "Fires when a pending (unsent) local-upload attachment is clicked in the input area — typically to preview before sending. `attachment` is a raw `File` object (no `url` yet — use `URL.createObjectURL(file)` for a preview).",
+            "payload": {
+                "attachment": "File",
+                "index": "number"
+            }
+        },
+        {
+            "name": "close",
+            "description": "Fires when the header close (×) button is clicked. Only visible when `headerShowCloseButton: true`. You're responsible for unmounting or hiding the chat in response.",
+            "payload": {}
+        }
+    ],
+    "localContext": [
+        {
+            "path": "chat",
+            "type": "object",
+            "description": "Available to elements rendered inside the chat via binding only (the chat has no slots). Exposes the fully resolved conversation state.",
+            "content": {
+                "messages": {
+                    "type": "array",
+                    "description": "Resolved messages (after field mapping)."
+                },
+                "conversation": {
+                    "type": "object",
+                    "description": "`{ type: 'private'|'group', participantCount, otherParticipantCount, participants, allParticipants }`."
+                },
+                "currentUser": {
+                    "type": "object",
+                    "description": "Participant with `isCurrentUser: true` — `{ id, name, avatar, location, status }`. Empty object if none is marked."
+                },
+                "utils": {
+                    "type": "object",
+                    "description": "`{ messageCount, isDisabled, allowAttachments, displayHeader }`."
+                }
+            }
+        }
+    ],
+    "actions": [
+        {
+            "label": "Scroll to bottom",
+            "actionName": "scrollToBottom",
+            "description": "Scroll the messages area to the latest message.",
+            "args": [
+                { "name": "smooth", "type": "boolean", "description": "Use smooth animation (ignores `autoScrollBehavior` for this call)." }
+            ]
+        }
+    ],
+    "slots": [],
+    "variables": [
+        {
+            "name": "chatState",
+            "description": "Full computed state: `{ messages, conversation, currentUser, utils }`. Read-only — kept in sync with `messages` + `participants` + mapping formulas. Useful to read the resolved state from outside the chat.",
+            "type": "object",
+            "readonly": true
+        }
+    ],
+    "specifications": [
+        "MANDATORY SEED — never insert this element with empty `messages` and empty `participants` (it renders as a blank box with no header and looks broken). ALWAYS seed at least: 1 participant with `isCurrentUser: true`, 1 other participant, and 2-3 short demo messages with matching `senderId` ↔ `participants[].id`. Use light placeholder content — the user replaces it with their own bindings. This applies even when the user only says 'add a chat'.",
+        "MANDATORY SIZING — set `min-height: 500px` on the element style at insertion. The chat has internal flex regions (header / scrollable messages / input) and collapses to 0 height inside flex/grid parents without an explicit minimum. Without this rule, the element is invisible even when seeded correctly.",
+        "MANDATORY THEMING (when page is non-default) — the chat's internal sub-components have ISOLATED CSS and do NOT inherit page-level color / background / font. As soon as the page is anything other than the default light/white theme (dark, terminal, brutalist, editorial, branded palette…), you MUST override the FULL token bundle below — partial theming always produces broken visuals (white date-separator pill in a dark chat, soft-blue send button in a brutalist grid, grey bubbles on a colored page). Treat the bundle as all-or-nothing.\n  TOKENS by zone (copy every one that applies):\n  • Typography: `fontFamily`\n  • Header: `headerBgColor`, `headerTextColor`, `headerBorder`, `groupChatAvatarColor`\n  • Messages area: `messagesAreaBgColor`, `emptyMessageColor`\n  • Date separator: `dateSeparatorTextColor`, `dateSeparatorLineColor`, `dateSeparatorBgColor`, `dateSeparatorBorderRadius` (the `Bg` one fixes the white pill)\n  • Other participants' bubbles: `messageBgColor`, `messageTextColor`, `messageBorder`, `messageRadius`\n  • Current user's bubbles: `ownMessageBgColor`, `ownMessageTextColor`, `ownMessageBorder`, `ownMessageRadius`\n  • Input area: `inputBgColor`, `inputTextColor`, `inputPlaceholderColor`, `inputAreaBorder`, `textareaBorder`, `textareaBorderFocus`, `inputBorderRadius`\n  • Send button: `sendButtonBgColor`, `sendButtonHoverBgColor`, `sendButtonBorder`, `sendButtonBorderRadius`, `sendButtonBoxShadow`, `sendIconColor`\n  • Attachment button: `attachmentIconColor`\n  Own-vs-other bubbles MUST be visually distinct (different bg color AND/OR different radius) — otherwise the conversation is unreadable.",
+        "DATA LINKING — every `messages[i].senderId` MUST match an `id` in `participants`. Without this link the chat cannot tell 'own' from 'other' messages.",
+        "Exactly ONE participant should carry `isCurrentUser: true`. If multiple do, behavior is undefined. If none do, every message renders as 'other'.",
+        "Send → persist → refresh flow — the chat does NOT auto-append sent messages. On `messageSent`: (1) accept the message from the event payload, (2) POST it to your backend, (3) push the confirmed message into the bound `messages` array. `messageReceived` then fires on other clients when their `messages` array gets the new item.",
+        "`messageReceived` is inferred from changes to the `messages` array (new entries whose `senderId !== currentUser.id`). It does NOT fire on the initial render, nor for messages the current user sent.",
+        "Keyboard in the input — `Enter` sends, `Shift+Enter` inserts a newline, `Escape` blurs the input.",
+        "Attachment lifecycle — user picks files → they become `pendingAttachments` (raw `File` objects, clickable via `pendingAttachmentClick`) → user sends → attachments arrive in `messageSent.payload.message.attachments` as `File[]` → you upload and replace with `{ id, name, type, size, url }` before storing in `messages`.",
+        "Group chat logic kicks in at `participants.length >= 2` (other than the current user). Avatar falls back to stacked initials; title falls back to `Group Chat (N participants)` unless `groupChatText` is set.",
+        "Locale / dates — auto-formatted in the configured `locale`: same-day messages show `timeFormat`, yesterday shows `yesterdayText`, older dates use the locale's long-date format.",
+        "DATE SEPARATOR — DOM-class shortcut: when the user mentions the class `ww-message-list__date-separator`, the centered date pill (Today / Yesterday / dates), the date separator stripe, or 'the white pill in the chat', this means set the 4 `dateSeparator*` properties (`dateSeparatorTextColor`, `dateSeparatorLineColor`, `dateSeparatorBgColor`, `dateSeparatorBorderRadius`). Custom CSS targeting `.ww-message-list__date-separator` will NOT work — the chat's internal stylesheet wins on specificity. The `Bg` token is the most common miss; without it the pill stays white over a themed page.",
+        "CONSTRAINTS (what NOT to do):\n  • NO slots — the element renders its own header / messages / input. Do not try to add child elements.\n  • DO NOT inject custom CSS via `classes` or inline `styles`. The listed style properties ARE the full theming surface. Repeated class-based attempts trigger infinite edit loops.\n  • Mapping formulas (`mappingMessageId`, `mappingMessageText`, `mappingSenderId`, `mappingTimestamp`, `mappingAttachments`, `mappingAttachment*`, `mappingParticipant*`, `mappingIsCurrentUser`) are advanced — only use when the bound data shape differs from the default.\n  • `close` is a UI-only signal — it does NOT unmount the chat. Wrap the element in a v-if or conditional container if you want hiding behavior."
+    ],
+    "examples": [
+        {
+            "description": "A 1-on-1 chat with two participants and a short history. Note how `senderId` in messages matches `id` in participants.",
+            "example": "{\"messages\":[{\"id\":\"m1\",\"text\":\"Hello!\",\"senderId\":\"u1\",\"userName\":\"Alice\",\"timestamp\":\"2026-04-23T09:00:00Z\"},{\"id\":\"m2\",\"text\":\"Hi Alice!\",\"senderId\":\"u2\",\"userName\":\"Bob\",\"timestamp\":\"2026-04-23T09:01:00Z\"}],\"participants\":[{\"id\":\"u1\",\"name\":\"Alice\",\"avatar\":\"https://i.pravatar.cc/80?u=alice\",\"status\":\"online\"},{\"id\":\"u2\",\"name\":\"Bob\",\"avatar\":\"https://i.pravatar.cc/80?u=bob\",\"status\":\"online\",\"isCurrentUser\":true}],\"allowAttachments\":true,\"locale\":\"enUS\"}"
+        },
+        {
+            "description": "A group chat with 3 participants, custom header label, and close button enabled.",
+            "example": "{\"messages\":[],\"participants\":[{\"id\":\"u1\",\"name\":\"Alice\",\"status\":\"online\"},{\"id\":\"u2\",\"name\":\"Bob\",\"status\":\"away\"},{\"id\":\"u3\",\"name\":\"Me\",\"status\":\"online\",\"isCurrentUser\":true}],\"groupChatText\":\"Team Discussion\",\"groupChatAvatar\":\"https://example.com/team.jpg\",\"headerShowCloseButton\":true,\"emptyMessageText\":\"No messages yet. Say hello!\",\"locale\":\"enUS\",\"timeFormat\":\"HH:mm\"}"
+        },
+        {
+            "description": "A disabled read-only chat (view-only, no input).",
+            "example": "{\"messages\":[{\"id\":\"m1\",\"text\":\"Support case closed.\",\"senderId\":\"support\",\"userName\":\"Support\",\"timestamp\":\"2026-04-22T15:00:00Z\"}],\"participants\":[{\"id\":\"support\",\"name\":\"Support\",\"status\":\"offline\"},{\"id\":\"me\",\"name\":\"You\",\"status\":\"online\",\"isCurrentUser\":true}],\"disabled\":true}"
+        },
+        {
+            "description": "COMPLETE DARK TERMINAL PRESET — copy-paste this entire bundle as a reference for any dark theme. EVERY token listed below must be set when moving away from the default light theme, otherwise white/blue defaults leak through (date pill, send button shadow, bubble bg, ...).",
+            "example": "{\"messages\":[{\"id\":\"m1\",\"text\":\"ssh prod-01\",\"senderId\":\"me\",\"userName\":\"me\",\"timestamp\":\"2026-04-23T10:00:00Z\"},{\"id\":\"m2\",\"text\":\"Connected.\",\"senderId\":\"sys\",\"userName\":\"system\",\"timestamp\":\"2026-04-23T10:00:01Z\"}],\"participants\":[{\"id\":\"me\",\"name\":\"me\",\"status\":\"online\",\"isCurrentUser\":true},{\"id\":\"sys\",\"name\":\"system\",\"status\":\"online\"}],\"inputPlaceholder\":\"$ type a message…\",\"sendIcon\":\"send\",\"fontFamily\":\"JetBrains Mono, monospace\",\"headerBgColor\":\"#0A0A0A\",\"headerTextColor\":\"#00FF41\",\"headerBorder\":\"1px solid rgba(0,255,65,0.3)\",\"groupChatAvatarColor\":\"#00FF41\",\"messagesAreaBgColor\":\"#0A0A0A\",\"emptyMessageColor\":\"#4A9960\",\"dateSeparatorTextColor\":\"#4A9960\",\"dateSeparatorLineColor\":\"rgba(0,255,65,0.2)\",\"dateSeparatorBgColor\":\"#0A0A0A\",\"dateSeparatorBorderRadius\":\"2px\",\"messageBgColor\":\"rgba(0,255,65,0.08)\",\"messageTextColor\":\"#00FF41\",\"messageBorder\":\"1px solid rgba(0,255,65,0.3)\",\"messageRadius\":\"2px\",\"ownMessageBgColor\":\"#00FF41\",\"ownMessageTextColor\":\"#0A0A0A\",\"ownMessageBorder\":\"1px solid #00FF41\",\"ownMessageRadius\":\"2px\",\"inputBgColor\":\"#0A0A0A\",\"inputTextColor\":\"#00FF41\",\"inputPlaceholderColor\":\"rgba(0,255,65,0.4)\",\"inputAreaBorder\":\"1px solid rgba(0,255,65,0.3)\",\"textareaBorder\":\"1px solid rgba(0,255,65,0.3)\",\"textareaBorderFocus\":\"1px solid #00FF41\",\"inputBorderRadius\":\"2px\",\"sendButtonBgColor\":\"#00FF41\",\"sendButtonHoverBgColor\":\"#4A9960\",\"sendButtonBorder\":\"none\",\"sendButtonBorderRadius\":\"2px\",\"sendButtonBoxShadow\":\"none\",\"sendIconColor\":\"#0A0A0A\",\"attachmentIconColor\":\"#00FF41\"}"
+        }
+    ],
+    "dependencies": []
+}

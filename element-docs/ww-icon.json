@@ -1,0 +1,44 @@
+{
+    "metadata": {
+        "name": "ww-icon",
+        "description": "An icon element that displays system icons with customizable color.",
+        "keywords": [
+            "icon",
+            "symbol",
+            "graphic"
+        ],
+        "features": [
+            "System icon selection",
+            "Custom color",
+            "Bindable icon name",
+            "Linkable"
+        ]
+    },
+    "properties": [
+        {
+            "name": "icon",
+            "description": "Icon code string. Always use full icon names in bindings (e.g. 'lucide/my-icon'). Icons with partial names will not be included in the published app.",
+            "type": "string",
+            "isIconName": true
+        },
+        {
+            "name": "color",
+            "description": "Color of the icon",
+            "type": "string",
+            "defaultValue": "black",
+            "responsive": true
+        }
+    ],
+    "states": [],
+    "events": [],
+    "actions": [],
+    "slots": [],
+    "variables": [],
+    "specifications": [
+        "Always use icons full names in binding",
+        "Icons with partial or cut names will not be included in the published app",
+        "Use format: if(cond, 'lucide/my-icon', 'lucide/other-icon') not 'lucide/' + if(cond, 'my-icon', 'other-icon')",
+        "Use width and height to change the size of the icon. font-size doesn't work."
+    ],
+    "examples": []
+}

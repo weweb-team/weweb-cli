@@ -1,5 +1,9 @@
 # WeWeb CLI (weweb-cli)
 
+**Absolute path:** `/Users/fbriou/Documents/Dev/weweb/weweb-cli/`
+
+> ⚠ **Running from parent cwd**: this CLI **must** be invoked from a component project's root (the directory containing `ww-config.js`), not from `/Users/fbriou/Documents/Dev/weweb/`. From the parent workspace: `cd <component-project-dir> && npx weweb <command>`. Also: `push` requires the workspace to have the `publicAPI` feature flag enabled and a prior `weweb auth login`.
+
 ## Project Identity
 
 - **What**: Node.js CLI tool — builds, serves, and pushes WeWeb components (sections, elements, plugins)
@@ -418,9 +422,9 @@ All authenticated via `Authorization: Bearer {selfHostSettings.privateKey}`.
 
 - **Version format** — `package.json` version must match `/^[\d\.]*$/` (digits and dots only)
 - **Missing ww-config** — Both `serve` and `build` require `ww-config.js` or `ww-config.json`
-- **CWD dependency** — The CLI must be run from the component project root
+- **CWD dependency** — The CLI must be run from the component project root (also called out in the header above)
 - **serve cd's into node_modules** — `serve.js` does `shell.cd("node_modules/@weweb/cli/")`
 - **tmp-build cleanup** — Build creates `tmp-build/index.js`, cleaned after webpack finishes
 - **CommonJS CLI, ES modules in generated code** — CLI uses `require()`, generated `index.js` uses `import`
-- **Auth required for push** — Must run `weweb auth login` first or set env vars
-- **publicAPI feature flag** — The workspace must have the `publicAPI` feature enabled for push to work
+- **Auth required for push** — Must run `weweb auth login` first or set env vars (also in header)
+- **publicAPI feature flag** — The workspace must have the `publicAPI` feature enabled for push to work (also in header)

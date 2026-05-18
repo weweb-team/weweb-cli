@@ -1,0 +1,837 @@
+{
+    "metadata": {
+        "name": "ww-input-date-time-picker",
+        "description": "A configurable date/time picker supporting single date, date range, and multi-date selection, with datetime/date/time/month/year modes, locale and timezone handling, custom trigger and action slots, and optional multi-calendar and flow behaviors.",
+        "keywords": [
+            "date",
+            "time",
+            "datetime",
+            "picker",
+            "calendar",
+            "range",
+            "multi-date",
+            "timezone",
+            "locale"
+        ],
+        "features": [
+            "Single, range, and multi-date selection modes",
+            "Datetime, date, time, month, and year modes",
+            "Custom trigger zone slot (fully stylable) and action-select button slot",
+            "Optional inline calendar-only display",
+            "Multi-calendar range display with independent or linked calendars",
+            "Range modes: free, auto (fixed span), and minmax (enforced min/max span)",
+            "Locale-aware formatting (pageLang or explicit lang) and timezone support",
+            "Configurable date/time format with custom unicode format support",
+            "Min/max/allowed/disabled dates and disabled weekdays",
+            "Auto-apply with optional close-on-apply",
+            "Customizable flow step order for the picker UI",
+            "Left and right sidebar slots for extra actions/filters",
+            "Exposed `value` variable and `change` / `initValueChange` / `onFlowStep` events",
+            "Programmatic actions: clear value, open menu, close menu"
+        ]
+    },
+    "properties": [
+        {
+            "name": "initValueSingle",
+            "description": "Initial value when `selectionMode` is `single`. ISO date string, e.g. `\"2021-03-11T10:11:20.000+00:00\"`. Inactive when selectionMode is not 'single'.",
+            "type": "string",
+            "defaultValue": null,
+            "inactiveProperty": {
+                "description": "Inactive when selectionMode is not 'single'."
+            }
+        },
+        {
+            "name": "initValueRangeStart",
+            "description": "Initial range start when `selectionMode` is `range`. ISO date string. Inactive when selectionMode is not 'range'.",
+            "type": "string",
+            "defaultValue": null,
+            "inactiveProperty": {
+                "description": "Inactive when selectionMode is not 'range'."
+            }
+        },
+        {
+            "name": "initValueRangeEnd",
+            "description": "Initial range end when `selectionMode` is `range`. ISO date string. Inactive when selectionMode is not 'range'.",
+            "type": "string",
+            "defaultValue": null,
+            "inactiveProperty": {
+                "description": "Inactive when selectionMode is not 'range'."
+            }
+        },
+        {
+            "name": "initValueMulti",
+            "description": "Initial values when `selectionMode` is `multi`. Array of ISO date strings. Inactive when selectionMode is not 'multi'.",
+            "type": "array",
+            "defaultValue": null,
+            "inactiveProperty": {
+                "description": "Inactive when selectionMode is not 'multi'."
+            }
+        },
+        {
+            "name": "advancedColors",
+            "description": "Editor toggle that reveals the advanced color theme properties (border, scrollbar, hover icon/text, success, danger, highlight, etc.). When false, only the basic color theme properties are shown in the editor — but advanced color properties can still be set programmatically.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "advancedStyles",
+            "description": "Editor toggle that reveals the advanced sizing theme properties (border radius, cell size/padding, menu min width, preview font size). When false, only the basic style properties are shown in the editor — but advanced style properties can still be set programmatically.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "advancedDates",
+            "description": "Editor toggle that reveals the advanced date constraints (preventMinMaxNavigation, ignoreTimeValidation, allowedDates, disabledDates, disabledWeekDays). When false, only the basic date constraints are shown in the editor — but advanced ones can still be set programmatically.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "enableCalendarOnly",
+            "description": "Render the calendar inline without a trigger. When true, the `triggerZone` slot is bypassed.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "stickedDatePicker",
+            "description": "Render the menu at trigger level instead of teleporting to the document body. Useful inside pop-ups.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "calendarOnlyFit",
+            "description": "Layout fit of the inline calendar (only when `enableCalendarOnly=true`). Inactive when enableCalendarOnly is false.",
+            "type": "string",
+            "options": [
+                "stretch",
+                "center"
+            ],
+            "defaultValue": "stretch",
+            "inactiveProperty": {
+                "description": "Inactive when enableCalendarOnly is false."
+            }
+        },
+        {
+            "name": "enableLeftSidebar",
+            "description": "Show the `leftSidebarZone` slot to the left of the calendar. Ignored when `enableCalendarOnly=true`. Inactive when enableCalendarOnly is true.",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when enableCalendarOnly is true."
+            }
+        },
+        {
+            "name": "enableRightSidebar",
+            "description": "Show the `rightSidebarZone` slot to the right of the calendar. Ignored when `enableCalendarOnly=true`. Inactive when enableCalendarOnly is true.",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when enableCalendarOnly is true."
+            }
+        },
+        {
+            "name": "menuPosition",
+            "description": "Horizontal alignment of the picker menu relative to the trigger.",
+            "type": "string",
+            "options": [
+                "center",
+                "left",
+                "right"
+            ],
+            "defaultValue": "center",
+            "responsive": true
+        },
+        {
+            "name": "selectionMode",
+            "description": "Selection mode. Determines which init value property is used and which date modes are available.",
+            "type": "string",
+            "options": [
+                "single",
+                "range",
+                "multi"
+            ],
+            "defaultValue": "single"
+        },
+        {
+            "name": "dateMode",
+            "description": "Date/time mode. `time`, `month`, and `year` support only `single` and `range` selection modes (not `multi`).",
+            "type": "string",
+            "options": [
+                "datetime",
+                "date",
+                "time",
+                "month",
+                "year"
+            ],
+            "defaultValue": "datetime"
+        },
+        {
+            "name": "enableSeconds",
+            "description": "Show seconds in the time picker. Only applies when `dateMode` is `datetime` or `time`. Inactive when dateMode is not 'datetime' and not 'time'.",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when dateMode is not 'datetime' and not 'time'."
+            }
+        },
+        {
+            "name": "use24",
+            "description": "Use 24-hour time format. Only applies when `dateMode` is `datetime` or `time`. Inactive when dateMode is not 'datetime' and not 'time'.",
+            "type": "boolean",
+            "defaultValue": false,
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when dateMode is not 'datetime' and not 'time'."
+            }
+        },
+        {
+            "name": "multiDatesLimit",
+            "description": "Maximum number of dates selectable in `multi` mode. 0 means no limit. Inactive when selectionMode is not 'multi'.",
+            "type": "number",
+            "defaultValue": 0,
+            "inactiveProperty": {
+                "description": "Inactive when selectionMode is not 'multi'."
+            }
+        },
+        {
+            "name": "enableMultiCalendars",
+            "description": "Show multiple calendars side-by-side. Only applies when `selectionMode=range` and `dateMode` is `datetime`, `date`, or `week`. Inactive when selectionMode is not 'range' or dateMode is not in ['datetime', 'date', 'week'].",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when selectionMode is not 'range' or dateMode is not in ['datetime', 'date', 'week']."
+            }
+        },
+        {
+            "name": "multiCalendars",
+            "description": "Number of calendars displayed (2-4, only when `enableMultiCalendars=true`). Inactive when selectionMode is not 'range', or dateMode is not in ['datetime', 'date', 'week'], or enableMultiCalendars is false.",
+            "type": "number",
+            "defaultValue": 2,
+            "inactiveProperty": {
+                "description": "Inactive when selectionMode is not 'range', or dateMode is not in ['datetime', 'date', 'week'], or enableMultiCalendars is false."
+            }
+        },
+        {
+            "name": "multiCalendarsSolo",
+            "description": "Make the multiple calendars navigate independently (only when `enableMultiCalendars=true`). Inactive when selectionMode is not 'range', or dateMode is not in ['datetime', 'date', 'week'], or enableMultiCalendars is false.",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when selectionMode is not 'range', or dateMode is not in ['datetime', 'date', 'week'], or enableMultiCalendars is false."
+            }
+        },
+        {
+            "name": "rangeMode",
+            "description": "Range selection behavior (only when `selectionMode=range`). `free` = any span, `auto` = fixed span from `autoRange`, `minmax` = enforce `minRange`/`maxRange`. Inactive when selectionMode is not 'range'.",
+            "type": "string",
+            "options": [
+                "free",
+                "auto",
+                "minmax"
+            ],
+            "defaultValue": "free",
+            "inactiveProperty": {
+                "description": "Inactive when selectionMode is not 'range'."
+            }
+        },
+        {
+            "name": "enablePartialRange",
+            "description": "Allow selecting only the start of a range without the end (only when `rangeMode=free`). Inactive when selectionMode is not 'range', or rangeMode is not 'free', or (rangeMode is 'free' and enableCalendarOnly is true).",
+            "type": "boolean",
+            "defaultValue": true,
+            "inactiveProperty": {
+                "description": "Inactive when selectionMode is not 'range', or rangeMode is not 'free', or (rangeMode is 'free' and enableCalendarOnly is true)."
+            }
+        },
+        {
+            "name": "autoRange",
+            "description": "Number of days auto-selected after the start date (only when `rangeMode=auto`). Inactive when selectionMode is not 'range' or rangeMode is not 'auto'.",
+            "type": "number",
+            "defaultValue": 1,
+            "inactiveProperty": {
+                "description": "Inactive when selectionMode is not 'range' or rangeMode is not 'auto'."
+            }
+        },
+        {
+            "name": "minRange",
+            "description": "Minimum number of days in a range (only when `rangeMode=minmax`). Inactive when selectionMode is not 'range' or rangeMode is not 'minmax'.",
+            "type": "number",
+            "defaultValue": 2,
+            "inactiveProperty": {
+                "description": "Inactive when selectionMode is not 'range' or rangeMode is not 'minmax'."
+            }
+        },
+        {
+            "name": "maxRange",
+            "description": "Maximum number of days in a range (only when `rangeMode=minmax`). Inactive when selectionMode is not 'range' or rangeMode is not 'minmax'.",
+            "type": "number",
+            "defaultValue": 7,
+            "inactiveProperty": {
+                "description": "Inactive when selectionMode is not 'range' or rangeMode is not 'minmax'."
+            }
+        },
+        {
+            "name": "orientation",
+            "description": "Orientation of the picker when in range mode with multiple calendars.",
+            "type": "string",
+            "options": [
+                "horizontal",
+                "vertical"
+            ],
+            "defaultValue": "horizontal",
+            "responsive": true
+        },
+        {
+            "name": "timezone",
+            "description": "IANA timezone for the picker (e.g. `\"UTC\"`, `\"Europe/Brussels\"`). `\"locale\"` uses the user's local timezone. Only applies when `dateMode=datetime`. Inactive when dateMode is not 'datetime'.",
+            "type": "string",
+            "defaultValue": "locale",
+            "inactiveProperty": {
+                "description": "Inactive when dateMode is not 'datetime'."
+            }
+        },
+        {
+            "name": "enableFlow",
+            "description": "Enable step-by-step picker flow (e.g. pick month, then year, then day). Ignored when `enableMultiCalendars=true`. Inactive when enableMultiCalendars is true.",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when enableMultiCalendars is true."
+            }
+        },
+        {
+            "name": "flowSteps",
+            "description": "Ordered list of picker steps when `enableFlow=true`. Valid values: `month`, `year`, `calendar`, `time`, `minutes`, `hours`, `seconds`. Inactive when enableFlow is false.",
+            "type": "array",
+            "defaultValue": [
+                "month",
+                "year",
+                "calendar",
+                "time",
+                "minutes",
+                "hours",
+                "seconds"
+            ],
+            "inactiveProperty": {
+                "description": "Inactive when enableFlow is false."
+            }
+        },
+        {
+            "name": "readonly",
+            "description": "Read-only state. Triggers the `readonly` element state when true.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "required",
+            "description": "Mark the input as required (HTML5 required attribute on the hidden validation input).",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "lang",
+            "description": "Locale for the picker. `\"pageLang\"` uses the current page language; otherwise any locale key supported by date-fns (e.g. `\"en\"`, `\"fr\"`).",
+            "type": "string",
+            "defaultValue": "pageLang"
+        },
+        {
+            "name": "format",
+            "description": "Display format for the selected date in the trigger's `preview`. Pick `custom` to use `customFormat`.",
+            "type": "string",
+            "options": [
+                "DD/MM/YYYY",
+                "MMMM D, YYYY",
+                "MMM D, YYYY",
+                "h:mm A",
+                "h:mm:ss A",
+                "MMM D, YYYY h:mm A",
+                "custom"
+            ],
+            "defaultValue": "DD/MM/YYYY"
+        },
+        {
+            "name": "customFormat",
+            "description": "Custom unicode date format string (only when `format=custom`). See https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table. Inactive when format is not 'custom'.",
+            "type": "string",
+            "defaultValue": "",
+            "inactiveProperty": {
+                "description": "Inactive when format is not 'custom'."
+            }
+        },
+        {
+            "name": "autoApply",
+            "description": "Apply the selection immediately without requiring the action-select button. Ignored when `dateMode=time`. Inactive when dateMode is 'time'.",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when dateMode is 'time'."
+            }
+        },
+        {
+            "name": "closeOnAutoApply",
+            "description": "Close the picker menu after an auto-apply (only when `autoApply=true`). Inactive when autoApply is false or dateMode is 'time'.",
+            "type": "boolean",
+            "defaultValue": true,
+            "inactiveProperty": {
+                "description": "Inactive when autoApply is false or dateMode is 'time'."
+            }
+        },
+        {
+            "name": "weekNumbers",
+            "description": "Display week numbers in the calendar. `\"local\"` uses locale rules, `\"iso\"` uses ISO 8601.",
+            "type": "string",
+            "options": [
+                "none",
+                "local",
+                "iso"
+            ],
+            "defaultValue": "none"
+        },
+        {
+            "name": "weekStart",
+            "description": "First day of the week. `\"0\"`=Sunday, `\"1\"`=Monday, ..., `\"6\"`=Saturday.",
+            "type": "string",
+            "options": [
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6"
+            ],
+            "defaultValue": "1"
+        },
+        {
+            "name": "hideOffsetDates",
+            "description": "Hide dates from previous/next months that fall within the visible grid.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "minDate",
+            "description": "Earliest selectable date. ISO date string.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "maxDate",
+            "description": "Latest selectable date. ISO date string.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "preventMinMaxNavigation",
+            "description": "Prevent navigating beyond `minDate` / `maxDate` months. Inactive when advancedDates is false (advanced toggle in editor).",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when advancedDates is false (the editor's advanced-dates toggle is off)."
+            }
+        },
+        {
+            "name": "ignoreTimeValidation",
+            "description": "When comparing against `minDate` / `maxDate`, ignore the time portion. Inactive when advancedDates is false (advanced toggle in editor).",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when advancedDates is false (the editor's advanced-dates toggle is off)."
+            }
+        },
+        {
+            "name": "startDate",
+            "description": "Initially focused date when the picker opens without a value. ISO date string.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "disableMonthYearSelect",
+            "description": "Prevent the user from clicking the month/year header to navigate.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "allowedDates",
+            "description": "Explicit list of selectable dates (array of ISO date strings). Empty array means no allow-list. Inactive when advancedDates is false (advanced toggle in editor).",
+            "type": "array",
+            "defaultValue": [],
+            "inactiveProperty": {
+                "description": "Inactive when advancedDates is false (the editor's advanced-dates toggle is off)."
+            }
+        },
+        {
+            "name": "disabledDates",
+            "description": "List of non-selectable dates (array of ISO date strings). Inactive when advancedDates is false (advanced toggle in editor).",
+            "type": "array",
+            "defaultValue": [],
+            "inactiveProperty": {
+                "description": "Inactive when advancedDates is false (the editor's advanced-dates toggle is off)."
+            }
+        },
+        {
+            "name": "disabledWeekDays",
+            "description": "List of disabled weekdays. Array of strings `\"0\"` (Sunday) to `\"6\"` (Saturday). Inactive when advancedDates is false (advanced toggle in editor).",
+            "type": "array",
+            "defaultValue": [],
+            "inactiveProperty": {
+                "description": "Inactive when advancedDates is false (the editor's advanced-dates toggle is off)."
+            }
+        },
+        {
+            "name": "noDisabledRange",
+            "description": "Allow ranges that span across disabled dates (only when `selectionMode=range`). Inactive when selectionMode is not 'range'.",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when selectionMode is not 'range'."
+            }
+        },
+        {
+            "name": "themeFontFamily",
+            "description": "Font family for the picker UI.",
+            "type": "string",
+            "responsive": true
+        },
+        {
+            "name": "themeFontSize",
+            "description": "Base font size for the picker UI.",
+            "type": "string",
+            "defaultValue": "16px",
+            "responsive": true
+        },
+        {
+            "name": "themeTimeFontSize",
+            "description": "Font size for the time picker digits.",
+            "type": "string",
+            "defaultValue": "32px",
+            "responsive": true
+        },
+        {
+            "name": "themeBorderRadius",
+            "description": "Border radius for the picker UI. Inactive when advancedStyles is false.",
+            "type": "string",
+            "defaultValue": "4px",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedStyles is false."
+            }
+        },
+        {
+            "name": "themeCellBorderRadius",
+            "description": "Border radius for individual day/month/year cells in the calendar grid. Inactive when advancedStyles is false.",
+            "type": "string",
+            "defaultValue": "4px",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedStyles is false."
+            }
+        },
+        {
+            "name": "themePreviewFontSize",
+            "description": "Font size for the preview text shown in the trigger zone. Inactive when advancedStyles is false.",
+            "type": "string",
+            "defaultValue": "13px",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedStyles is false."
+            }
+        },
+        {
+            "name": "themeMenuMinWidth",
+            "description": "Minimum width of the picker menu. Inactive when advancedStyles is false.",
+            "type": "string",
+            "defaultValue": "250px",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedStyles is false."
+            }
+        },
+        {
+            "name": "themeCellSize",
+            "description": "Size (width and height) of each calendar cell. Inactive when advancedStyles is false.",
+            "type": "string",
+            "defaultValue": "35px",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedStyles is false."
+            }
+        },
+        {
+            "name": "themeCellPadding",
+            "description": "Padding inside each calendar cell. Inactive when advancedStyles is false.",
+            "type": "string",
+            "defaultValue": "5px",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedStyles is false."
+            }
+        },
+        {
+            "name": "themePrimaryColor",
+            "description": "Primary accent color (selected date background, focused controls).",
+            "type": "string",
+            "defaultValue": "#1976d2",
+            "responsive": true
+        },
+        {
+            "name": "themeSecondaryColor",
+            "description": "Secondary color (secondary controls, inactive accents).",
+            "type": "string",
+            "defaultValue": "#c0c4cc",
+            "responsive": true
+        },
+        {
+            "name": "themeBackgroundColor",
+            "description": "Background color of the picker menu.",
+            "type": "string",
+            "defaultValue": "#ffffff",
+            "responsive": true
+        },
+        {
+            "name": "themeTextColor",
+            "description": "Default text color inside the picker.",
+            "type": "string",
+            "defaultValue": "#212121",
+            "responsive": true
+        },
+        {
+            "name": "themePrimaryTextColor",
+            "description": "Text color on top of the primary color (e.g. selected date text).",
+            "type": "string",
+            "defaultValue": "#f8f5f5",
+            "responsive": true
+        },
+        {
+            "name": "themeHoverColor",
+            "description": "Background color on hover.",
+            "type": "string",
+            "defaultValue": "#f3f3f3",
+            "responsive": true
+        },
+        {
+            "name": "themeDisabledColor",
+            "description": "Background color for disabled dates.",
+            "type": "string",
+            "defaultValue": "#f6f6f6",
+            "responsive": true
+        },
+        {
+            "name": "themeHoverTextColor",
+            "description": "Text color shown on hover. Inactive when advancedColors is false.",
+            "type": "string",
+            "defaultValue": "#212121",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedColors is false."
+            }
+        },
+        {
+            "name": "themeHoverIconColor",
+            "description": "Icon color shown on hover. Inactive when advancedColors is false.",
+            "type": "string",
+            "defaultValue": "#959595",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedColors is false."
+            }
+        },
+        {
+            "name": "themeBorderColor",
+            "description": "Default border color used inside the picker UI. Inactive when advancedColors is false.",
+            "type": "string",
+            "defaultValue": "#ddd",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedColors is false."
+            }
+        },
+        {
+            "name": "themeMenuBorderColor",
+            "description": "Border color of the picker menu. Inactive when advancedColors is false.",
+            "type": "string",
+            "defaultValue": "#ddd",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedColors is false."
+            }
+        },
+        {
+            "name": "themeBorderHoverColor",
+            "description": "Border color on hover. Inactive when advancedColors is false.",
+            "type": "string",
+            "defaultValue": "#aaaeb7",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedColors is false."
+            }
+        },
+        {
+            "name": "themeScrollBarBackgroundColor",
+            "description": "Background color of the scrollbar inside the picker. Inactive when advancedColors is false.",
+            "type": "string",
+            "defaultValue": "#f3f3f3",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedColors is false."
+            }
+        },
+        {
+            "name": "themeScrollBarColor",
+            "description": "Scrollbar thumb color. Inactive when advancedColors is false.",
+            "type": "string",
+            "defaultValue": "#959595",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedColors is false."
+            }
+        },
+        {
+            "name": "themeSuccessColor",
+            "description": "Color used for success/valid states. Inactive when advancedColors is false.",
+            "type": "string",
+            "defaultValue": "#76d275",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedColors is false."
+            }
+        },
+        {
+            "name": "themeSuccessDisabledColor",
+            "description": "Color used for success states when disabled. Inactive when advancedColors is false.",
+            "type": "string",
+            "defaultValue": "#a3d9b1",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedColors is false."
+            }
+        },
+        {
+            "name": "themeIconColor",
+            "description": "Default icon color in the picker (chevrons, navigation icons). Inactive when advancedColors is false.",
+            "type": "string",
+            "defaultValue": "#959595",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedColors is false."
+            }
+        },
+        {
+            "name": "themeDangerColor",
+            "description": "Color used for danger/invalid states. Inactive when advancedColors is false.",
+            "type": "string",
+            "defaultValue": "#ff6f60",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedColors is false."
+            }
+        },
+        {
+            "name": "themeHighlightColor",
+            "description": "Color used to highlight ranges and the today marker. Inactive when advancedColors is false.",
+            "type": "string",
+            "defaultValue": "#1976d219",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when advancedColors is false."
+            }
+        }
+    ],
+    "states": [
+        {
+            "name": "readonly",
+            "description": "Active while the picker is in read-only mode (set by the `readonly` property)."
+        }
+    ],
+    "events": [
+        {
+            "name": "change",
+            "description": "Triggered when the selected value changes.",
+            "payload": {
+                "value": "string | { start: string, end: string } | string[] — shape depends on selectionMode (single / range / multi)"
+            }
+        },
+        {
+            "name": "initValueChange",
+            "description": "Triggered when the bound initial value changes externally.",
+            "payload": {
+                "value": "string | { start: string, end: string } | string[]"
+            }
+        },
+        {
+            "name": "onFlowStep",
+            "description": "Triggered when the user advances a step in flow mode (only when `enableFlow=true`).",
+            "payload": {
+                "value": "number — the step index"
+            }
+        }
+    ],
+    "localContext": [],
+    "actions": [
+        {
+            "label": "Clear",
+            "actionName": "clearValue",
+            "description": "Clear the current selection. For `single` resets to null, for `range` resets to `{ start: null, end: null }`, for `multi` resets to `[]`."
+        },
+        {
+            "label": "Open Menu",
+            "actionName": "openMenu",
+            "description": "Open the picker menu programmatically."
+        },
+        {
+            "label": "Close Menu",
+            "actionName": "closeMenu",
+            "description": "Close the picker menu programmatically."
+        }
+    ],
+    "slots": [
+        {
+            "name": "triggerZone",
+            "description": "The clickable trigger that opens the picker menu. Required unless `enableCalendarOnly=true`. Must contain at least one element (typically a `ww-div` with a date label and an icon). Inside this slot, `context.item.data.preview` exposes the formatted display string and `context.item.data.value` exposes the raw value.",
+            "type": "array"
+        },
+        {
+            "name": "actionSelectElement",
+            "description": "Button shown at the bottom of the picker menu to confirm the selection. Required when `autoApply=false`. Typically a `ww-button`.",
+            "type": "object"
+        },
+        {
+            "name": "leftSidebarZone",
+            "description": "Optional sidebar content shown to the left of the calendar. Only rendered when `enableLeftSidebar=true`.",
+            "type": "array"
+        },
+        {
+            "name": "rightSidebarZone",
+            "description": "Optional sidebar content shown to the right of the calendar. Only rendered when `enableRightSidebar=true`.",
+            "type": "array"
+        }
+    ],
+    "variables": [
+        {
+            "name": "value",
+            "description": "The current selected value. Shape depends on `selectionMode`: for `single` a string (ISO date), for `range` an object `{ start, end }`, for `multi` an array of strings.",
+            "type": "any"
+        }
+    ],
+    "specifications": [
+        "Only one of `initValueSingle`, `{initValueRangeStart, initValueRangeEnd}`, or `initValueMulti` is active at a time — it is selected by `selectionMode` (`single` / `range` / `multi`). Setting the others has no effect.",
+        "`dateMode` values `time`, `month`, and `year` only support `selectionMode` of `single` or `range` (not `multi`). The editor coerces `dateMode` to `datetime` when switching to `multi`.",
+        "`enableMultiCalendars`, `multiCalendars`, and `multiCalendarsSolo` only take effect when `selectionMode=range` and `dateMode` is `datetime`, `date`, or `week`.",
+        "`autoApply` is ignored when `dateMode=time`. When `autoApply=false`, the `actionSelectElement` slot MUST contain a button (typically `ww-button`) for the user to confirm the selection.",
+        "When `enableCalendarOnly=true`, the picker renders inline and the `triggerZone` slot is NOT shown; `calendarOnlyFit` then controls whether the inline calendar stretches or centers.",
+        "Inside the `triggerZone` slot the layout-item context exposes `context.item.data.preview` (formatted display string per `format` / `customFormat`) and `context.item.data.value` (the raw selected value). Use these to render the selected date(s) and a fallback placeholder.",
+        "`timezone` is only applied when `dateMode=datetime`. `\"locale\"` means 'use the browser/local timezone'.",
+        "`customFormat` only takes effect when `format=\"custom\"`. Unicode tokens (Y/y, D/d, A/a) are normalized internally.",
+        "Advanced date constraints (`preventMinMaxNavigation`, `ignoreTimeValidation`, `allowedDates`, `disabledDates`, `disabledWeekDays`) are only surfaced in the editor behind an 'Advanced' toggle, but can be bound at any time.",
+        "Form-container caveat: this element does NOT currently register with `ww-form-container` via the `_wwForm:useForm` injection — when placed inside a form container, the form's submit payload will NOT include this field's value until the underlying component is updated. Read the exposed `value` variable directly for now."
+    ],
+    "examples": [
+        {
+            "description": "Single date picker with a custom trigger zone and an action-select button (autoApply disabled).",
+            "example": "{\"uid\":\"date-picker-1\",\"tag\":\"ww-input-date-time-picker\",\"name\":\"Date Picker\",\"content\":{\"default\":{\"selectionMode\":\"single\",\"dateMode\":\"date\",\"format\":\"MMM D, YYYY\",\"lang\":\"pageLang\",\"required\":true,\"readonly\":false,\"autoApply\":false,\"menuPosition\":\"center\",\"weekStart\":\"1\"}},\"styles\":{\"default\":{\"width\":\"300px\"}},\"slots\":[{\"slotKey\": \"triggerZone\", \"elements\":[\"date-trigger\"]},{\"slotKey\":\"actionSelectElement\", \"elements\":[\"date-select-btn\"]}]}\n{\"uid\":\"date-trigger\",\"tag\":\"ww-div\",\"name\":\"Date Trigger\",\"styles\":{\"default\":{\"width\":\"100%\",\"border\":\"1px solid #ddd\",\"cursor\":\"pointer\",\"display\":\"flex\",\"padding\":\"8px 12px\",\"borderRadius\":\"6px\",\"backgroundColor\":\"white\",\"columnGap\":\"8px\",\"alignItems\":\"center\"}},\"slots\":[{\"slotKey\":\"triggerZone\",\"elements\":[\"date-trigger-icon\",\"date-trigger-text\"]}]}\n{\"uid\":\"date-trigger-icon\",\"tag\":\"ww-icon\",\"content\":{\"default\":{\"icon\":\"<icon-name>\",\"color\":\"#959595\",\"fontSize\":\"16px\"}}}\n{\"uid\":\"date-trigger-text\",\"tag\":\"ww-text\",\"content\":{\"default\":{\"tag\":\"p\",\"text\":{\"en\":{\"__wwtype\": \"js\", \"code\":\"return context.item.data?.['preview'] || 'Select a date'\", \"defaultValue\": \"Select a date\"}}}},\"styles\":{\"default\":{\"color\":\"#212121\",\"fontSize\":\"14px\"}}}\n{\"uid\":\"date-select-btn\",\"tag\":\"ww-button\",\"content\":{\"default\":{\"text\":\"Select date\",\"buttonType\":\"button\"}}}"
+        },
+        {
+            "description": "Date range picker with two linked calendars and minmax range mode.",
+            "example": "{\"uid\":\"date-range\",\"tag\":\"ww-input-date-time-picker\",\"name\":\"Date Range\",\"content\":{\"default\":{\"selectionMode\":\"range\",\"dateMode\":\"date\",\"format\":\"MMM D, YYYY\",\"rangeMode\":\"minmax\",\"minRange\":2,\"maxRange\":14,\"enableMultiCalendars\":true,\"multiCalendars\":2,\"autoApply\":true,\"closeOnAutoApply\":true}},\"styles\":{\"default\":{\"width\":\"360px\"}},\"slots\":[{\"slotKey\":\"triggerZone\", \"elements\":[\"range-trigger\"]}]}\n{\"uid\":\"range-trigger\",\"tag\":\"ww-div\",\"styles\":{\"default\":{\"width\":\"100%\",\"border\":\"1px solid #ddd\",\"cursor\":\"pointer\",\"display\":\"flex\",\"padding\":\"8px 12px\",\"borderRadius\":\"6px\",\"backgroundColor\":\"white\",\"alignItems\":\"center\"}},\"slots\":[{\"slotKey\": \"children\", \"elements\":[\"range-trigger-text\"]}]}\n{\"uid\":\"range-trigger-text\",\"tag\":\"ww-text\",\"content\":{\"default\":{\"tag\":\"p\",\"text\":{\"en\":{\"__wwtype\": \"js\", \"code\":\"return context.item.data?.['preview'] || 'Select a date range'\", \"defaultValue\": \"Select a date range\"}}}}}"
+        }
+    ],
+    "dependencies": []
+}

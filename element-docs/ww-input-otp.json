@@ -1,0 +1,439 @@
+{
+    "metadata": {
+        "name": "ww-input-otp",
+        "description": "A form-integrated one-time-password (OTP) input component for verification codes, PINs, and multi-character tokens. Renders a configurable number of single-character fields driven by a format string (e.g. 'xxxxxx', 'xxx-xxx', 'xx xx xx'), with optional separators, masking, and numeric or alphanumeric input modes.",
+        "keywords": [
+            "otp",
+            "one-time-password",
+            "pin",
+            "verification",
+            "code",
+            "authentication",
+            "2fa",
+            "input",
+            "form"
+        ],
+        "features": [
+            "Flexible format string: 'x' marks an input slot, any other character marks a separator position",
+            "Numeric or alphanumeric character types",
+            "Form container integration via fieldName with submission and validation support",
+            "Custom validation formula support",
+            "Auto-focus of the first empty field on mount",
+            "Auto-submit of the parent form when all fields are filled",
+            "Automatic forward/backward navigation between fields on input and backspace",
+            "Paste handling that fills all fields from a single pasted string",
+            "Optional input masking with a custom mask character",
+            "Configurable separator rendered as a character or an icon",
+            "Exposes states: focus, readonly, disabled, error, complete",
+            "Does not support per-field labels or per-field styling",
+            "Does not support multi-line OTP layouts"
+        ],
+        "inherit": [
+            "ww-layout"
+        ]
+    },
+    "properties": [
+        {
+            "name": "fieldName",
+            "description": "The field name used to identify this OTP input in form submissions. Required when the input is used inside a ww-form-container. Inactive when the element is not placed inside a form container.",
+            "type": "string",
+            "defaultValue": "",
+            "inactiveProperty": {
+                "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy)."
+            }
+        },
+        {
+            "name": "customValidation",
+            "description": "Enable a custom validation formula for this field. Only used inside a ww-form-container. Inactive when the element is not placed inside a form container.",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy)."
+            }
+        },
+        {
+            "name": "validation",
+            "description": "A formula expression used for custom validation logic. Only used when customValidation is enabled. Inactive when the element is not in a form container or when customValidation is false.",
+            "type": "formula",
+            "defaultValue": "",
+            "inactiveProperty": {
+                "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy) or when customValidation is false."
+            }
+        },
+        {
+            "name": "format",
+            "description": "Defines the OTP layout. Each 'x' (or 'X') represents a single-character input field; any other character represents a separator position. Examples: 'xxxxxx' (6 fields), 'xxx-xxx' (two groups of three separated by '-'), 'xx xx xx'.",
+            "type": "string",
+            "defaultValue": "xxxxxx"
+        },
+        {
+            "name": "type",
+            "description": "The allowed character type. 'numeric' restricts input to digits 0-9 (and triggers numeric keyboards on mobile); 'alphanumeric' also allows letters a-z and A-Z.",
+            "type": "string",
+            "options": [
+                "numeric",
+                "alphanumeric"
+            ],
+            "defaultValue": "numeric"
+        },
+        {
+            "name": "value",
+            "description": "Initial value for the OTP fields, trimmed to the number of slots defined by format. This is an init value only; read the current OTP through the exposed 'value' component variable, not through this prop.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "autoFocus",
+            "description": "Whether to automatically focus the first empty field when the component is mounted.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "autoSubmit",
+            "description": "Whether to automatically submit the surrounding ww-form-container when all fields are filled. Has no effect outside a form container.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "required",
+            "description": "Whether all fields must be filled for form validation to pass.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "readonly",
+            "description": "Whether the fields are read-only and cannot be edited by the user.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "disabled",
+            "description": "Whether the fields are disabled. Disabled inputs do not receive focus and are not included in form submission.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "gap",
+            "description": "Horizontal gap between input fields and separators. Accepts px values.",
+            "type": "string",
+            "defaultValue": "8px",
+            "responsive": true
+        },
+        {
+            "name": "fieldWidth",
+            "description": "Width of each input field. Accepts px or em values.",
+            "type": "string",
+            "defaultValue": "40px",
+            "responsive": true
+        },
+        {
+            "name": "fieldHeight",
+            "description": "Height of each input field. Accepts px or em values.",
+            "type": "string",
+            "defaultValue": "40px",
+            "responsive": true
+        },
+        {
+            "name": "borderRadius",
+            "description": "Corner radius of each input field.",
+            "type": "string",
+            "defaultValue": "4px",
+            "responsive": true
+        },
+        {
+            "name": "borderWidth",
+            "description": "Border thickness of each input field.",
+            "type": "string",
+            "defaultValue": "1px",
+            "responsive": true
+        },
+        {
+            "name": "borderColor",
+            "description": "Default border color of each input field.",
+            "type": "string",
+            "defaultValue": "#cccccc",
+            "responsive": true
+        },
+        {
+            "name": "borderColorFocus",
+            "description": "Border color applied to the currently focused field.",
+            "type": "string",
+            "defaultValue": "#3b82f6",
+            "responsive": true
+        },
+        {
+            "name": "backgroundColor",
+            "description": "Background color of each input field.",
+            "type": "string",
+            "defaultValue": "#ffffff",
+            "responsive": true
+        },
+        {
+            "name": "textAlign",
+            "description": "Horizontal alignment of the character inside each field.",
+            "type": "string",
+            "options": [
+                "left",
+                "center",
+                "right"
+            ],
+            "defaultValue": "center",
+            "responsive": true
+        },
+        {
+            "name": "fontFamily",
+            "description": "Font family used for the characters typed into the fields.",
+            "type": "string",
+            "defaultValue": "",
+            "responsive": true
+        },
+        {
+            "name": "fontSize",
+            "description": "Font size of the characters inside the fields.",
+            "type": "string",
+            "defaultValue": "18px",
+            "responsive": true
+        },
+        {
+            "name": "fontWeight",
+            "description": "Font weight of the characters inside the fields. Pass null for the default weight.",
+            "type": "number",
+            "options": [
+                null,
+                100,
+                200,
+                300,
+                400,
+                500,
+                600,
+                700,
+                800,
+                900
+            ],
+            "defaultValue": 500,
+            "responsive": true
+        },
+        {
+            "name": "color",
+            "description": "Text color of the characters inside the fields.",
+            "type": "string",
+            "defaultValue": "#000000",
+            "responsive": true
+        },
+        {
+            "name": "placeholderChar",
+            "description": "Single character displayed inside empty fields when displayPlaceholder is true. Inactive when displayPlaceholder is false.",
+            "type": "string",
+            "defaultValue": "·",
+            "inactiveProperty": {
+                "description": "Inactive when displayPlaceholder is false."
+            }
+        },
+        {
+            "name": "placeholderColor",
+            "description": "Color of the placeholder character inside empty fields. Inactive when displayPlaceholder is false.",
+            "type": "string",
+            "defaultValue": "#999999",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when displayPlaceholder is false."
+            }
+        },
+        {
+            "name": "maskInput",
+            "description": "Whether to hide typed characters and render the mask character instead. The real value remains available through the 'value' component variable.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "maskCharacter",
+            "description": "Single character rendered in place of the typed character when maskInput is true. Inactive when maskInput is false.",
+            "type": "string",
+            "defaultValue": "·",
+            "inactiveProperty": {
+                "description": "Inactive when maskInput is false."
+            }
+        },
+        {
+            "name": "maskColor",
+            "description": "Color of the mask character when maskInput is true. Inactive when maskInput is false.",
+            "type": "string",
+            "defaultValue": "#000000",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when maskInput is false."
+            }
+        },
+        {
+            "name": "displayPlaceholder",
+            "description": "Whether to render the placeholder character in empty fields.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "separatorType",
+            "description": "Type of separator rendered at non-'x' positions in the format string. When set to 'none', separator-related style properties are ignored and no separator is rendered.",
+            "type": "string",
+            "options": [
+                "none",
+                "character",
+                "icon"
+            ],
+            "defaultValue": "character"
+        },
+        {
+            "name": "separatorChar",
+            "description": "Character used as separator when separatorType is 'character'. If empty, the character from the format string at the separator position is used. Inactive when separatorType is not 'character'.",
+            "type": "string",
+            "defaultValue": "-",
+            "inactiveProperty": {
+                "description": "Inactive when separatorType is not 'character'."
+            }
+        },
+        {
+            "name": "separatorIcon",
+            "description": "Icon name used as separator when separatorType is 'icon'. Uses the wwLib icon set (e.g. 'lucide/separator-vertical'). Inactive when separatorType is not 'icon'.",
+            "type": "string",
+            "defaultValue": "lucide/separator-vertical",
+            "inactiveProperty": {
+                "description": "Inactive when separatorType is not 'icon'."
+            }
+        },
+        {
+            "name": "separatorColor",
+            "description": "Color of the separator character or icon. Inactive when separatorType is 'none'.",
+            "type": "string",
+            "defaultValue": "#000000",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when separatorType is 'none'."
+            }
+        },
+        {
+            "name": "separatorSize",
+            "description": "Font size of the separator character or icon. Inactive when separatorType is 'none'.",
+            "type": "string",
+            "defaultValue": "18px",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when separatorType is 'none'."
+            }
+        }
+    ],
+    "states": [
+        {
+            "name": "focus",
+            "description": "Active while any field is currently focused."
+        },
+        {
+            "name": "readonly",
+            "description": "Active when the readonly property is true."
+        },
+        {
+            "name": "disabled",
+            "description": "Active when the disabled property is true."
+        },
+        {
+            "name": "error",
+            "description": "Active when the current value fails validation (required check or custom validation formula)."
+        },
+        {
+            "name": "complete",
+            "description": "Active when every field is filled."
+        }
+    ],
+    "events": [
+        {
+            "name": "change",
+            "description": "Triggered whenever the OTP value changes, including on individual character input, backspace, paste, and programmatic setValue calls.",
+            "payload": {
+                "value": "string"
+            }
+        },
+        {
+            "name": "complete",
+            "description": "Triggered when every field has been filled (fires once the last empty field receives a character).",
+            "payload": {
+                "value": "string"
+            }
+        },
+        {
+            "name": "focus",
+            "description": "Triggered when any field receives focus from user interaction (not emitted when focus is moved programmatically between fields)."
+        },
+        {
+            "name": "blur",
+            "description": "Triggered when focus leaves the OTP component entirely (not when moving between its own fields)."
+        },
+        {
+            "name": "clear",
+            "description": "Triggered when the clear action is invoked, resetting all fields to empty.",
+            "payload": {
+                "value": "string"
+            }
+        }
+    ],
+    "localContext": [
+        {
+            "path": "otp-input",
+            "type": "object",
+            "description": "Local context object exposing the current OTP state. Useful for binding to the current value, validity, or completeness directly inside the component's subtree.",
+            "content": {
+                "value": "string",
+                "formattedValue": "string",
+                "isComplete": "boolean",
+                "isValid": "boolean",
+                "isFocused": "boolean"
+            }
+        }
+    ],
+    "actions": [
+        {
+            "label": "Focus first field",
+            "actionName": "focus",
+            "description": "Focus the first empty field, or the first field if all are filled."
+        },
+        {
+            "label": "Clear all fields",
+            "actionName": "clear",
+            "description": "Clear every field and reset the value to an empty string."
+        },
+        {
+            "label": "Set value",
+            "actionName": "setValue",
+            "description": "Programmatically set the OTP value. The value is trimmed to the number of input slots defined by format.",
+            "args": [
+                {
+                    "name": "value",
+                    "type": "string"
+                }
+            ]
+        }
+    ],
+    "slots": [],
+    "variables": [
+        {
+            "name": "value",
+            "description": "The current raw OTP value without separators (e.g. '123456'). Updated on every input, backspace, paste, clear, and setValue call.",
+            "type": "string",
+            "readonly": true
+        },
+        {
+            "name": "formattedValue",
+            "description": "The current OTP value with separators inserted according to the format string (e.g. '123-456' for format 'xxx-xxx'). Read-only.",
+            "type": "string",
+            "readonly": true
+        }
+    ],
+    "specifications": [
+        "When used as a form input, place this element inside a ww-form-container and set a meaningful fieldName. The form container collects the current raw value automatically.",
+        "The number of input fields is derived from the number of 'x' (or 'X') characters in the format string. Any other character in format is a separator position.",
+        "Do not attempt to bind to the 'value' property to read the user's input; it is only an init value. Read the current OTP via the 'value' component variable or the 'otp-input.value' local context path.",
+        "When separatorType is 'none', the separatorChar, separatorIcon, separatorColor, and separatorSize properties have no visual effect.",
+        "When maskInput is true, typed characters are visually replaced with maskCharacter but the real value is still exposed via the 'value' variable and submitted to the form.",
+        "autoSubmit has no effect outside a ww-form-container; setting it to true on a standalone OTP input does nothing.",
+        "The element exposes the 'complete' state when every slot is filled; use this state for conditional styling (e.g. success border) rather than binding a workflow to it."
+    ],
+    "examples": [],
+    "dependencies": []
+}

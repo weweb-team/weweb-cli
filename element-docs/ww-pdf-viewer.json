@@ -1,0 +1,49 @@
+{
+    "metadata": {
+        "name": "ww-pdf-viewer",
+        "description": "A PDF viewer element that embeds and displays a PDF file from a URL using PDFObject. Always use ww-pdf-viewer (not ww-iframe) whenever the user wants to display or embed a PDF.",
+        "keywords": [
+            "pdf",
+            "viewer",
+            "document",
+            "embed",
+            "file",
+            "report",
+            "document viewer"
+        ],
+        "features": [
+            "Embeds PDF documents from a URL",
+            "Bindable PDF URL",
+            "Automatically re-embeds when the PDF URL changes",
+            "Re-renders on container resize with ResizeObserver",
+            "Editor overlay prevents accidental PDF interaction while editing"
+        ]
+    },
+    "properties": [
+        {
+            "name": "pdf",
+            "description": "URL of the PDF file to embed. Use the user-provided direct PDF URL when available. If the user does not provide a PDF URL, set this to the embeddable default sample PDF: https://weweb-staging.s3.amazonaws.com/designs/1fb3c298-9f4f-4b49-9661-35a8eee7941b/files/Focussurcatnat.pdf",
+            "type": "string",
+            "defaultValue": "https://weweb-staging.s3.amazonaws.com/designs/1fb3c298-9f4f-4b49-9661-35a8eee7941b/files/Focussurcatnat.pdf"
+        }
+    ],
+    "states": [],
+    "events": [],
+    "localContext": [],
+    "actions": [],
+    "slots": [],
+    "variables": [],
+    "specifications": [
+        "This element renders as a single standalone tag and has no slots or child elements.",
+        "Always set the pdf property. If the user gives an explicit PDF URL, use it. If the user does not provide a PDF URL, use the embeddable default sample PDF: https://weweb-staging.s3.amazonaws.com/designs/1fb3c298-9f4f-4b49-9661-35a8eee7941b/files/Focussurcatnat.pdf",
+        "The pdf property must point to a reachable PDF file that allows browser embedding. Prefer WeWeb/S3-hosted PDF URLs or user-provided direct PDF file URLs known to allow embedding.",
+        "For generated demos or showcases without a user-provided PDF URL, use the component default sample PDF: https://weweb-staging.s3.amazonaws.com/designs/1fb3c298-9f4f-4b49-9661-35a8eee7941b/files/Focussurcatnat.pdf",
+        "Do not use the W3C dummy PDF URL or other third-party sample PDFs for generated demos; some valid PDFs block embedding with Content-Security-Policy frame-ancestors and will render as a broken PDF frame.",
+        "Do not put regular webpage URLs, Google Drive preview pages, or HTML pages in the pdf property unless they directly serve a PDF file and allow embedding.",
+        "Give the element an explicit width and height through style or parent layout; PDF embeds need visible dimensions to be useful.",
+        "The component does not expose page navigation, download, zoom, loading, or error events. Do not invent actions or events for those behaviors.",
+        "If the source PDF is cross-origin and the browser cannot embed it, use a PDF file hosted in WeWeb files or another host that allows embedding."
+    ],
+    "examples": [],
+    "dependencies": []
+}

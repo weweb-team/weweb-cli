@@ -1,0 +1,43 @@
+{
+    "metadata": {
+        "name": "ww-fake-full-inherit",
+        "description": "Fake element, not for use. Used in design system tools to convert classes styles.",
+        "keywords": [],
+        "features": [],
+        "inherit": [
+            "ww-text",
+            "ww-layout",
+            "ww-background-video"
+        ]
+    },
+    "properties": [
+        {
+            "name": "color",
+            "description": "Color - Fix for icons",
+            "type": "string",
+            "defaultValue": "black",
+            "responsive": true
+        },
+        {
+            "name": "objectFit",
+            "description": "Object fit - Fix for images",
+            "type": "string",
+            "options": [
+                "cover",
+                "contain"
+            ]
+        },
+        {
+            "name": "filter",
+            "description": "Filter - Fix for images",
+            "type": "string"
+        }
+    ],
+    "states": [],
+    "events": [],
+    "actions": [],
+    "slots": [],
+    "variables": [],
+    "specifications": [],
+    "examples": []
+}

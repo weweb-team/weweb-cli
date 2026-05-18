@@ -1,0 +1,129 @@
+{
+    "metadata": {
+        "name": "ww-dropdown",
+        "description": "A customizable dropdown menu component that can be triggered by click, hover, or right-click, with configurable positions, alignments, offsets, and optional animations. The dropdown content is rendered as a portal (teleported) to avoid overflow clipping issues.",
+        "keywords": [
+            "dropdown",
+            "menu",
+            "popover",
+            "trigger",
+            "tooltip"
+        ],
+        "features": [
+            "Click, hover, or right-click trigger modes",
+            "Configurable position (top, right, bottom, left) and alignment (start, center, end)",
+            "Customizable X and Y offsets in px or %",
+            "Optional slide animation with transform origin based on position",
+            "Nested dropdown support",
+            "Automatic closure on outside click",
+            "Responsive: hover mode falls back to click on mobile",
+            "Z-index control for stacking order",
+            "Disabled state support"
+        ],
+        "advanced": true
+    },
+    "properties": [
+        {
+            "name": "triggerType",
+            "description": "Type of interaction that opens the dropdown. 'click' opens on click, 'hover' opens on mouse enter (falls back to click on mobile), 'right-click' opens on context menu.",
+            "type": "string",
+            "options": ["click", "hover", "right-click"],
+            "defaultValue": "click"
+        },
+        {
+            "name": "position",
+            "description": "Position of the dropdown relative to the trigger element.",
+            "type": "string",
+            "options": ["top", "right", "bottom", "left"],
+            "defaultValue": "bottom",
+            "responsive": true
+        },
+        {
+            "name": "alignment",
+            "description": "Alignment of the dropdown along the position axis. For top/bottom positions: start=left, center=centered, end=right. For left/right positions: start=top, center=centered, end=bottom.",
+            "type": "string",
+            "options": ["start", "center", "end"],
+            "defaultValue": "start",
+            "responsive": true
+        },
+        {
+            "name": "offsetX",
+            "description": "Horizontal offset of the dropdown from the trigger element, as a string with unit (e.g. '10px' or '50%').",
+            "type": "string",
+            "defaultValue": "0px"
+        },
+        {
+            "name": "offsetY",
+            "description": "Vertical offset of the dropdown from the trigger element, as a string with unit (e.g. '8px' or '20%').",
+            "type": "string",
+            "defaultValue": "0px"
+        },
+        {
+            "name": "dropdownZIndex",
+            "description": "Z-index of the dropdown overlay. Range 0-100.",
+            "type": "number",
+            "responsive": true
+        },
+        {
+            "name": "disabled",
+            "description": "When true, disables the dropdown so it cannot be opened by any trigger.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "animated",
+            "description": "When true, enables a slide/scale animation when the dropdown opens and closes.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "forceDisplayEditor",
+            "description": "When true, forces the dropdown to be displayed in editor mode for design purposes.",
+            "type": "boolean",
+            "defaultValue": false
+        }
+    ],
+    "states": [],
+    "events": [],
+    "localContext": [],
+    "actions": [
+        {
+            "label": "Close dropdown",
+            "actionName": "closeDropdown",
+            "description": "Programmatically closes the dropdown."
+        }
+    ],
+    "slots": [
+        {
+            "name": "triggerLayout",
+            "description": "The element(s) that serve as the trigger for the dropdown. Clicking, hovering, or right-clicking this area (depending on triggerType) will open the dropdown.",
+            "type": "array"
+        },
+        {
+            "name": "dropdownLayout",
+            "description": "The content displayed inside the dropdown when it is open. Can contain any elements such as menus, lists, forms, etc.",
+            "type": "array"
+        }
+    ],
+    "variables": [],
+    "specifications": [
+        "The dropdown is teleported to the app root to avoid overflow clipping from parent containers.",
+        "On mobile screen sizes, hover trigger type automatically falls back to click behavior.",
+        "The dropdown auto-closes when clicking outside of both the trigger and dropdown areas.",
+        "When animated is true, the dropdown uses a slide + scale transition with transform origin based on position and alignment.",
+        "Nested dropdowns are supported: clicking inside a child dropdown won't close parent dropdowns.",
+        "forceDisplayEditor only affects editor mode preview and has no effect in production.",
+        "Does not support programmatic open — only the closeDropdown action is available.",
+        "Does not support custom transition durations or easing; animation timing is fixed."
+    ],
+    "examples": [
+        {
+            "description": "A simple click-triggered dropdown menu positioned below the trigger with a button as trigger and a list of items.",
+            "example": "{\"triggerType\":\"click\",\"position\":\"bottom\",\"alignment\":\"start\",\"offsetY\":\"8px\",\"animated\":true,\"forceDisplayEditor\":true}"
+        },
+        {
+            "description": "A hover-triggered dropdown positioned to the right, centered alignment.",
+            "example": "{\"triggerType\":\"hover\",\"position\":\"right\",\"alignment\":\"center\",\"offsetX\":\"4px\",\"animated\":true}"
+        }
+    ]
+}

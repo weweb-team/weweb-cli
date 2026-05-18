@@ -1,0 +1,143 @@
+{
+    "metadata": {
+        "name": "ww-stack",
+        "description": "A sortable drag-and-drop stack/list element that renders repeated item cards with optional header and footer content.",
+        "keywords": ["stack", "sortable", "draggable", "drag and drop", "list", "kanban", "cards"],
+        "features": [
+            "Sortable repeated items",
+            "Drag-and-drop between stacks with a shared group",
+            "Custom header, repeated item, and footer slots",
+            "Readonly state to disable dragging",
+            "Optional custom drag handle CSS class",
+            "Move, add, and remove events with updated item lists",
+            "Readonly isDragging variable while drag is active"
+        ]
+    },
+    "properties": [
+        {
+            "name": "group",
+            "description": "Drag-and-drop group name. Stacks with the same group can exchange items.",
+            "type": "string",
+            "defaultValue": "common"
+        },
+        {
+            "name": "items",
+            "description": "Array or collection of item objects rendered by the itemElement slot.",
+            "type": "array",
+            "defaultValue": []
+        },
+        {
+            "name": "sortable",
+            "description": "Whether items can be dragged and reordered.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "readonly",
+            "description": "Whether drag-and-drop is disabled.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "customDragHandle",
+            "description": "Whether dragging must start from an element inside the item that has the handleClass CSS class.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "handleClass",
+            "description": "CSS class used as the drag handle when customDragHandle is true.",
+            "type": "string",
+            "defaultValue": "draggable"
+        }
+    ],
+    "states": [
+        {
+            "name": "readonly",
+            "description": "Applied when the stack is readonly and cannot be reordered."
+        }
+    ],
+    "events": [
+        {
+            "name": "item:moved",
+            "description": "Triggered when an item is reordered inside the stack.",
+            "payload": {
+                "item": "moved item object",
+                "oldIndex": "number",
+                "newIndex": "number",
+                "updatedList": "array of items after the move"
+            }
+        },
+        {
+            "name": "item:added",
+            "description": "Triggered when an item is added from another stack in the same group.",
+            "payload": {
+                "item": "added item object",
+                "newIndex": "number",
+                "updatedList": "array of items after the addition"
+            }
+        },
+        {
+            "name": "item:removed",
+            "description": "Triggered when an item is removed from this stack into another stack in the same group.",
+            "payload": {
+                "item": "removed item object",
+                "oldIndex": "number",
+                "updatedList": "array of items after the removal"
+            }
+        }
+    ],
+    "localContext": [],
+    "actions": [],
+    "slots": [
+        {
+            "name": "itemElement",
+            "description": "Required repeated card/template rendered once for each item. Inside this slot, use context.item.data for the current item and context.item.index for the current index.",
+            "type": "array",
+            "required": true,
+            "tag": "ww-div"
+        },
+        {
+            "name": "headerElement",
+            "description": "Optional content rendered above the repeated items. In a Kanban board, this commonly displays the stack label from context.item.data.label.",
+            "type": "array",
+            "tag": "ww-text"
+        },
+        {
+            "name": "footerElement",
+            "description": "Optional content rendered below the repeated items, often used for an add-card action or summary.",
+            "type": "array"
+        }
+    ],
+    "variables": [
+        {
+            "name": "isDragging",
+            "description": "True while an item in the stack is being dragged.",
+            "type": "boolean",
+            "readonly": true,
+            "content": false
+        }
+    ],
+    "specifications": [
+        "Use ww-stack for a standalone sortable list or as the stackElement child of ww-kanban.",
+        "The items property must resolve to an array. Each item should be an object and should include a stable id field when possible because the internal item key defaults to id.",
+        "The itemElement slot is repeated automatically. Do not add your own repeat on itemElement children; bind text and styles directly to context.item.data fields.",
+        "Inside itemElement, use context.item.data.<field> or context.item.data?.['field'] to display item properties.",
+        "Inside headerElement when used in ww-kanban, context.item.data is the current stack object with label, value, and items fields.",
+        "Use the same group value for multiple standalone stacks when items should be draggable between them.",
+        "When customDragHandle is true, add the handleClass value as an HTML class on a child element inside itemElement. Otherwise the whole item can start dragging.",
+        "Set readonly to true when the list is display-only.",
+        "Use item:moved, item:added, and item:removed events to update the source array when drag-and-drop should persist."
+    ],
+    "examples": [
+        {
+            "description": "Standalone sortable task list.",
+            "example": "{\"uid\":\"task_stack\",\"tag\":\"ww-stack\",\"name\":\"Task Stack\",\"content\":{\"default\":{\"group\":\"tasks\",\"items\":[{\"id\":1,\"title\":\"Plan launch\",\"owner\":\"Maya\"},{\"id\":2,\"title\":\"Review copy\",\"owner\":\"Noah\"}],\"sortable\":true,\"readonly\":false,\"customDragHandle\":false}},\"style\":{\"default\":{\"display\":\"flex\",\"flexDirection\":\"column\",\"gap\":\"12px\",\"width\":\"100%\"}},\"slots\":[{\"slotKey\":\"headerElement\",\"elements\":[\"task_stack_header\"]},{\"slotKey\":\"itemElement\",\"elements\":[\"task_card\"]}]}{\"uid\":\"task_stack_header\",\"tag\":\"ww-text\",\"name\":\"Stack Title\",\"content\":{\"default\":{\"tag\":\"h3\",\"text\":{\"en\":\"Tasks\"}}}}{\"uid\":\"task_card\",\"tag\":\"ww-div\",\"name\":\"Task Card\",\"style\":{\"default\":{\"display\":\"flex\",\"flexDirection\":\"column\",\"gap\":\"4px\",\"padding\":\"16px\",\"border\":\"1px solid #E5E7EB\",\"borderRadius\":\"12px\",\"backgroundColor\":\"#FFFFFF\"}},\"slots\":[{\"slotKey\":\"children\",\"elements\":[\"task_title\",\"task_owner\"]}]}{\"uid\":\"task_title\",\"tag\":\"ww-text\",\"name\":\"Task Title\",\"content\":{\"default\":{\"tag\":\"p\",\"text\":{\"en\":{\"__wwtype\":\"f\",\"code\":\"context.item.data.title\"}}}},\"style\":{\"default\":{\"fontWeight\":\"700\"}}}{\"uid\":\"task_owner\",\"tag\":\"ww-text\",\"name\":\"Task Owner\",\"content\":{\"default\":{\"tag\":\"p\",\"text\":{\"en\":{\"__wwtype\":\"f\",\"code\":\"context.item.data.owner\"}}}}}"
+        },
+        {
+            "description": "Stack item with a custom drag handle.",
+            "example": "{\"uid\":\"handle_stack\",\"tag\":\"ww-stack\",\"name\":\"Handle Stack\",\"content\":{\"default\":{\"group\":\"tasks\",\"items\":[{\"id\":1,\"title\":\"Design card\"}],\"sortable\":true,\"customDragHandle\":true,\"handleClass\":\"drag-handle\"}},\"slots\":[{\"slotKey\":\"itemElement\",\"elements\":[\"handle_card\"]}]}{\"uid\":\"handle_card\",\"tag\":\"ww-div\",\"name\":\"Task Card\",\"style\":{\"default\":{\"display\":\"flex\",\"alignItems\":\"center\",\"gap\":\"12px\",\"padding\":\"12px\",\"backgroundColor\":\"#FFFFFF\",\"borderRadius\":\"10px\"}},\"slots\":[{\"slotKey\":\"children\",\"elements\":[\"handle_icon\",\"handle_title\"]}]}{\"uid\":\"handle_icon\",\"tag\":\"ww-icon\",\"name\":\"Drag Handle\",\"content\":{\"default\":{\"icon\":\"lucide/grip-vertical\"}},\"settings\":{\"htmlAttributes\":{\"class\":\"drag-handle\"}}}{\"uid\":\"handle_title\",\"tag\":\"ww-text\",\"name\":\"Task Title\",\"content\":{\"default\":{\"tag\":\"p\",\"text\":{\"en\":{\"__wwtype\":\"f\",\"code\":\"context.item.data.title\"}}}}}"
+        }
+    ],
+    "dependencies": ["ww-div", "ww-icon", "ww-text"]
+}

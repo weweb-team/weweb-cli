@@ -1,0 +1,220 @@
+{
+    "metadata": {
+        "name": "ww-kanban",
+        "description": "A Kanban board element that groups item data into draggable stacks and renders each stack through a ww-stack child.",
+        "keywords": ["kanban", "board", "tasks", "pipeline", "columns", "cards", "drag and drop", "sortable"],
+        "features": [
+            "Groups item objects into stacks by a configured item property",
+            "Renders each stack with a ww-stack dependency",
+            "Supports manual or bound stack definitions",
+            "Sortable cards within and between stacks",
+            "Optional uncategorized stack for unmatched items",
+            "Ascending or descending sorting inside stacks",
+            "Readonly mode to disable drag-and-drop",
+            "Item moved event with source and destination stack values",
+            "Readonly isDragging variable while any stack item is being dragged"
+        ]
+    },
+    "properties": [
+        {
+            "name": "wrapStacks",
+            "description": "Whether stacks wrap to a new row when there is not enough horizontal space.",
+            "type": "boolean",
+            "defaultValue": true,
+            "responsive": true
+        },
+        {
+            "name": "items",
+            "description": "Array or collection of item objects displayed as cards in the board.",
+            "type": "array",
+            "defaultValue": []
+        },
+        {
+            "name": "itemKey",
+            "description": "Object property path used as the stable unique key for each item. It must reference a property that exists on every item, for example \"id\", \"slug\", or \"['id']\".",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "stackedBy",
+            "description": "Object property path on each item that determines which stack it belongs to, for example \"status\" or \"['status']\".",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "sortedBy",
+            "description": "Optional object property path used to sort items inside each stack.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "sortOrder",
+            "description": "Sort direction for items inside each stack when sortedBy is set.",
+            "type": "string",
+            "options": ["asc", "desc"],
+            "defaultValue": "asc"
+        },
+        {
+            "name": "sortable",
+            "description": "Whether cards can be dragged and reordered.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "uncategorizedStack",
+            "description": "Whether to display an extra stack containing items whose stackedBy value does not match any configured stack value.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "stacks",
+            "description": "Array or collection of stack objects. Each stack must provide a label and value, or matching custom paths through stackLabel and stackValue.",
+            "type": "array",
+            "defaultValue": [
+                { "label": "Todo", "value": "todo" },
+                { "label": "In progress", "value": "wip" },
+                { "label": "Done", "value": "done" }
+            ]
+        },
+        {
+            "name": "stackLabel",
+            "description": "Object property path used as the display label for each stack when stacks are object data.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "stackValue",
+            "description": "Object property path used as the stack value when stacks are object data. Item stackedBy values must match this value.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "readonly",
+            "description": "Whether all drag-and-drop interactions are disabled.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "draggingCursor",
+            "description": "CSS cursor used globally while an item is being dragged.",
+            "type": "string",
+            "options": [
+                "auto",
+                "default",
+                "pointer",
+                "none",
+                "not-allowed",
+                "help",
+                "text",
+                "move",
+                "grab",
+                "grabbing",
+                "n-resize",
+                "s-resize",
+                "w-resize",
+                "e-resize",
+                "ne-resize",
+                "nw-resize",
+                "se-resize",
+                "sw-resize",
+                "ew-resize",
+                "ns-resize",
+                "nesw-resize",
+                "nwse-resize",
+                "zoom-in",
+                "zoom-out",
+                "col-resize",
+                "row-resize",
+                "all-scroll",
+                "context-menu",
+                "cell",
+                "crosshair",
+                "vertical-text",
+                "alias",
+                "copy",
+                "progress",
+                "wait"
+            ],
+            "defaultValue": "grabbing"
+        },
+        {
+            "name": "customDragHandle",
+            "description": "Whether dragging must start from an element inside the card that has the handleClass CSS class.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "handleClass",
+            "description": "CSS class used as the drag handle when customDragHandle is true.",
+            "type": "string",
+            "defaultValue": "draggable"
+        }
+    ],
+    "states": [
+        {
+            "name": "readonly",
+            "description": "Applied when the Kanban board is readonly and cannot be reordered."
+        }
+    ],
+    "events": [
+        {
+            "name": "item:moved",
+            "description": "Triggered when a card is moved within the same stack or into another stack.",
+            "payload": {
+                "item": "moved item object",
+                "from": "source stack value",
+                "to": "destination stack value",
+                "oldIndex": "previous item index, or null when added into a stack",
+                "newIndex": "new item index",
+                "updatedList": "array of items in the updated destination stack"
+            }
+        }
+    ],
+    "localContext": [],
+    "actions": [],
+    "slots": [
+        {
+            "name": "stackElement",
+            "description": "Required ww-stack child rendered once for each configured stack. Its itemElement slot defines the card template and its headerElement slot defines the stack header.",
+            "type": "object",
+            "required": true,
+            "tag": "ww-stack"
+        }
+    ],
+    "variables": [
+        {
+            "name": "isDragging",
+            "description": "True while any card in the Kanban board is being dragged.",
+            "type": "boolean",
+            "readonly": true,
+            "content": false
+        }
+    ],
+    "specifications": [
+        "Always include a stackElement slot containing a ww-stack child. Without it, the Kanban has no stack UI.",
+        "Configure the ww-stack child with headerElement and itemElement slots. The ww-kanban passes each stack's items and metadata into the ww-stack automatically through ww-props.",
+        "The items property must resolve to an array of objects. Each item must include a stable unique field and a stack/category field such as status.",
+        "When items come from a collection or table view, set itemKey to an existing unique field returned by that data source. Do not assume id exists; if the rows expose slug, uuid, or another unique field, use that field instead.",
+        "Set stackedBy to the item field that stores the stack value. Each item value must match one of the stacks values.",
+        "The stacks property must resolve to an array of objects. By default each stack object uses label for display and value for matching items.",
+        "Use stackLabel and stackValue only when the stack objects use custom field names instead of label and value.",
+        "Inside the ww-stack headerElement slot, context.item.data is the current stack object with label, value, and items fields.",
+        "Inside the ww-stack itemElement slot, context.item.data is the current card/item object.",
+        "Do not add a repeat to the stackElement slot or to the ww-stack itemElement slot; repetition is handled by ww-kanban and ww-stack.",
+        "Use uncategorizedStack only when unmatched items should remain visible.",
+        "Set readonly to true for display-only boards.",
+        "If customDragHandle is true, add the handleClass value as an HTML class on a child element inside the card template.",
+        "Use the item:moved event to persist changes to variables, collections, or a backend. The component does not automatically mutate external source data beyond its internal display order."
+    ],
+    "examples": [
+        {
+            "description": "Project Kanban board with three stacks and repeated cards.",
+            "example": "{\"uid\":\"project_kanban\",\"tag\":\"ww-kanban\",\"name\":\"Project Kanban\",\"content\":{\"default\":{\"items\":[{\"id\":1,\"title\":\"Write brief\",\"owner\":\"Maya\",\"status\":\"todo\",\"priority\":\"High\"},{\"id\":2,\"title\":\"Build prototype\",\"owner\":\"Noah\",\"status\":\"doing\",\"priority\":\"Medium\"},{\"id\":3,\"title\":\"Launch page\",\"owner\":\"Lina\",\"status\":\"done\",\"priority\":\"Low\"}],\"stacks\":[{\"label\":\"Todo\",\"value\":\"todo\"},{\"label\":\"Doing\",\"value\":\"doing\"},{\"label\":\"Done\",\"value\":\"done\"}],\"itemKey\":\"id\",\"stackedBy\":\"status\",\"sortedBy\":\"priority\",\"sortOrder\":\"asc\",\"wrapStacks\":true,\"sortable\":true,\"readonly\":false,\"uncategorizedStack\":false,\"draggingCursor\":\"grabbing\"}},\"style\":{\"default\":{\"display\":\"flex\",\"width\":\"100%\",\"minHeight\":\"520px\",\"gap\":\"16px\"}},\"slots\":[{\"slotKey\":\"stackElement\",\"elements\":[\"kanban_stack\"]}]}{\"uid\":\"kanban_stack\",\"tag\":\"ww-stack\",\"name\":\"Kanban Stack\",\"content\":{\"default\":{\"group\":\"project-kanban\",\"sortable\":true,\"readonly\":false}},\"style\":{\"default\":{\"display\":\"flex\",\"flexDirection\":\"column\",\"gap\":\"12px\",\"width\":\"320px\",\"minHeight\":\"420px\",\"padding\":\"16px\",\"border\":\"1px solid #E5E7EB\",\"borderRadius\":\"16px\",\"backgroundColor\":\"#F9FAFB\"}},\"slots\":[{\"slotKey\":\"headerElement\",\"elements\":[\"stack_header\"]},{\"slotKey\":\"itemElement\",\"elements\":[\"kanban_card\"]}]}{\"uid\":\"stack_header\",\"tag\":\"ww-text\",\"name\":\"Stack Header\",\"content\":{\"default\":{\"tag\":\"h3\",\"text\":{\"en\":{\"__wwtype\":\"f\",\"code\":\"context.item.data.label + ' (' + context.item.data.items.length + ')'\"}}}},\"style\":{\"default\":{\"fontWeight\":\"700\"}}}{\"uid\":\"kanban_card\",\"tag\":\"ww-div\",\"name\":\"Kanban Card\",\"style\":{\"default\":{\"display\":\"flex\",\"flexDirection\":\"column\",\"gap\":\"8px\",\"padding\":\"16px\",\"border\":\"1px solid #E5E7EB\",\"borderRadius\":\"12px\",\"backgroundColor\":\"#FFFFFF\",\"boxShadow\":\"0 8px 20px rgba(15,23,42,0.08)\"}},\"slots\":[{\"slotKey\":\"children\",\"elements\":[\"card_title\",\"card_meta\"]}]}{\"uid\":\"card_title\",\"tag\":\"ww-text\",\"name\":\"Card Title\",\"content\":{\"default\":{\"tag\":\"p\",\"text\":{\"en\":{\"__wwtype\":\"f\",\"code\":\"context.item.data.title\"}}}},\"style\":{\"default\":{\"fontWeight\":\"700\"}}}{\"uid\":\"card_meta\",\"tag\":\"ww-text\",\"name\":\"Card Meta\",\"content\":{\"default\":{\"tag\":\"p\",\"text\":{\"en\":{\"__wwtype\":\"f\",\"code\":\"context.item.data.owner + ' - ' + context.item.data.priority\"}}}}}"
+        },
+        {
+            "description": "Readonly Kanban bound to a table view data array.",
+            "example": "{\"uid\":\"readonly_kanban\",\"tag\":\"ww-kanban\",\"name\":\"Readonly Kanban\",\"content\":{\"default\":{\"items\":{\"__wwtype\":\"f\",\"code\":\"globalContext.tableViews['<TABLE_VIEW_UUID>']?.data\",\"defaultValue\":[]},\"stacks\":[{\"label\":\"Open\",\"value\":\"open\"},{\"label\":\"Review\",\"value\":\"review\"},{\"label\":\"Closed\",\"value\":\"closed\"}],\"itemKey\":\"slug\",\"stackedBy\":\"status\",\"wrapStacks\":true,\"sortable\":false,\"readonly\":true}},\"slots\":[{\"slotKey\":\"stackElement\",\"elements\":[\"readonly_stack\"]}]}{\"uid\":\"readonly_stack\",\"tag\":\"ww-stack\",\"name\":\"Readonly Stack\",\"content\":{\"default\":{\"sortable\":false,\"readonly\":true}},\"slots\":[{\"slotKey\":\"headerElement\",\"elements\":[\"readonly_stack_header\"]},{\"slotKey\":\"itemElement\",\"elements\":[\"readonly_card\"]}]}{\"uid\":\"readonly_stack_header\",\"tag\":\"ww-text\",\"name\":\"Stack Header\",\"content\":{\"default\":{\"tag\":\"h3\",\"text\":{\"en\":{\"__wwtype\":\"f\",\"code\":\"context.item.data.label\"}}}}}{\"uid\":\"readonly_card\",\"tag\":\"ww-div\",\"name\":\"Readonly Card\",\"slots\":[{\"slotKey\":\"children\",\"elements\":[\"readonly_card_title\"]}]}{\"uid\":\"readonly_card_title\",\"tag\":\"ww-text\",\"name\":\"Card Title\",\"content\":{\"default\":{\"tag\":\"p\",\"text\":{\"en\":{\"__wwtype\":\"f\",\"code\":\"context.item.data.title || context.item.data.name\"}}}}}"
+        }
+    ],
+    "dependencies": ["ww-stack"]
+}

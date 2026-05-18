@@ -1,0 +1,183 @@
+{
+    "metadata": {
+        "name": "ww-input-radio",
+        "description": "A form radio button group component that allows users to select a single option from a list of choices. Supports both static and dynamic data sources with configurable label and value fields, flexible layout direction (vertical/horizontal), and responsive styling options.",
+        "keywords": [
+            "radio",
+            "radio button",
+            "form",
+            "input",
+            "select",
+            "choice",
+            "option"
+        ],
+        "features": [
+            "Single selection from a list of radio button options",
+            "Static choices with label/value pairs or dynamic data binding from collections",
+            "Configurable label and value fields for dynamic object data",
+            "Vertical (column) or horizontal (row) layout direction",
+            "Responsive gap, alignment, and justify content controls",
+            "Flex wrap support for horizontal layout",
+            "Required field validation support",
+            "Does not support multi-select (use ww-input-checkbox for that)",
+            "Does not support disabled state per option",
+            "Does not support grouping or nested options"
+        ]
+    },
+    "properties": [
+        {
+            "name": "options",
+            "description": "Array of choices for the radio group. Each item can be a simple string/number or an object with label and value fields. When bound to a collection of objects, use labelField and valueField to specify which properties to use.",
+            "type": "array",
+            "defaultValue": [
+                {
+                    "value": "first value",
+                    "label": "first label"
+                },
+                {
+                    "value": "second value",
+                    "label": "second label"
+                }
+            ]
+        },
+        {
+            "name": "value",
+            "description": "The initial selected value of the radio group. Should match one of the option values.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "labelField",
+            "description": "Object property path to use as the label when options are bound to a collection of objects. Only relevant when options is a bound array of objects. Inactive when options is not bound or its first item is not an object.",
+            "type": "string",
+            "defaultValue": null,
+            "inactiveProperty": {
+                "description": "Inactive when options is not bound (boundProps.options is falsy) or the first option is not an object."
+            }
+        },
+        {
+            "name": "valueField",
+            "description": "Object property path to use as the value when options are bound to a collection of objects. Only relevant when options is a bound array of objects. Inactive when options is not bound or its first item is not an object.",
+            "type": "string",
+            "defaultValue": null,
+            "inactiveProperty": {
+                "description": "Inactive when options is not bound (boundProps.options is falsy) or the first option is not an object."
+            }
+        },
+        {
+            "name": "required",
+            "description": "Whether the radio group is required for form validation.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "direction",
+            "description": "Layout direction of the radio buttons. 'column' for vertical layout, 'row' for horizontal layout.",
+            "type": "string",
+            "options": [
+                "column",
+                "row"
+            ],
+            "defaultValue": "column",
+            "responsive": true
+        },
+        {
+            "name": "rowGap",
+            "description": "Vertical gap between radio button rows. Supports px, %, em, and rem units.",
+            "type": "string",
+            "responsive": true
+        },
+        {
+            "name": "columnGap",
+            "description": "Horizontal gap between radio button columns. Supports px, %, em, and rem units.",
+            "type": "string",
+            "responsive": true
+        },
+        {
+            "name": "justifyContent",
+            "description": "Flexbox justify-content alignment for the radio group container.",
+            "type": "string",
+            "options": [
+                "flex-start",
+                "center",
+                "flex-end",
+                "space-around",
+                "space-between"
+            ],
+            "defaultValue": "center",
+            "responsive": true
+        },
+        {
+            "name": "alignItems",
+            "description": "Flexbox align-items alignment for the radio group container.",
+            "type": "string",
+            "options": [
+                "flex-start",
+                "center",
+                "flex-end",
+                "stretch",
+                "baseline"
+            ],
+            "defaultValue": "flex-start",
+            "responsive": true
+        },
+        {
+            "name": "flexWrap",
+            "description": "Whether radio buttons should wrap to the next line when in horizontal (row) direction. Only applies when direction is 'row'. Inactive when direction is not 'row'.",
+            "type": "boolean",
+            "defaultValue": true,
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when direction is not 'row'."
+            }
+        }
+    ],
+    "states": [],
+    "events": [
+        {
+            "name": "change",
+            "description": "Triggered when the user selects a different radio option.",
+            "payload": {
+                "domEvent": "Event",
+                "value": "string"
+            }
+        },
+        {
+            "name": "initValueChange",
+            "description": "Triggered when the initial value is changed programmatically (e.g., via binding update).",
+            "payload": {
+                "value": "string"
+            }
+        }
+    ],
+    "localContext": [],
+    "actions": [],
+    "slots": [
+        {
+            "name": "choicesElement",
+            "description": "ww-text element used as radio label. Text will be set using the 'label' configuration of the option.",
+            "type": "object",
+            "required": true,
+            "tag": "ww-text"
+        }
+    ],
+    "variables": [
+        {
+            "name": "value",
+            "description": "The currently selected radio button value.",
+            "type": "string",
+            "readonly": true
+        }
+    ],
+    "specifications": [
+        "The value property sets the initial selected option and should match one of the option values exactly.",
+        "When binding dynamic data to options, use labelField and valueField to map object properties.",
+        "Use inside a ww-form-container when collecting form submissions; set a unique fieldName-equivalent via the surrounding form configuration.",
+        "flexWrap only applies when direction is set to 'row'.",
+        "Use ww-input-radio for mutually exclusive single-choice selection; use ww-input-checkbox for multi-select scenarios."
+    ],
+    "examples": [],
+    "dependencies": [
+        "ww-text"
+    ]
+}

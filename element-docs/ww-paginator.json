@@ -1,0 +1,128 @@
+{
+    "metadata": {
+        "name": "ww-paginator",
+        "description": "A pagination navigation element that displays page numbers with previous and next controls, and can drive a paginated table view, collection, or custom pagination state.",
+        "keywords": [
+            "paginator",
+            "pagination",
+            "paging",
+            "pages",
+            "navigation",
+            "table view",
+            "collection",
+            "data"
+        ],
+        "features": [
+            "Automatic pagination for table views through paginatedSourceId",
+            "Automatic pagination for collections when a collection ID is explicitly known",
+            "Custom pagination mode with configurable total items, items per page, and offset",
+            "Page change events with page, offset, limit, and total metadata",
+            "Customizable repeated page-number text element",
+            "Customizable previous and next icon elements",
+            "Smart navigation display with ellipsis separators for large page counts"
+        ],
+        "advanced": true
+    },
+    "properties": [
+        {
+            "name": "useCustomPagination",
+            "description": "Enable custom pagination mode instead of linking to a table view or collection. When true, paginatedSourceId is ignored and paginatorTotal, paginatorLimit, and paginatorOffset must be provided manually.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "paginatedSourceId",
+            "description": "Paginated source to link to when useCustomPagination is false. Use exactly \"tableView:<TABLE_VIEW_UUID>\" for a table view or \"collection:<COLLECTION_ID>\" for a collection. Never invent this ID.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "paginatorTotal",
+            "description": "Total number of items to paginate. Only used when useCustomPagination is true.",
+            "type": "number",
+            "defaultValue": 10
+        },
+        {
+            "name": "paginatorLimit",
+            "description": "Number of items per page. Only used when useCustomPagination is true.",
+            "type": "number",
+            "defaultValue": 5
+        },
+        {
+            "name": "paginatorOffset",
+            "description": "Current offset, meaning the number of items to skip from the beginning. Only used when useCustomPagination is true.",
+            "type": "number",
+            "defaultValue": 0
+        }
+    ],
+    "states": [],
+    "events": [
+        {
+            "name": "change",
+            "description": "Triggered when the user navigates to a different page with the previous button, next button, or a page number.",
+            "payload": {
+                "context": {
+                    "page": "number (1-based page number)",
+                    "offset": "number (0-based item offset)",
+                    "limit": "number (items per page)",
+                    "total": "number (total items)"
+                }
+            }
+        }
+    ],
+    "localContext": [],
+    "actions": [],
+    "slots": [
+        {
+            "name": "paginatorText",
+            "description": "Required repeated ww-text element rendered for each visible page number or ellipsis. The paginator automatically injects the text value, so do not set its text content manually. Add an active state to style the current page.",
+            "type": "object",
+            "required": true,
+            "tag": "ww-text"
+        },
+        {
+            "name": "paginatorPrev",
+            "description": "Optional ww-icon element used as the previous-page control. It is automatically hidden when the current page is the first page.",
+            "type": "object",
+            "tag": "ww-icon"
+        },
+        {
+            "name": "paginatorNext",
+            "description": "Optional ww-icon element used as the next-page control. It is automatically hidden when the current page is the last page.",
+            "type": "object",
+            "tag": "ww-icon"
+        }
+    ],
+    "variables": [],
+    "specifications": [
+        "Use table view pagination whenever the target data source is a table view. Set useCustomPagination to false and paginatedSourceId to \"tableView:<TABLE_VIEW_UUID>\".",
+        "Never invent table view IDs. Use an existing table view ID from the current semantic context or from searchTableViews. If a table view is requested by name, search for it first.",
+        "When paginating a table view, bind the repeated list/grid data to globalContext.tableViews['<TABLE_VIEW_UUID>']?.data and set the paginator paginatedSourceId to \"tableView:<TABLE_VIEW_UUID>\". The paginator updates the table view offset itself.",
+        "If the page needs initial or refreshed table view data, use the fetch-table-view workflow action with the same tableViewId and the required parameters. The fetch-table-view action refreshes globalContext.tableViews and does not return row data directly.",
+        "Use collection pagination only when a concrete collection ID is explicitly known from current context or the user. Set paginatedSourceId to \"collection:<COLLECTION_ID>\". Do not invent collection IDs.",
+        "Use custom pagination mode only for arrays or manual pagination states that are not backed by a table view or collection. In custom mode, update paginatorOffset from the change event if the displayed list should react to page changes.",
+        "The change event payload is available under event.context and contains page, offset, limit, and total.",
+        "The page-number slot must use ww-text. Do not manually set its text; the paginator injects the page number or ellipsis.",
+        "Add an active state to the page-number ww-text child to style the current page differently.",
+        "Previous and next slots should use ww-icon elements with icon names that exist in the project icon sets.",
+        "The paginator does not provide page-size selection, infinite scroll, or load-more behavior."
+    ],
+    "examples": [
+        {
+            "description": "Paginator linked to an existing table view and paired with a repeated list.",
+            "example": "{\"uid\":\"orders_paginator\",\"tag\":\"ww-paginator\",\"name\":\"Orders Paginator\",\"content\":{\"default\":{\"useCustomPagination\":false,\"paginatedSourceId\":\"tableView:<EXISTING_TABLE_VIEW_UUID>\"}},\"slots\":[{\"slotKey\":\"paginatorText\",\"elements\":[\"orders_paginator_page\"]},{\"slotKey\":\"paginatorPrev\",\"elements\":[\"orders_paginator_prev\"]},{\"slotKey\":\"paginatorNext\",\"elements\":[\"orders_paginator_next\"]}]}{\"uid\":\"orders_paginator_page\",\"tag\":\"ww-text\",\"name\":\"Page Number\",\"states\":[{\"id\":\"active\",\"label\":\"active\"}],\"content\":{\"default\":{\"tag\":\"button\"}},\"style\":{\"default\":{\"padding\":\"8px 12px\",\"borderRadius\":\"8px\"},\"active_default\":{\"fontWeight\":\"700\"}}}{\"uid\":\"orders_paginator_prev\",\"tag\":\"ww-icon\",\"name\":\"Previous Page\",\"content\":{\"default\":{\"icon\":\"lucide/chevron-left\"}},\"style\":{\"default\":{\"width\":\"20px\",\"height\":\"20px\"}}}{\"uid\":\"orders_paginator_next\",\"tag\":\"ww-icon\",\"name\":\"Next Page\",\"content\":{\"default\":{\"icon\":\"lucide/chevron-right\"}},\"style\":{\"default\":{\"width\":\"20px\",\"height\":\"20px\"}}}"
+        },
+        {
+            "description": "Paginator linked to a known collection ID.",
+            "example": "{\"uid\":\"products_paginator\",\"tag\":\"ww-paginator\",\"name\":\"Products Paginator\",\"content\":{\"default\":{\"useCustomPagination\":false,\"paginatedSourceId\":\"collection:<KNOWN_COLLECTION_ID>\"}},\"slots\":[{\"slotKey\":\"paginatorText\",\"elements\":[\"products_paginator_page\"]},{\"slotKey\":\"paginatorPrev\",\"elements\":[\"products_paginator_prev\"]},{\"slotKey\":\"paginatorNext\",\"elements\":[\"products_paginator_next\"]}]}{\"uid\":\"products_paginator_page\",\"tag\":\"ww-text\",\"name\":\"Page Number\",\"states\":[{\"id\":\"active\",\"label\":\"active\"}],\"content\":{\"default\":{\"tag\":\"button\"}}}{\"uid\":\"products_paginator_prev\",\"tag\":\"ww-icon\",\"name\":\"Previous Page\",\"content\":{\"default\":{\"icon\":\"lucide/chevron-left\"}}}{\"uid\":\"products_paginator_next\",\"tag\":\"ww-icon\",\"name\":\"Next Page\",\"content\":{\"default\":{\"icon\":\"lucide/chevron-right\"}}}"
+        },
+        {
+            "description": "Custom pagination for manually controlled data.",
+            "example": "{\"uid\":\"manual_paginator\",\"tag\":\"ww-paginator\",\"name\":\"Manual Paginator\",\"content\":{\"default\":{\"useCustomPagination\":true,\"paginatorTotal\":100,\"paginatorLimit\":10,\"paginatorOffset\":0}},\"slots\":[{\"slotKey\":\"paginatorText\",\"elements\":[\"manual_paginator_page\"]},{\"slotKey\":\"paginatorPrev\",\"elements\":[\"manual_paginator_prev\"]},{\"slotKey\":\"paginatorNext\",\"elements\":[\"manual_paginator_next\"]}]}{\"uid\":\"manual_paginator_page\",\"tag\":\"ww-text\",\"name\":\"Page Number\",\"states\":[{\"id\":\"active\",\"label\":\"active\"}],\"content\":{\"default\":{\"tag\":\"button\"}}}{\"uid\":\"manual_paginator_prev\",\"tag\":\"ww-icon\",\"name\":\"Previous Page\",\"content\":{\"default\":{\"icon\":\"lucide/chevron-left\"}}}{\"uid\":\"manual_paginator_next\",\"tag\":\"ww-icon\",\"name\":\"Next Page\",\"content\":{\"default\":{\"icon\":\"lucide/chevron-right\"}}}"
+        }
+    ],
+    "dependencies": [
+        "ww-icon",
+        "ww-text"
+    ]
+}

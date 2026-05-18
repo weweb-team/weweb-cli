@@ -1,0 +1,65 @@
+{
+    "metadata": {
+        "name": "ww-iframe",
+        "description": "Embeds external content in an `<iframe>`. The `source` can be an HTTP(S) URL (typical usage) or a raw HTML/text string that is auto-wrapped as a `data:text/html;charset=utf-8,<encoded>` URI. Common use cases: YouTube / Vimeo players, Google Maps, Figma / Miro boards, payment widgets, docs embeds, form providers. The iframe fills the element's bounding box (100% × 100%) — size the parent to size the embed. IMPORTANT: do NOT use ww-iframe to display PDF files — use ww-pdf-viewer instead.",
+        "keywords": [
+            "iframe",
+            "embed",
+            "video",
+            "map",
+            "external",
+            "widget",
+            "youtube",
+            "vimeo"
+        ],
+        "features": [
+            "Single bindable `source` (URL or inline HTML)",
+            "Accepts `http:`, `https:`, and `data:` URLs; anything else is auto-wrapped in a `data:text/html` URI",
+            "Width/height always 100% of the parent — no need to pass attributes",
+            "Works with most major embed platforms out of the box (as long as they allow iframing)"
+        ]
+    },
+    "properties": [
+        {
+            "name": "source",
+            "description": "URL of the page to embed, or a raw HTML string. Common embed URL formats:\n- YouTube: `https://www.youtube.com/embed/{VIDEO_ID}` (use `/embed/`, NOT `/watch?v=`)\n- Vimeo: `https://player.vimeo.com/video/{VIDEO_ID}`\n- Google Maps: `https://www.google.com/maps/embed?pb={ENCODED_PARAMS}` (copy from the 'Share → Embed' panel)\n- Figma: `https://www.figma.com/embed?embed_host=share&url={FIGMA_URL}`\n- Loom: `https://www.loom.com/embed/{VIDEO_ID}`\n- Typeform: `https://form.typeform.com/to/{FORM_ID}`\n\nStrings that are not valid `http:` / `https:` / `data:` URLs are automatically wrapped as `data:text/html;charset=utf-8,<encoded-content>` — handy for quick HTML previews, but do NOT use this path for untrusted content (no sanitization).",
+            "type": "string",
+            "defaultValue": ""
+        }
+    ],
+    "states": [],
+    "events": [],
+    "localContext": [],
+    "actions": [],
+    "slots": [],
+    "variables": [],
+    "specifications": [
+        "Iframe dimensions: the iframe is forced to `width: 100%; height: 100%; border: 0` via scoped CSS. Set the SIZE of the ww-iframe element itself (via style) — the iframe will fill it.",
+        "The component does NOT expose `sandbox`, `allow`, `loading`, or `referrerpolicy` attributes. If you need `allow=\"fullscreen; autoplay\"` or a `sandbox=\"allow-scripts\"` policy, you must use `ww-html` with a hand-written `<iframe>` tag instead.",
+        "Cross-origin restrictions: by default iframes cannot read/write the parent's DOM (same-origin policy) and vice-versa. Communication with an embedded app must go through `window.postMessage`. Cookies set inside the iframe are partitioned (third-party cookie blocking in Chrome/Safari) — session-based embeds (e.g. your own backoffice behind auth) may break unless you set the right `SameSite=None; Secure` cookies on the embed's domain.",
+        "Embed policy: many sites send `X-Frame-Options: DENY/SAMEORIGIN` or a `Content-Security-Policy: frame-ancestors` header that refuses iframing from your domain. If the embed shows as blank or 'refused to connect', the target host is blocking you — there is no workaround short of proxying.",
+        "Autoplay: media embeds require a user gesture OR the right `allow` attribute (which `ww-iframe` does NOT expose). YouTube's `?autoplay=1` works only when muted (`&mute=1`) on most browsers.",
+        "When `source` is empty in the editor, a placeholder (`Edit iFrame source in settings`) is shown. In production, nothing renders.",
+        "The element has no events or variables — to react to interactions inside the iframe you need `window.addEventListener('message', ...)` on the parent side and a postMessage sender on the embed side.",
+        "For UNTRUSTED content (arbitrary user URLs, sandboxed HTML previews), use this element (or `ww-html` with a `sandbox` attribute) rather than `ww-html` alone — an iframe isolates scripts in a separate browsing context."
+    ],
+    "examples": [
+        {
+            "description": "Embed a YouTube video. Note the `/embed/` path, NOT `/watch?v=`.",
+            "example": "{\"source\":\"https://www.youtube.com/embed/dQw4w9WgXcQ\"}"
+        },
+        {
+            "description": "Embed a Google Maps location (paste the URL from the Share → Embed panel).",
+            "example": "{\"source\":\"https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.9983037932837!2d2.2944813!3d48.8583701!2m3\"}"
+        },
+        {
+            "description": "Embed a Vimeo video with a specific ID.",
+            "example": "{\"source\":\"https://player.vimeo.com/video/76979871\"}"
+        },
+        {
+            "description": "Embed a standalone WeWeb landing page (their header must allow iframing — own domain by default does).",
+            "example": "{\"source\":\"https://www.weweb.io\"}"
+        }
+    ],
+    "dependencies": []
+}

@@ -1,0 +1,657 @@
+{
+    "metadata": {
+        "name": "ww-calendar",
+        "description": "A feature-rich calendar component based on the FullCalendar library with multiple view types (year, month, week, day, list), event management with drag-and-drop and resize support, extensive styling customization, and timezone/locale support.",
+        "keywords": [
+            "calendar",
+            "fullcalendar",
+            "events",
+            "schedule",
+            "planner"
+        ],
+        "features": [
+            "Multiple calendar views: year (multi-month), month (dayGrid), week (timeGrid), day (timeGrid), and list",
+            "Event drag-and-drop to reschedule events",
+            "Event resize to adjust duration",
+            "Grouped events that move together via groupId",
+            "Internationalization with multiple locale support (en, fr, es, de, it, pt, ru, zh-cn, ja, ar)",
+            "Timezone support including local, UTC, and IANA timezone names",
+            "Formula-based event field mapping for flexible data binding",
+            "Customizable header toolbar with navigation buttons and view switchers",
+            "Today highlight and now indicator line",
+            "Hide weekends or specific days of the week",
+            "Configurable time range (start/end hours) for time grid views",
+            "All-day slot toggle for week and day views",
+            "Extensive color and typography customization for header, cells, buttons, borders, and events",
+            "Custom button labels with multilingual text support",
+            "Does not support inline event editing or event tooltips natively",
+            "Does not support recurring events natively — recurrence must be handled in the data source",
+            "Does not support multi-day time grid spanning — only dayGrid supports multi-day events visually"
+        ],
+        "advanced": true
+    },
+    "properties": [
+        {
+            "name": "fontFamily",
+            "description": "Font family for the entire calendar.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "fontSize",
+            "description": "Font size for the entire calendar.",
+            "type": "string",
+            "defaultValue": "14px",
+            "responsive": true
+        },
+        {
+            "name": "fontWeight",
+            "description": "Font weight for the entire calendar text.",
+            "type": "string",
+            "options": ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+            "defaultValue": "400",
+            "responsive": true
+        },
+        {
+            "name": "headerBackgroundColor",
+            "description": "Background color of the header toolbar area.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "headerTextColor",
+            "description": "Text color of the header toolbar title.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "headerHeight",
+            "description": "Height of the header toolbar.",
+            "type": "string",
+            "defaultValue": null,
+            "responsive": true
+        },
+        {
+            "name": "dayHeaderBackgroundColor",
+            "description": "Background color of the day header row (Mon, Tue, etc.).",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "dayHeaderTextColor",
+            "description": "Text color of the day header row.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "dayHeaderHeight",
+            "description": "Height of the day header row.",
+            "type": "string",
+            "defaultValue": null,
+            "responsive": true
+        },
+        {
+            "name": "dayHeaderFontSize",
+            "description": "Font size of the day header text.",
+            "type": "string",
+            "defaultValue": "14px",
+            "responsive": true
+        },
+        {
+            "name": "dayHeaderFontWeight",
+            "description": "Font weight of the day header text.",
+            "type": "string",
+            "options": ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+            "defaultValue": "400",
+            "responsive": true
+        },
+        {
+            "name": "weekendTextColor",
+            "description": "Text color for weekend day numbers and headers.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "todayBackgroundColor",
+            "description": "Background color highlighting today's cell.",
+            "type": "string",
+            "defaultValue": "rgba(255, 220, 40, 0.15)"
+        },
+        {
+            "name": "cellBackgroundColor",
+            "description": "Background color of regular calendar day cells.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "cellTextColor",
+            "description": "Text color of calendar day cells.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "otherMonthBackgroundColor",
+            "description": "Background color for days belonging to other months.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "otherMonthTextColor",
+            "description": "Text color for days belonging to other months.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "timeGridBackgroundColor",
+            "description": "Background color of the time grid area in week/day views.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "buttonBackgroundColor",
+            "description": "Background color of navigation and view switcher buttons.",
+            "type": "string",
+            "defaultValue": "#2C3E50"
+        },
+        {
+            "name": "buttonTextColor",
+            "description": "Text color of navigation and view switcher buttons.",
+            "type": "string",
+            "defaultValue": "#FFFFFF"
+        },
+        {
+            "name": "buttonHoverBackgroundColor",
+            "description": "Background color of buttons on hover.",
+            "type": "string",
+            "defaultValue": "#1e2b37"
+        },
+        {
+            "name": "buttonHoverTextColor",
+            "description": "Text color of buttons on hover.",
+            "type": "string",
+            "defaultValue": "#FFFFFF"
+        },
+        {
+            "name": "buttonActiveBackgroundColor",
+            "description": "Background color of the currently active view button.",
+            "type": "string",
+            "defaultValue": "#1a252f"
+        },
+        {
+            "name": "buttonActiveTextColor",
+            "description": "Text color of the currently active view button.",
+            "type": "string",
+            "defaultValue": "#FFFFFF"
+        },
+        {
+            "name": "buttonBorderRadius",
+            "description": "Border radius of navigation and view buttons.",
+            "type": "string",
+            "defaultValue": "4px"
+        },
+        {
+            "name": "todayButtonBackgroundColor",
+            "description": "Background color of the 'Today' button specifically. Falls back to buttonBackgroundColor if null.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "todayButtonTextColor",
+            "description": "Text color of the 'Today' button specifically. Falls back to buttonTextColor if null.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "todayButtonHoverBackgroundColor",
+            "description": "Hover background color of the 'Today' button. Falls back to buttonHoverBackgroundColor if null.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "todayButtonHoverTextColor",
+            "description": "Hover text color of the 'Today' button. Falls back to buttonHoverTextColor if null.",
+            "type": "string",
+            "defaultValue": null
+        },
+        {
+            "name": "borderColor",
+            "description": "Color of calendar grid borders.",
+            "type": "string",
+            "defaultValue": "#ddd"
+        },
+        {
+            "name": "defaultEventBackgroundColor",
+            "description": "Default background color for events that do not specify their own.",
+            "type": "string",
+            "defaultValue": "#3788d8"
+        },
+        {
+            "name": "defaultEventBorderColor",
+            "description": "Default border color for events that do not specify their own.",
+            "type": "string",
+            "defaultValue": "#3788d8"
+        },
+        {
+            "name": "defaultEventTextColor",
+            "description": "Default text color for events that do not specify their own.",
+            "type": "string",
+            "defaultValue": "#ffffff"
+        },
+        {
+            "name": "nowIndicatorColor",
+            "description": "Color of the current time indicator line in time grid views.",
+            "type": "string",
+            "defaultValue": "red"
+        },
+        {
+            "name": "disableInteractions",
+            "description": "When enabled, disables all user interactions (click, drag, resize) on the calendar.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "showHeader",
+            "description": "Show or hide the header toolbar with navigation buttons and view switchers.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "locale",
+            "description": "Locale for the calendar interface language. 'auto' uses the app's current language.",
+            "type": "string",
+            "options": ["auto", "en", "fr", "es", "de", "it", "pt", "ru", "zh-cn", "ja", "ar"],
+            "defaultValue": "auto"
+        },
+        {
+            "name": "timezone",
+            "description": "Timezone for displaying event times. Accepts 'local', 'UTC', or IANA timezone names.",
+            "type": "string",
+            "options": ["local", "UTC", "America/New_York", "America/Chicago", "America/Denver", "America/Los_Angeles", "Europe/London", "Europe/Paris", "Europe/Berlin", "Asia/Tokyo", "Asia/Shanghai", "Australia/Sydney"],
+            "defaultValue": "local"
+        },
+        {
+            "name": "defaultView",
+            "description": "The initial calendar view displayed on load.",
+            "type": "string",
+            "options": ["multiMonthYear", "dayGridMonth", "timeGridWeek", "timeGridDay", "listWeek"],
+            "defaultValue": "dayGridMonth",
+            "responsive": true
+        },
+        {
+            "name": "yearView",
+            "description": "Enable or disable the year (multi-month) view option.",
+            "type": "boolean",
+            "defaultValue": true,
+            "responsive": true
+        },
+        {
+            "name": "monthView",
+            "description": "Enable or disable the month view option.",
+            "type": "boolean",
+            "defaultValue": true,
+            "responsive": true
+        },
+        {
+            "name": "weekView",
+            "description": "Enable or disable the week view option.",
+            "type": "boolean",
+            "defaultValue": true,
+            "responsive": true
+        },
+        {
+            "name": "dayView",
+            "description": "Enable or disable the day view option.",
+            "type": "boolean",
+            "defaultValue": true,
+            "responsive": true
+        },
+        {
+            "name": "listView",
+            "description": "Enable or disable the list view option.",
+            "type": "boolean",
+            "defaultValue": true,
+            "responsive": true
+        },
+        {
+            "name": "allDaySlot",
+            "description": "Show or hide the all-day slot in week and day time grid views.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "timeStart",
+            "description": "Start time for the time grid display in HH:MM:SS format.",
+            "type": "string",
+            "defaultValue": "00:00:00"
+        },
+        {
+            "name": "timeEnd",
+            "description": "End time for the time grid display in HH:MM:SS format.",
+            "type": "string",
+            "defaultValue": "24:00:00"
+        },
+        {
+            "name": "hideWeekends",
+            "description": "Hide Saturday and Sunday from the calendar.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "startWeekOnSunday",
+            "description": "When enabled, the week starts on Sunday instead of Monday.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "hideDaysOfWeek",
+            "description": "Array of day numbers (0=Sunday to 6=Saturday) to hide from the calendar.",
+            "type": "array",
+            "defaultValue": []
+        },
+        {
+            "name": "events",
+            "description": "Array of event objects to display on the calendar. Each event should have at least id, title, start, and end fields. Use the formula properties to map custom field names.",
+            "type": "array",
+            "defaultValue": []
+        },
+        {
+            "name": "eventsIdFormula",
+            "description": "Formula to extract the event ID from each event object. Uses context.mapping to access event fields.",
+            "type": "formula",
+            "defaultValue": { "type": "f", "code": "context.mapping?.['id']" }
+        },
+        {
+            "name": "eventsTitleFormula",
+            "description": "Formula to extract the event title from each event object.",
+            "type": "formula",
+            "defaultValue": { "type": "f", "code": "context.mapping?.['title']" }
+        },
+        {
+            "name": "eventsStartFormula",
+            "description": "Formula to extract the event start date/time from each event object. Should return an ISO date string.",
+            "type": "formula",
+            "defaultValue": { "type": "f", "code": "context.mapping?.['start']" }
+        },
+        {
+            "name": "eventsEndFormula",
+            "description": "Formula to extract the event end date/time from each event object. Should return an ISO date string.",
+            "type": "formula",
+            "defaultValue": { "type": "f", "code": "context.mapping?.['end']" }
+        },
+        {
+            "name": "eventsAllDayFormula",
+            "description": "Formula to determine if an event is an all-day event. Should return a boolean.",
+            "type": "formula",
+            "defaultValue": { "type": "f", "code": "context.mapping?.['allDay']" }
+        },
+        {
+            "name": "eventsBackgroundColorFormula",
+            "description": "Formula to extract per-event background color. Returns a color string or null to use default.",
+            "type": "formula",
+            "defaultValue": { "type": "f", "code": "context.mapping?.['backgroundColor']" }
+        },
+        {
+            "name": "eventsBorderColorFormula",
+            "description": "Formula to extract per-event border color. Returns a color string or null to use default.",
+            "type": "formula",
+            "defaultValue": { "type": "f", "code": "context.mapping?.['borderColor']" }
+        },
+        {
+            "name": "eventsTextColorFormula",
+            "description": "Formula to extract per-event text color. Returns a color string or null to use default.",
+            "type": "formula",
+            "defaultValue": { "type": "f", "code": "context.mapping?.['textColor']" }
+        },
+        {
+            "name": "eventsContentFormula",
+            "description": "Formula to extract additional content/description from each event object.",
+            "type": "formula",
+            "defaultValue": { "type": "f", "code": "context.mapping?.['content']" }
+        },
+        {
+            "name": "eventsDataFormula",
+            "description": "Formula to extract custom data object from each event for use in event handlers.",
+            "type": "formula",
+            "defaultValue": { "type": "f", "code": "context.mapping?.['data']" }
+        },
+        {
+            "name": "eventsGroupIdFormula",
+            "description": "Formula to extract the group ID from each event. Events sharing a groupId move together on drag.",
+            "type": "formula",
+            "defaultValue": { "type": "f", "code": "context.mapping?.['groupId']" }
+        },
+        {
+            "name": "buttonTextToday",
+            "description": "Custom label for the 'Today' button. Leave empty for the default locale label.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "buttonTextYear",
+            "description": "Custom label for the 'Year' view button. Leave empty for the default locale label.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "buttonTextMonth",
+            "description": "Custom label for the 'Month' view button. Leave empty for the default locale label.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "buttonTextWeek",
+            "description": "Custom label for the 'Week' view button. Leave empty for the default locale label.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "buttonTextDay",
+            "description": "Custom label for the 'Day' view button. Leave empty for the default locale label.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "buttonTextList",
+            "description": "Custom label for the 'List' view button. Leave empty for the default locale label.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "noEventsText",
+            "description": "Custom text displayed when there are no events in the list view.",
+            "type": "string",
+            "defaultValue": ""
+        }
+    ],
+    "states": [],
+    "events": [
+        {
+            "name": "eventClick",
+            "description": "Triggered when clicking on a calendar event.",
+            "payload": {
+                "id": "string",
+                "title": "string",
+                "start": "string (ISO date)",
+                "end": "string (ISO date)",
+                "allDay": "boolean",
+                "groupId": "string",
+                "originalEvent": "object"
+            }
+        },
+        {
+            "name": "viewChange",
+            "description": "Triggered when the calendar view changes (e.g., month to week).",
+            "payload": {
+                "view": "string",
+                "start": "string (ISO date)",
+                "end": "string (ISO date)",
+                "title": "string"
+            }
+        },
+        {
+            "name": "eventCreated",
+            "description": "Triggered when the user selects a date/time range to create a new event.",
+            "payload": {
+                "start": "string (ISO date)",
+                "end": "string (ISO date)",
+                "allDay": "boolean"
+            }
+        },
+        {
+            "name": "eventUpdated",
+            "description": "Triggered when an event is modified (via drag or resize).",
+            "payload": {
+                "id": "string",
+                "title": "string",
+                "start": "string (ISO date)",
+                "end": "string (ISO date)",
+                "allDay": "boolean"
+            }
+        },
+        {
+            "name": "eventDragStart",
+            "description": "Triggered when the user starts dragging an event.",
+            "payload": {
+                "id": "string",
+                "title": "string",
+                "start": "string (ISO date)",
+                "end": "string (ISO date)",
+                "allDay": "boolean"
+            }
+        },
+        {
+            "name": "eventDragEnd",
+            "description": "Triggered when the user stops dragging an event (before it is dropped).",
+            "payload": {
+                "id": "string",
+                "title": "string",
+                "start": "string (ISO date)",
+                "end": "string (ISO date)",
+                "allDay": "boolean"
+            }
+        },
+        {
+            "name": "eventDrop",
+            "description": "Triggered when an event is dropped after dragging to a new position.",
+            "payload": {
+                "id": "string",
+                "title": "string",
+                "start": "string (ISO date)",
+                "end": "string (ISO date)",
+                "allDay": "boolean",
+                "delta": "object"
+            }
+        },
+        {
+            "name": "eventResizeStart",
+            "description": "Triggered when the user starts resizing an event.",
+            "payload": {
+                "id": "string",
+                "title": "string",
+                "start": "string (ISO date)",
+                "end": "string (ISO date)",
+                "allDay": "boolean"
+            }
+        },
+        {
+            "name": "eventResize",
+            "description": "Triggered when an event is resized to a new duration.",
+            "payload": {
+                "id": "string",
+                "title": "string",
+                "start": "string (ISO date)",
+                "end": "string (ISO date)",
+                "allDay": "boolean",
+                "startDelta": "object",
+                "endDelta": "object"
+            }
+        }
+    ],
+    "localContext": [],
+    "actions": [
+        {
+            "label": "Change view",
+            "actionName": "changeView",
+            "description": "Switch the calendar to a different view type.",
+            "args": [
+                {
+                    "name": "viewName",
+                    "type": "select",
+                    "options": [
+                        {
+                            "value": "multiMonthYear",
+                            "label": "Year"
+                        },
+                        {
+                            "value": "dayGridMonth",
+                            "label": "Month",
+                            "default": true
+                        },
+                        {
+                            "value": "timeGridWeek",
+                            "label": "Week"
+                        },
+                        {
+                            "value": "timeGridDay",
+                            "label": "Day"
+                        },
+                        {
+                            "value": "listWeek",
+                            "label": "List"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "Go to date",
+            "actionName": "goToDate",
+            "description": "Navigate the calendar to a specific date.",
+            "args": [
+                {
+                    "name": "date",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "label": "Next period",
+            "actionName": "next",
+            "description": "Navigate to the next period (month, week, day, etc.) based on the current view."
+        },
+        {
+            "label": "Previous period",
+            "actionName": "prev",
+            "description": "Navigate to the previous period (month, week, day, etc.) based on the current view."
+        },
+        {
+            "label": "Go to today",
+            "actionName": "today",
+            "description": "Navigate the calendar back to today's date."
+        }
+    ],
+    "slots": [],
+    "variables": [
+        {
+            "name": "currentView",
+            "description": "The currently active calendar view type (e.g., dayGridMonth, timeGridWeek).",
+            "type": "string",
+            "readonly": true
+        },
+        {
+            "name": "selectedEvent",
+            "description": "The last clicked event object, containing id, title, start, end, allDay, and original event data.",
+            "type": "object",
+            "readonly": true
+        }
+    ],
+    "specifications": [
+        "CRITICAL: Apply a fixed height to the calendar element. Do not use flex or min-height directly on it.",
+        "When creating test events, place them within the current year/month/week timeframe so they are visible.",
+        "All formula properties (eventsIdFormula, eventsTitleFormula, etc.) use 'context.mapping?.['fieldName']' syntax to access event fields.",
+        "The events array should contain objects with at least id, title, start, and end fields. Use formula properties to map custom field names.",
+        "Event dates should be in ISO 8601 format (e.g., '2026-03-11T10:00:00').",
+        "The calendar defaults to the app locale when locale is set to 'auto'."
+    ],
+    "examples": []
+}

@@ -1,0 +1,178 @@
+{
+    "metadata": {
+        "name": "ww-input-checkbox",
+        "description": "A form-integrated checkbox input component that provides a complete checkbox implementation with form validation, state management, and accessibility support. It wraps a native HTML checkbox with optional custom visual checkbox element and embedded label container.",
+        "keywords": [
+            "checkbox",
+            "input",
+            "form",
+            "toggle",
+            "check",
+            "boolean"
+        ],
+        "features": [
+            "Form validation and submission support with required field enforcement",
+            "Custom validation formula support",
+            "Accessibility compliance with native HTML checkbox input",
+            "Real-time two-way data binding",
+            "Customizable label positioning through embedded containers (left, right, top, bottom)",
+            "Automatic checked and readonly state management",
+            "Read-only mode support",
+            "Does not support indeterminate/tri-state checkbox",
+            "Does not support checkbox groups or multi-select patterns natively"
+        ]
+    },
+    "properties": [
+        {
+            "name": "initValue",
+            "wewebName": "value",
+            "description": "The initial checked state of the checkbox. When true, the checkbox is checked by default.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "required",
+            "description": "Whether the checkbox must be checked for form validation to pass.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "readonly",
+            "description": "Whether the checkbox is in read-only mode, preventing user interaction.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "isEmbeddedContainer",
+            "description": "Whether to display an embedded container (label area) alongside the checkbox.",
+            "type": "boolean",
+            "defaultValue": false,
+            "responsive": true
+        },
+        {
+            "name": "containerPosition",
+            "description": "Position of the embedded container relative to the checkbox. Inactive when isEmbeddedContainer is false.",
+            "type": "string",
+            "options": [
+                "right",
+                "left",
+                "top",
+                "bottom"
+            ],
+            "defaultValue": "right",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when isEmbeddedContainer is false."
+            }
+        },
+        {
+            "name": "containerGap",
+            "description": "Gap spacing between the checkbox and the embedded container. Accepts values in px, em, or rem units. Inactive when isEmbeddedContainer is false.",
+            "type": "string",
+            "defaultValue": "0px",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when isEmbeddedContainer is false."
+            }
+        },
+        {
+            "name": "fieldName",
+            "description": "The field name used to identify this checkbox in form submissions. Inactive when the element is not placed inside a form container.",
+            "type": "string",
+            "defaultValue": "",
+            "inactiveProperty": {
+                "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy)."
+            }
+        },
+        {
+            "name": "customValidation",
+            "description": "Enable custom validation rules for this checkbox field. Inactive when the element is not placed inside a form container.",
+            "type": "boolean",
+            "defaultValue": false,
+            "inactiveProperty": {
+                "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy)."
+            }
+        },
+        {
+            "name": "validation",
+            "description": "A formula expression used for custom validation logic. Only used when customValidation is enabled. Inactive when the element is not in a form container or when customValidation is false.",
+            "type": "formula",
+            "defaultValue": "",
+            "inactiveProperty": {
+                "description": "Inactive when the element is not placed inside a form container (sidePanelContent.form?.uid is falsy) or when customValidation is false."
+            }
+        }
+    ],
+    "states": [
+        {
+            "name": "checked",
+            "description": "Active when the checkbox is in the checked state. Automatically managed based on the current value."
+        },
+        {
+            "name": "readonly",
+            "description": "Active when the checkbox is in read-only mode. Automatically managed based on the readonly property."
+        }
+    ],
+    "events": [
+        {
+            "name": "change",
+            "description": "Triggered when the user manually toggles the checkbox by clicking or interacting with it.",
+            "payload": {
+                "domEvent": "Event",
+                "value": "boolean"
+            }
+        },
+        {
+            "name": "initValueChange",
+            "description": "Triggered when the initial value property changes programmatically (not from user interaction).",
+            "payload": {
+                "value": "boolean"
+            }
+        }
+    ],
+    "localContext": [],
+    "actions": [],
+    "slots": [
+        {
+            "name": "checkbox",
+            "description": "The visual checkbox element slot. Must exclusively contain a ww-checkbox component. DO NOT use ww-div, ww-icon, or any other component here.",
+            "type": "object"
+        },
+        {
+            "name": "embeddedContainer",
+            "description": "An optional embedded container for label content displayed alongside the checkbox. Only visible when isEmbeddedContainer is true.",
+            "type": "object"
+        }
+    ],
+    "variables": [
+        {
+            "name": "value",
+            "description": "The current checked state of the checkbox as a boolean. Updated on user interaction or programmatic changes.",
+            "type": "boolean",
+            "readonly": true
+        }
+    ],
+    "specifications": [
+        "The checkbox slot must exclusively contain a ww-checkbox component. DO NOT use ww-div, ww-icon, or any other component.",
+        "The component automatically manages 'checked' and 'readonly' states - do not manually manage these through conditions.",
+        "The icon color property on the inner ww-checkbox controls only the checkmark appearance, not the background.",
+        "Default icon color should be transparent (#00000000) to hide the checkmark when unchecked, and use a contrasting color like white (#FFFFFF) for the checked state.",
+        "Background styling (backgroundColor, border) should be applied to the ww-checkbox via styles, NOT the color prop.",
+        "When using embedded containers, set isEmbeddedContainer to true and configure containerPosition and containerGap.",
+        "Text labels and descriptions should be placed in the embeddedContainer slot, not in the checkbox slot.",
+        "Styles must use named CSS properties (e.g., cursor, display, alignItems). Never use numeric indices or array-like keys in style objects."
+    ],
+    "examples": [
+        {
+            "description": "Basic checkbox with a label on the right side",
+            "example": "{\"uid\":\"input-checkbox\",\"tag\":\"ww-input-checkbox\",\"name\":\"Checkbox\",\"content\":{\"default\":{\"value\":false,\"required\":false,\"readonly\":false,\"isEmbeddedContainer\":true,\"containerPosition\":\"right\",\"containerGap\":\"8px\"}},\"slots\":[{\"slotKey\": \"checkbox\", \"elements\": [\"checkbox-1\"]},{\"slotKey\": \"embeddedContainer\", \"elements\": [\"label-container\"]}]}\n{\"uid\":\"checkbox-1\",\"tag\":\"ww-checkbox\",\"name\":\"Checkbox Icon\",\"content\":{\"default\":{\"icon\":\"lucide/check\",\"color\":\"#00000000\"},\"checked_default\":{\"color\":\"#FFFFFF\"}},\"states\":[{\"id\":\"checked\",\"label\":\"checked\"}],\"styles\":{\"default\":{\"width\":\"20px\",\"height\":\"20px\",\"borderRadius\":\"4px\",\"border\":\"2px solid #D1D5DB\",\"backgroundColor\":\"#FFFFFF\",\"cursor\":\"pointer\"},\"checked_default\":{\"backgroundColor\":\"#3B82F6\",\"borderColor\":\"#3B82F6\"}}}\n{\"uid\":\"label-container\",\"tag\":\"ww-flexbox\",\"name\":\"Label Container\",\"slots\":[{\"slotKey\": \"children\", \"elements\": [\"checkbox-label-1\"]}]}\n{\"uid\":\"checkbox-label-1\",\"tag\":\"ww-text\",\"name\":\"Checkbox Label\",\"content\":{\"default\":{\"text\":{\"en\":\"Accept terms\"}}}}"
+        },
+        {
+            "description": "Required checkbox for form validation",
+            "example": "{\"uid\":\"input-checkbox\",\"tag\":\"ww-input-checkbox\",\"name\":\"Required Checkbox\",\"content\":{\"default\":{\"value\":false,\"required\":true,\"readonly\":false,\"fieldName\":\"acceptTerms\",\"isEmbeddedContainer\":true,\"containerPosition\":\"right\",\"containerGap\":\"8px\"}},\"slots\":[{\"slotKey\": \"checkbox\", \"elements\": [\"checkbox-1\"]}]}\n{\"uid\":\"checkbox-1\",\"tag\":\"ww-checkbox\",\"name\":\"Checkbox Icon\",\"content\":{\"default\":{\"icon\":\"lucide/check\",\"color\":\"#00000000\"},\"checked_default\":{\"color\":\"#FFFFFF\"}},\"states\":[{\"id\":\"checked\",\"label\":\"checked\"}],\"styles\":{\"default\":{\"width\":\"20px\",\"height\":\"20px\",\"borderRadius\":\"4px\",\"border\":\"2px solid #D1D5DB\",\"backgroundColor\":\"#FFFFFF\"},\"checked_default\":{\"backgroundColor\":\"#3B82F6\",\"borderColor\":\"#3B82F6\"}}}"
+        }
+    ],
+    "dependencies": [
+        "ww-checkbox"
+    ]
+}

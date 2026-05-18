@@ -1,0 +1,206 @@
+{
+    "metadata": {
+        "name": "ww-input-range",
+        "description": "A form-integrated numeric range slider (native HTML <input type=\"range\">) that lets the user pick a value between a configurable min and max with a given step. Supports an optional tooltip that displays the current value, debounced change events, and form validation via the parent ww-form-container.",
+        "keywords": [
+            "range",
+            "slider",
+            "numeric",
+            "input",
+            "form",
+            "tooltip",
+            "min-max",
+            "step"
+        ],
+        "features": [
+            "Native HTML range input with configurable min, max, and step",
+            "Optional tooltip displaying the current value",
+            "Built-in debounce for change events with configurable delay",
+            "Required-field support integrated with ww-form-container validation",
+            "Real-time two-way data binding via the exposed 'value' variable",
+            "Customizable track, active range, selector, and tooltip styling",
+            "Does not support multi-handle (dual-thumb) ranges",
+            "Does not support non-linear or logarithmic scales",
+            "Does not support custom validation formulas (use form-level validation instead)"
+        ]
+    },
+    "properties": [
+        {
+            "name": "value",
+            "description": "The initial numeric value of the slider when the element mounts. Should fall within [min, max].",
+            "type": "number",
+            "defaultValue": 0
+        },
+        {
+            "name": "required",
+            "description": "Whether a value must be present for the parent form's validation to pass.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "min",
+            "description": "Minimum selectable value. Must be less than or equal to max.",
+            "type": "number",
+            "defaultValue": 0
+        },
+        {
+            "name": "max",
+            "description": "Maximum selectable value. Must be greater than or equal to min.",
+            "type": "number",
+            "defaultValue": 100
+        },
+        {
+            "name": "step",
+            "description": "Increment between selectable values. Must be greater than 0.",
+            "type": "number",
+            "defaultValue": 1
+        },
+        {
+            "name": "debounce",
+            "description": "When true, the 'change' event is debounced by debounceDelay instead of firing on every slider move.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "debounceDelay",
+            "description": "Debounce delay applied to the 'change' event when debounce is enabled. Accepts values in ms (e.g. '500ms'). Inactive when debounce is false.",
+            "type": "string",
+            "defaultValue": "500ms",
+            "responsive": true,
+            "inactiveProperty": {
+                "description": "Inactive when debounce is false."
+            }
+        },
+        {
+            "name": "isTooltip",
+            "description": "When true, displays a tooltip above the slider thumb showing the current value.",
+            "type": "boolean",
+            "defaultValue": true
+        },
+        {
+            "name": "globalStyle",
+            "description": "Visual styling of the slider (track, selector/thumb, tooltip). Object property matching the `globalStyle` group in ww-config.js. Responsive and supports states/classes.",
+            "type": "object",
+            "responsive": true,
+            "defaultValue": {
+                "fontSize": "15px",
+                "fontFamily": "",
+                "rangeBackgroundColor": "rgb(9, 154, 242)",
+                "activeRangeBackgroundColor": null,
+                "selectorBorderColor": "#1565C0",
+                "selectorBackgroundColor": "rgb(9, 154, 242)",
+                "tooltipBackground": "rgb(9, 154, 242)",
+                "tooltipTextColor": "#FFFFFF"
+            },
+            "properties": [
+                {
+                    "name": "fontSize",
+                    "description": "Font size of the tooltip value. Units: px, em, rem. Only visible when isTooltip is true. Inactive when isTooltip is false.",
+                    "type": "string",
+                    "defaultValue": "15px",
+                    "inactiveProperty": {
+                        "description": "Inactive when isTooltip is false."
+                    }
+                },
+                {
+                    "name": "fontFamily",
+                    "description": "Font family of the tooltip value. Only visible when isTooltip is true. Inactive when isTooltip is false.",
+                    "type": "string",
+                    "defaultValue": "",
+                    "inactiveProperty": {
+                        "description": "Inactive when isTooltip is false."
+                    }
+                },
+                {
+                    "name": "useActiveRangeBackground",
+                    "description": "When true, enables a distinct color for the filled portion of the track (between min and the current value).",
+                    "type": "boolean",
+                    "defaultValue": false
+                },
+                {
+                    "name": "rangeBackgroundColor",
+                    "description": "Background color of the slider track.",
+                    "type": "string",
+                    "defaultValue": "rgb(9, 154, 242)"
+                },
+                {
+                    "name": "activeRangeBackgroundColor",
+                    "description": "Background color of the filled portion of the track. Only visible when useActiveRangeBackground is true. Inactive when globalStyle.useActiveRangeBackground is false.",
+                    "type": "string",
+                    "defaultValue": null,
+                    "inactiveProperty": {
+                        "description": "Inactive when globalStyle.useActiveRangeBackground is false."
+                    }
+                },
+                {
+                    "name": "selectorBorderColor",
+                    "description": "Border color of the slider selector (thumb).",
+                    "type": "string",
+                    "defaultValue": "#1565C0"
+                },
+                {
+                    "name": "selectorBackgroundColor",
+                    "description": "Background color of the slider selector (thumb).",
+                    "type": "string",
+                    "defaultValue": "rgb(9, 154, 242)"
+                },
+                {
+                    "name": "tooltipBackground",
+                    "description": "Background color of the tooltip. Only visible when isTooltip is true. Inactive when isTooltip is false.",
+                    "type": "string",
+                    "defaultValue": "rgb(9, 154, 242)",
+                    "inactiveProperty": {
+                        "description": "Inactive when isTooltip is false."
+                    }
+                },
+                {
+                    "name": "tooltipTextColor",
+                    "description": "Text color of the tooltip value. Only visible when isTooltip is true. Inactive when isTooltip is false.",
+                    "type": "string",
+                    "defaultValue": "#FFFFFF",
+                    "inactiveProperty": {
+                        "description": "Inactive when isTooltip is false."
+                    }
+                }
+            ]
+        }
+    ],
+    "states": [],
+    "events": [
+        {
+            "name": "change",
+            "description": "Triggered when the user changes the slider value. Respects the debounce/debounceDelay settings.",
+            "payload": {
+                "value": "number",
+                "domEvent": "Event"
+            }
+        },
+        {
+            "name": "initValueChange",
+            "description": "Triggered when the 'value' property changes programmatically (not from user interaction).",
+            "payload": {
+                "value": "number"
+            }
+        }
+    ],
+    "localContext": [],
+    "actions": [],
+    "slots": [],
+    "variables": [
+        {
+            "name": "value",
+            "description": "Current numeric value of the slider. Updates on user interaction (respecting debounce) or programmatic changes to the initial value.",
+            "type": "number",
+            "readonly": true
+        }
+    ],
+    "specifications": [
+        "min must be less than or equal to max; step must be strictly greater than 0.",
+        "The initial 'value' should fall within [min, max] — out-of-range values will be clamped by the browser.",
+        "When the slider is used inside a ww-form-container, expose its value to the form via the parent's field tracking rather than storing it in a separate variable.",
+        "Use debounceDelay when the 'change' workflow performs expensive work (API calls, heavy computations) to avoid firing on every drag frame.",
+        "The isTooltip, selector, and range styling properties are purely visual and do not affect form behavior."
+    ],
+    "examples": [],
+    "dependencies": []
+}

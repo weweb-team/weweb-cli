@@ -1,0 +1,241 @@
+{
+    "metadata": {
+        "name": "ww-breadcrumb",
+        "description": "A breadcrumbs navigation element that displays a page hierarchy or custom trail with configurable separators, styles, links, text, and icons.",
+        "keywords": ["breadcrumb", "breadcrumbs", "navigation", "path", "hierarchy", "trail", "links"],
+        "features": [
+            "Manual breadcrumb items",
+            "Automatic breadcrumb generation from the current URL",
+            "Custom label, link, and icon property paths",
+            "Standard, pills, arrows, and underline display styles",
+            "Configurable separators, colors, typography, and spacing",
+            "Reusable link, icon, and text child slots for item styling"
+        ]
+    },
+    "properties": [
+        {
+            "name": "items",
+            "description": "Breadcrumb items used in manual mode. Each item can be a string or an object with label, link, and optional icon fields. Labels may be multilingual objects.",
+            "type": "array",
+            "defaultValue": [
+                {
+                    "label": {
+                        "en": "Home"
+                    },
+                    "link": "/"
+                },
+                {
+                    "label": {
+                        "en": "Products"
+                    },
+                    "link": "/products"
+                },
+                {
+                    "label": {
+                        "en": "Category"
+                    },
+                    "link": "/products/category"
+                },
+                {
+                    "label": {
+                        "en": "Current Page"
+                    },
+                    "link": "/products/category/item"
+                }
+            ]
+        },
+        {
+            "name": "mode",
+            "description": "Controls whether breadcrumb items are provided manually or generated automatically from the current URL path.",
+            "type": "string",
+            "options": ["manual", "auto"],
+            "defaultValue": "manual"
+        },
+        {
+            "name": "labelPropertyPath",
+            "description": "Property path used to read the display label from each item object.",
+            "type": "string",
+            "defaultValue": "label"
+        },
+        {
+            "name": "urlPropertyPath",
+            "description": "Property path used to read the link value from each item object. Hidden in auto mode.",
+            "type": "string",
+            "defaultValue": "link"
+        },
+        {
+            "name": "iconPropertyPath",
+            "description": "Property path used to read the optional icon name from each item object.",
+            "type": "string",
+            "defaultValue": "icon"
+        },
+        {
+            "name": "displayStyle",
+            "description": "Visual style used to render the breadcrumb trail.",
+            "type": "string",
+            "options": ["standard", "pills", "arrows", "underline"],
+            "defaultValue": "standard"
+        },
+        {
+            "name": "separatorType",
+            "description": "Separator displayed between breadcrumb items. Ignored by the arrows display style.",
+            "type": "string",
+            "options": ["slash", "arrow", "chevron", "dot", "pipe", "dash", "custom"],
+            "defaultValue": "slash"
+        },
+        {
+            "name": "customSeparator",
+            "description": "Custom separator text or inline HTML/SVG snippet used when separatorType is custom. Do not create a separate ww-icon for separators; it will not be connected to the breadcrumb.",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "collapse",
+            "description": "When true, hides middle breadcrumb items and displays an ellipsis between the first and last items.",
+            "type": "boolean",
+            "defaultValue": false
+        },
+        {
+            "name": "linkColor",
+            "description": "Color of inactive breadcrumb link text.",
+            "type": "string",
+            "defaultValue": "#6B7280"
+        },
+        {
+            "name": "activeColor",
+            "description": "Color of the active/current breadcrumb item text.",
+            "type": "string",
+            "defaultValue": "#111827"
+        },
+        {
+            "name": "separatorColor",
+            "description": "Color of the separators between breadcrumb items.",
+            "type": "string",
+            "defaultValue": "#9CA3AF"
+        },
+        {
+            "name": "iconColor",
+            "description": "Color of inactive breadcrumb icons.",
+            "type": "string",
+            "defaultValue": "#4B5563"
+        },
+        {
+            "name": "activeIconColor",
+            "description": "Color of the active/current breadcrumb item icon.",
+            "type": "string",
+            "defaultValue": "#111827"
+        },
+        {
+            "name": "pillBackgroundColor",
+            "description": "Background color for pill-style inactive breadcrumb items.",
+            "type": "string",
+            "defaultValue": "#f0f0f0"
+        },
+        {
+            "name": "activePillBackgroundColor",
+            "description": "Background color for the active pill-style breadcrumb item.",
+            "type": "string",
+            "defaultValue": "#e0e0e0"
+        },
+        {
+            "name": "arrowColor",
+            "description": "Arrow shape color when displayStyle is arrows.",
+            "type": "string",
+            "defaultValue": "#FFFFFF"
+        },
+        {
+            "name": "fontSize",
+            "description": "Font size for breadcrumb text.",
+            "type": "string",
+            "defaultValue": "14px"
+        },
+        {
+            "name": "activeItemFontWeight",
+            "description": "Font weight applied to the active/current breadcrumb item.",
+            "type": "string",
+            "options": ["normal", "bold", "100", "200", "300", "400", "500", "600", "700", "800", "900"],
+            "defaultValue": "600"
+        },
+        {
+            "name": "hoverDecoration",
+            "description": "Text decoration applied when hovering breadcrumb links.",
+            "type": "string",
+            "options": ["none", "underline", "overline", "line-through"],
+            "defaultValue": "none"
+        },
+        {
+            "name": "itemSpacing",
+            "description": "Gap between breadcrumb items.",
+            "type": "string",
+            "defaultValue": "8px"
+        },
+        {
+            "name": "separatorSpacing",
+            "description": "Horizontal spacing around separators.",
+            "type": "string",
+            "defaultValue": "12px"
+        },
+        {
+            "name": "separatorSize",
+            "description": "Font size or rendered size for separators.",
+            "type": "string",
+            "defaultValue": "12px"
+        }
+    ],
+    "states": [],
+    "events": [],
+    "localContext": [],
+    "actions": [],
+    "slots": [
+        {
+            "name": "linkElement",
+            "description": "Required wrapper element reused for each breadcrumb item. The component injects the item link through wwLink, so use a simple styled container and do not set custom link behavior on this child.",
+            "type": "object",
+            "required": true,
+            "tag": "ww-div"
+        },
+        {
+            "name": "iconElement",
+            "description": "Required icon template reused when a breadcrumb item has an icon. The component injects the icon name and active/inactive color.",
+            "type": "object",
+            "required": true,
+            "tag": "ww-icon"
+        },
+        {
+            "name": "textElement",
+            "description": "Required text template reused for every breadcrumb item. The component injects the item label as text.",
+            "type": "object",
+            "required": true,
+            "tag": "ww-text"
+        }
+    ],
+    "variables": [],
+    "specifications": [
+        "Use mode manual when the desired trail is known from the prompt, and provide the full items array.",
+        "Use mode auto only when the breadcrumb should reflect the current URL path and project pages.",
+        "In manual mode, keep labelPropertyPath, urlPropertyPath, and iconPropertyPath aligned with the item object keys.",
+        "For linked items, use WeWeb link objects for internal navigation when page IDs are known; use strings only for simple URL paths or when the target page is unknown.",
+        "The last item usually represents the current page. It may omit a link or link to the current page.",
+        "When using icons, include icon names on the items and keep iconElement as a ww-icon child slot.",
+        "Separators are not slots. Never create a separate ww-icon child or sibling for a separator; the component ignores it.",
+        "For icon-like separators, set separatorType to custom and put inline SVG or a text glyph such as › in customSeparator.",
+        "Do not put per-item text directly in textElement. The component injects the label for each repeated breadcrumb item.",
+        "Do not put per-item icon values directly in iconElement. The component injects icon and color for each repeated breadcrumb item.",
+        "The linkElement, iconElement, and textElement slots are templates reused across all breadcrumb items, not one child per item."
+    ],
+    "examples": [
+        {
+            "description": "Manual breadcrumb with icons and standard slash separators.",
+            "example": "[{\"uid\":\"breadcrumb\",\"tag\":\"ww-breadcrumb\",\"name\":\"Product Breadcrumb\",\"content\":{\"default\":{\"mode\":\"manual\",\"items\":[{\"label\":\"Home\",\"link\":\"/\",\"icon\":\"lucide/house\"},{\"label\":\"Products\",\"link\":\"/products\",\"icon\":\"lucide/package\"},{\"label\":\"Shoes\",\"link\":\"/products/shoes\"},{\"label\":\"Trail Runner\"}],\"labelPropertyPath\":\"label\",\"urlPropertyPath\":\"link\",\"iconPropertyPath\":\"icon\",\"displayStyle\":\"standard\",\"separatorType\":\"slash\",\"customSeparator\":\"\",\"collapse\":false,\"linkColor\":\"#6B7280\",\"activeColor\":\"#111827\",\"separatorColor\":\"#9CA3AF\",\"iconColor\":\"#4B5563\",\"activeIconColor\":\"#111827\",\"pillBackgroundColor\":\"#f0f0f0\",\"activePillBackgroundColor\":\"#e0e0e0\",\"arrowColor\":\"#FFFFFF\",\"fontSize\":\"14px\",\"activeItemFontWeight\":\"600\",\"hoverDecoration\":\"underline\",\"itemSpacing\":\"8px\",\"separatorSpacing\":\"12px\",\"separatorSize\":\"12px\"}},\"slots\":[{\"slotKey\":\"linkElement\",\"elements\":[\"breadcrumb_link\"]},{\"slotKey\":\"iconElement\",\"elements\":[\"breadcrumb_icon\"]},{\"slotKey\":\"textElement\",\"elements\":[\"breadcrumb_text\"]}],\"style\":{\"default\":{\"width\":\"100%\"}}},{\"uid\":\"breadcrumb_link\",\"tag\":\"ww-div\",\"name\":\"Breadcrumb Link\",\"style\":{\"default\":{\"display\":\"inline-flex\",\"alignItems\":\"center\",\"gap\":\"4px\"}}},{\"uid\":\"breadcrumb_icon\",\"tag\":\"ww-icon\",\"name\":\"Breadcrumb Icon\",\"style\":{\"default\":{\"width\":\"16px\",\"height\":\"16px\"}}},{\"uid\":\"breadcrumb_text\",\"tag\":\"ww-text\",\"name\":\"Breadcrumb Text\",\"content\":{\"default\":{\"tag\":\"span\"}},\"style\":{\"default\":{\"fontSize\":\"14px\"}}}]"
+        },
+        {
+            "description": "Compact pill breadcrumb for a dashboard page.",
+            "example": "[{\"uid\":\"dashboard_breadcrumb\",\"tag\":\"ww-breadcrumb\",\"name\":\"Dashboard Breadcrumb\",\"content\":{\"default\":{\"mode\":\"manual\",\"items\":[{\"label\":\"Dashboard\",\"link\":\"/dashboard\",\"icon\":\"lucide/layout-dashboard\"},{\"label\":\"Reports\",\"link\":\"/dashboard/reports\"},{\"label\":\"Revenue\"}],\"labelPropertyPath\":\"label\",\"urlPropertyPath\":\"link\",\"iconPropertyPath\":\"icon\",\"displayStyle\":\"pills\",\"separatorType\":\"slash\",\"customSeparator\":\"\",\"collapse\":true,\"linkColor\":\"#475569\",\"activeColor\":\"#0F172A\",\"separatorColor\":\"#CBD5E1\",\"iconColor\":\"#64748B\",\"activeIconColor\":\"#2563EB\",\"pillBackgroundColor\":\"#F1F5F9\",\"activePillBackgroundColor\":\"#DBEAFE\",\"arrowColor\":\"#FFFFFF\",\"fontSize\":\"13px\",\"activeItemFontWeight\":\"700\",\"hoverDecoration\":\"none\",\"itemSpacing\":\"6px\",\"separatorSpacing\":\"8px\",\"separatorSize\":\"12px\"}},\"slots\":[{\"slotKey\":\"linkElement\",\"elements\":[\"dashboard_breadcrumb_link\"]},{\"slotKey\":\"iconElement\",\"elements\":[\"dashboard_breadcrumb_icon\"]},{\"slotKey\":\"textElement\",\"elements\":[\"dashboard_breadcrumb_text\"]}]},{\"uid\":\"dashboard_breadcrumb_link\",\"tag\":\"ww-div\",\"name\":\"Dashboard Breadcrumb Link\",\"style\":{\"default\":{\"display\":\"inline-flex\",\"alignItems\":\"center\",\"gap\":\"6px\",\"padding\":\"4px 8px\"}}},{\"uid\":\"dashboard_breadcrumb_icon\",\"tag\":\"ww-icon\",\"name\":\"Dashboard Breadcrumb Icon\",\"style\":{\"default\":{\"width\":\"14px\",\"height\":\"14px\"}}},{\"uid\":\"dashboard_breadcrumb_text\",\"tag\":\"ww-text\",\"name\":\"Dashboard Breadcrumb Text\",\"content\":{\"default\":{\"tag\":\"span\"}},\"style\":{\"default\":{\"fontSize\":\"13px\",\"fontWeight\":\"500\"}}}]"
+        },
+        {
+            "description": "Automatic breadcrumb using arrow display style.",
+            "example": "[{\"uid\":\"auto_breadcrumb\",\"tag\":\"ww-breadcrumb\",\"name\":\"Auto Breadcrumb\",\"content\":{\"default\":{\"mode\":\"auto\",\"items\":[],\"labelPropertyPath\":\"label\",\"urlPropertyPath\":\"link\",\"iconPropertyPath\":\"icon\",\"displayStyle\":\"arrows\",\"separatorType\":\"slash\",\"customSeparator\":\"\",\"collapse\":false,\"linkColor\":\"#334155\",\"activeColor\":\"#0F172A\",\"separatorColor\":\"#94A3B8\",\"iconColor\":\"#64748B\",\"activeIconColor\":\"#0F172A\",\"pillBackgroundColor\":\"#f0f0f0\",\"activePillBackgroundColor\":\"#e0e0e0\",\"arrowColor\":\"#E2E8F0\",\"fontSize\":\"14px\",\"activeItemFontWeight\":\"700\",\"hoverDecoration\":\"none\",\"itemSpacing\":\"0px\",\"separatorSpacing\":\"10px\",\"separatorSize\":\"16px\"}},\"slots\":[{\"slotKey\":\"linkElement\",\"elements\":[\"auto_breadcrumb_link\"]},{\"slotKey\":\"iconElement\",\"elements\":[\"auto_breadcrumb_icon\"]},{\"slotKey\":\"textElement\",\"elements\":[\"auto_breadcrumb_text\"]}]},{\"uid\":\"auto_breadcrumb_link\",\"tag\":\"ww-div\",\"name\":\"Auto Breadcrumb Link\",\"style\":{\"default\":{\"display\":\"inline-flex\",\"alignItems\":\"center\",\"gap\":\"4px\"}}},{\"uid\":\"auto_breadcrumb_icon\",\"tag\":\"ww-icon\",\"name\":\"Auto Breadcrumb Icon\",\"style\":{\"default\":{\"width\":\"16px\",\"height\":\"16px\"}}},{\"uid\":\"auto_breadcrumb_text\",\"tag\":\"ww-text\",\"name\":\"Auto Breadcrumb Text\",\"content\":{\"default\":{\"tag\":\"span\"}}}]"
+        }
+    ],
+    "dependencies": ["ww-div", "ww-icon", "ww-text"]
+}
