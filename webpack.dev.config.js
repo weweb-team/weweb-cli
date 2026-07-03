@@ -4,6 +4,7 @@ const { VueLoaderPlugin } = require("vue-loader");
 const autoprefixer = require("autoprefixer");
 const fs = require("fs");
 const webpack = require("webpack");
+const wewebCssLayerPlugin = require("./bin/utils/wewebCssLayerPlugin");
 
 const wewebClientVersion = "1.0.40";
 
@@ -158,7 +159,7 @@ module.exports = function () {
                             options: {
                                 postcssOptions: {
                                     plugins: function () {
-                                        return [autoprefixer];
+                                        return [wewebCssLayerPlugin(), autoprefixer];
                                     },
                                 },
                             },

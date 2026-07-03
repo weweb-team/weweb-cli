@@ -7,6 +7,7 @@ const { VueLoaderPlugin } = require('vue-loader');
 const autoprefixer = require('autoprefixer');
 const fs = require('fs');
 const webpack = require('webpack');
+const wewebCssLayerPlugin = require('../utils/wewebCssLayerPlugin');
 
 exports.build = (name, type) => {
     if (!name) {
@@ -188,7 +189,7 @@ exports.build = (name, type) => {
                                 options: {
                                     postcssOptions: {
                                         plugins: function () {
-                                            return [autoprefixer];
+                                            return [wewebCssLayerPlugin(), autoprefixer];
                                         },
                                     },
                                 },
