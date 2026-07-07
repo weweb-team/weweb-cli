@@ -158,9 +158,7 @@ module.exports = function () {
                             loader: "postcss-loader",
                             options: {
                                 postcssOptions: {
-                                    plugins: function () {
-                                        return [wewebCssLayerPlugin(), autoprefixer];
-                                    },
+                                    plugins: [wewebCssLayerPlugin(), autoprefixer],
                                 },
                             },
                         },

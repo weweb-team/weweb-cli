@@ -188,9 +188,7 @@ exports.build = (name, type) => {
                                 loader: 'postcss-loader',
                                 options: {
                                     postcssOptions: {
-                                        plugins: function () {
-                                            return [wewebCssLayerPlugin(), autoprefixer];
-                                        },
+                                        plugins: [wewebCssLayerPlugin(), autoprefixer],
                                     },
                                 },
                             },

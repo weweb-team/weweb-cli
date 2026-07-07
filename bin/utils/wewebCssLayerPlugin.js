@@ -1,9 +1,13 @@
+const STYLE_RESET_LAYER = 'ww-style-reset';
 const STYLE_CODED_COMPONENT_LAYER = 'ww-style-component';
+const STYLE_RUNTIME_LAYER = 'ww-style-runtime';
 const STYLE_LAYER_ORDER = [
+    STYLE_RESET_LAYER,
     STYLE_CODED_COMPONENT_LAYER,
     'ww-style-library',
     'ww-style-section',
     'ww-style-element',
+    STYLE_RUNTIME_LAYER,
 ];
 
 function wewebCssLayerPlugin(options = {}) {
@@ -77,5 +81,7 @@ function getLastTopLevelImportBoundary(root) {
 }
 
 module.exports = wewebCssLayerPlugin;
+module.exports.STYLE_RESET_LAYER = STYLE_RESET_LAYER;
 module.exports.STYLE_CODED_COMPONENT_LAYER = STYLE_CODED_COMPONENT_LAYER;
+module.exports.STYLE_RUNTIME_LAYER = STYLE_RUNTIME_LAYER;
 module.exports.STYLE_LAYER_ORDER = STYLE_LAYER_ORDER;
