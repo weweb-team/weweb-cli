@@ -1,18 +1,7 @@
-const STYLE_RESET_LAYER = 'ww-style-reset';
 const STYLE_CODED_COMPONENT_LAYER = 'ww-style-component';
-const STYLE_RUNTIME_LAYER = 'ww-style-runtime';
-const STYLE_LAYER_ORDER = [
-    STYLE_RESET_LAYER,
-    STYLE_CODED_COMPONENT_LAYER,
-    'ww-style-library',
-    'ww-style-section',
-    'ww-style-element',
-    STYLE_RUNTIME_LAYER,
-];
 
 function wewebCssLayerPlugin(options = {}) {
     const layerName = options.layerName || STYLE_CODED_COMPONENT_LAYER;
-    const layerOrder = options.layerOrder || STYLE_LAYER_ORDER;
     const include = options.include;
 
     return {
@@ -28,10 +17,6 @@ function wewebCssLayerPlugin(options = {}) {
 
             if (!nodesToWrap.length) return;
 
-            const layerOrderRule = postcss.atRule({
-                name: 'layer',
-                params: layerOrder.join(', '),
-            });
             const layerRule = postcss.atRule({
                 name: 'layer',
                 params: layerName,
@@ -44,11 +29,10 @@ function wewebCssLayerPlugin(options = {}) {
 
             const insertAfter = getLastTopLevelImportBoundary(root);
             if (insertAfter) {
-                insertAfter.after(layerOrderRule);
+                insertAfter.after(layerRule);
             } else {
-                root.prepend(layerOrderRule);
+                root.prepend(layerRule);
             }
-            layerOrderRule.after(layerRule);
         },
     };
 }
@@ -81,7 +65,4 @@ function getLastTopLevelImportBoundary(root) {
 }
 
 module.exports = wewebCssLayerPlugin;
-module.exports.STYLE_RESET_LAYER = STYLE_RESET_LAYER;
 module.exports.STYLE_CODED_COMPONENT_LAYER = STYLE_CODED_COMPONENT_LAYER;
-module.exports.STYLE_RUNTIME_LAYER = STYLE_RUNTIME_LAYER;
-module.exports.STYLE_LAYER_ORDER = STYLE_LAYER_ORDER;
