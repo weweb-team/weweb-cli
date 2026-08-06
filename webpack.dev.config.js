@@ -1,10 +1,9 @@
 // webpack.config.js
 const path = require("path");
 const { VueLoaderPlugin } = require("vue-loader");
-const autoprefixer = require("autoprefixer");
 const fs = require("fs");
 const webpack = require("webpack");
-const wewebCssLayerPlugin = require("./bin/utils/wewebCssLayerPlugin");
+const createCssLoaders = require("./bin/utils/createCssLoaders");
 
 const wewebClientVersion = "1.0.40";
 
@@ -151,19 +150,7 @@ module.exports = function () {
                 // AND `<style>` blocks in `.vue` files
                 {
                     test: /\.(css|scss)$/,
-                    use: [
-                        "vue-style-loader",
-                        "css-loader",
-                        {
-                            loader: "postcss-loader",
-                            options: {
-                                postcssOptions: {
-                                    plugins: [wewebCssLayerPlugin(), autoprefixer],
-                                },
-                            },
-                        },
-                        "sass-loader",
-                    ],
+                    use: createCssLoaders(),
                 },
                 {
                     test: /\.(png|jpg|gif|svg)$/i,

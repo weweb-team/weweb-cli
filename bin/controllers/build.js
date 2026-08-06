@@ -4,10 +4,9 @@ const prebuildCore = require('../core/prebuild.js');
 
 const path = require('path');
 const { VueLoaderPlugin } = require('vue-loader');
-const autoprefixer = require('autoprefixer');
 const fs = require('fs');
 const webpack = require('webpack');
-const wewebCssLayerPlugin = require('../utils/wewebCssLayerPlugin');
+const createCssLoaders = require('../utils/createCssLoaders');
 
 exports.build = (name, type) => {
     if (!name) {
@@ -181,19 +180,7 @@ exports.build = (name, type) => {
                     // AND `<style>` blocks in `.vue` files
                     {
                         test: /\.(css|scss)$/,
-                        use: [
-                            'vue-style-loader',
-                            'css-loader',
-                            {
-                                loader: 'postcss-loader',
-                                options: {
-                                    postcssOptions: {
-                                        plugins: [wewebCssLayerPlugin(), autoprefixer],
-                                    },
-                                },
-                            },
-                            'sass-loader',
-                        ],
+                        use: createCssLoaders(),
                     },
                     {
                         test: /\.(png|jpg|gif|svg)$/i,
