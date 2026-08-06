@@ -10,7 +10,12 @@
 - Leave top-level `@charset` and `@import` at the top of the stylesheet, as required by CSS, but
   namespace every import into `ww-style-component`. Existing import layers become nested component
   layers, and unlayered local or remote imports receive the component layer explicitly.
-- Run local imports through the same PostCSS and Sass pipeline with `css-loader.importLoaders = 2`.
-  This keeps dependency CSS transformed and prevents an imported stylesheet from escaping the
-  component cascade boundary.
+- Inline local CSS imports before applying the component layer, while retaining
+  `css-loader.importLoaders = 2` for the loader pipeline. This keeps dependency CSS transformed,
+  matches Vite's import processing, and prevents a local dependency from being wrapped in the
+  component layer twice. Rebase dependency asset URLs before `css-loader` resolves them so they
+  remain relative to the stylesheet that authored them.
+- Leave imports remaining after local inlining as literal CSS instead of letting `css-loader`
+  extract them. They are external imports, and keeping their `layer`, `supports`, and media
+  qualifiers in the CSS is required because `vue-style-loader` does not forward that metadata.
 - Keep the plugin CommonJS because the CLI webpack config is CommonJS.
