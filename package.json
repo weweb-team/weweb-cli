@@ -1,6 +1,6 @@
 {
     "name": "@weweb/cli",
-    "version": "3.8.15-nightly.20260810130118",
+    "version": "3.8.15-nightly.20260810132724",
     "description": "WeWeb CLI",
     "bin": {
         "weweb": "bin/weweb.js"
@@ -33,7 +33,7 @@
         "@babel/core": "7.22.1",
         "@vue/compiler-sfc": "3.5.13",
         "@weweb/drizzle-kit": "0.32.0-weweb.6",
-        "autoprefixer": "9.8.6",
+        "autoprefixer": "10.5.4",
         "babel-loader": "9.1.2",
         "css-loader": "6.8.1",
         "file-loader": "6.2.0",

@@ -86,6 +86,7 @@ exports.build = (name, type) => {
                 fallback: { 
                     "assert": false,
                     "buffer": false,
+                    "canvas": false,
                     "child_process": false,
                     "cluster": false,
                     "crypto": false,
@@ -95,6 +96,7 @@ exports.build = (name, type) => {
                     "events": false,
                     "fs": false,
                     "http": false,
+                    "http2": false,
                     "https": false,
                     "net": false,
                     "os": false,

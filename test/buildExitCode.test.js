@@ -11,7 +11,6 @@ test('build exits with an error when no component entry can be resolved', (t) =>
 
     fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({ name: 'legacy-component', version: '1.0.0' }));
     fs.writeFileSync(path.join(root, 'ww-config.json'), '{}');
-    fs.writeFileSync(path.join(root, 'legacy.vue'), '<template><div>Legacy</div></template>');
 
     const result = spawnSync(
         process.execPath,
@@ -21,6 +20,37 @@ test('build exits with an error when no component entry can be resolved', (t) =>
 
     assert.equal(result.status, 1, result.stdout + result.stderr);
     assert.match(result.stdout, /BUILD ERROR/);
+    assert.equal(fs.existsSync(path.join(root, 'dist')), false);
+});
+
+test('build uses an unambiguous root Vue file as a legacy component entry', (t) => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'weweb-cli-legacy-entry-'));
+    t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+
+    fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({ name: 'legacy-component', version: '1.0.0' }));
+    fs.writeFileSync(path.join(root, 'ww-config.json'), '{}');
+    fs.writeFileSync(path.join(root, 'legacy.vue'), '<template><div>Legacy</div></template>');
+
+    const result = runBuild(root);
+
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.match(result.stdout, /Component Path : "\.\/legacy\.vue"/);
+    assert.equal(fs.existsSync(path.join(root, 'dist/manager.js')), true);
+});
+
+test('build rejects ambiguous root Vue component entries', (t) => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'weweb-cli-ambiguous-entry-'));
+    t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+
+    fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({ name: 'legacy-component', version: '1.0.0' }));
+    fs.writeFileSync(path.join(root, 'ww-config.json'), '{}');
+    fs.writeFileSync(path.join(root, 'first.vue'), '<template><div>First</div></template>');
+    fs.writeFileSync(path.join(root, 'second.vue'), '<template><div>Second</div></template>');
+
+    const result = runBuild(root);
+
+    assert.equal(result.status, 1, result.stdout + result.stderr);
+    assert.match(result.stdout, /Multiple root Vue files found/);
     assert.equal(fs.existsSync(path.join(root, 'dist')), false);
 });
 
@@ -40,6 +70,26 @@ test('build exits with an error when webpack rejects the component', (t) => {
 test('build exits successfully after producing the component artifact', (t) => {
     const root = createComponentFixture(t);
     fs.writeFileSync(path.join(root, 'src/wwElement.vue'), '<template><div>Valid</div></template>');
+
+    const result = runBuild(root);
+
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.equal(fs.existsSync(path.join(root, 'dist/manager.js')), true);
+});
+
+test('build ignores optional server-only modules in browser component dependencies', (t) => {
+    const root = createComponentFixture(t);
+    fs.writeFileSync(
+        path.join(root, 'src/wwElement.vue'),
+        [
+            '<template><div>Browser component</div></template>',
+            '<script>',
+            "import http2 from 'http2';",
+            "import canvas from 'canvas';",
+            'export default { data: () => ({ http2, canvas }) };',
+            '</script>',
+        ].join('\n')
+    );
 
     const result = runBuild(root);
 

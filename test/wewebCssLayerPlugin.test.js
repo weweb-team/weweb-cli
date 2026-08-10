@@ -117,6 +117,18 @@ test('rebases imported asset URLs without changing root or external URLs', async
     assert.match(result.css, /\.root \{ background: url\("\.\/root\.svg"\); \}/);
 });
 
+test('supports modern CSS syntax through the configured PostCSS pipeline', async () => {
+    const loaders = createCssLoaders();
+    const postcssLoader = loaders.find(loader => typeof loader === 'object' && loader.loader === 'postcss-loader');
+    const result = await postcss(postcssLoader.options.postcssOptions.plugins).process(
+        '@supports selector(:focus-visible) { .button:focus-visible { appearance: none; } }',
+        { from: undefined }
+    );
+
+    assert.match(result.css, /@supports selector\(:focus-visible\)/);
+    assert.match(result.css, /appearance: none/);
+});
+
 function runWebpack(config) {
     return new Promise((resolve, reject) => {
         webpack(config, (error, stats) => {
