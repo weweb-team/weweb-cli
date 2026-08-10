@@ -1,6 +1,6 @@
 {
     "name": "@weweb/cli",
-    "version": "3.8.15-nightly.20260806201654",
+    "version": "3.8.15-nightly.20260810130118",
     "description": "WeWeb CLI",
     "bin": {
         "weweb": "bin/weweb.js"
