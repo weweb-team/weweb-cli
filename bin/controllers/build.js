@@ -4,24 +4,31 @@ const prebuildCore = require('../core/prebuild.js');
 
 const path = require('path');
 const { VueLoaderPlugin } = require('vue-loader');
-const autoprefixer = require('autoprefixer');
 const fs = require('fs');
 const webpack = require('webpack');
+const createCssLoaders = require('../utils/createCssLoaders');
+
+const markBuildFailed = () => {
+    process.exitCode = 1;
+};
 
 exports.build = (name, type) => {
     if (!name) {
         console.log('\x1b[41m Error : arg \'name="name"\' not specified. \x1b[0m');
+        markBuildFailed();
         return;
     }
     if (!type) {
         console.log(
             "\x1b[41m Error : arg 'type=\"type\"' not specified. Must be 'section', 'wwobject' or 'plugin'. \x1b[0m"
         );
+        markBuildFailed();
         return;
     }
 
     if (!prebuildCore.prebuild("build", { type })) {
         console.log('BUILD ERROR');
+        markBuildFailed();
     } else {
         const getPackageJson = function () {
             try {
@@ -40,6 +47,7 @@ exports.build = (name, type) => {
         const packageJSON = getPackageJson();
         if (!packageJSON) {
             console.log('\x1b[41mError : package.json not found\x1b[0m');
+            markBuildFailed();
             return;
         }
 
@@ -49,6 +57,7 @@ exports.build = (name, type) => {
             console.log(
                 '\x1b[41mError : package.json version must be an integer (got : ' + packageJSON.version + ')\x1b[0m'
             );
+            markBuildFailed();
             return;
         }
 
@@ -77,6 +86,7 @@ exports.build = (name, type) => {
                 fallback: { 
                     "assert": false,
                     "buffer": false,
+                    "canvas": false,
                     "child_process": false,
                     "cluster": false,
                     "crypto": false,
@@ -86,6 +96,7 @@ exports.build = (name, type) => {
                     "events": false,
                     "fs": false,
                     "http": false,
+                    "http2": false,
                     "https": false,
                     "net": false,
                     "os": false,
@@ -180,21 +191,7 @@ exports.build = (name, type) => {
                     // AND `<style>` blocks in `.vue` files
                     {
                         test: /\.(css|scss)$/,
-                        use: [
-                            'vue-style-loader',
-                            'css-loader',
-                            {
-                                loader: 'postcss-loader',
-                                options: {
-                                    postcssOptions: {
-                                        plugins: function () {
-                                            return [autoprefixer];
-                                        },
-                                    },
-                                },
-                            },
-                            'sass-loader',
-                        ],
+                        use: createCssLoaders(),
                     },
                     {
                         test: /\.(png|jpg|gif|svg)$/i,
@@ -232,12 +229,14 @@ exports.build = (name, type) => {
                 console.error(err, stats);
                 console.log('\x1b[41mError : build failed.\x1b[0m');
                 console.log('\x1b[41mMake sur that package.json version is in correct format (ex: 1.0.4)\x1b[0m');
+                markBuildFailed();
                 return;
             }
 
             const info = stats.toJson();
 
             if (stats.hasErrors()) {
+                markBuildFailed();
                 return this.console.error(info.errors);
             }
 
@@ -250,6 +249,7 @@ exports.build = (name, type) => {
                 stats.stats[0].compilation.errors.length
             ) {
                 console.log(stats.stats[0].compilation.errors);
+                markBuildFailed();
                 return false;
             }
         });
