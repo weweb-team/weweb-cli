@@ -39,13 +39,13 @@ test('moves Vue static and bound style declarations behind the host runtime help
 
     assert.match(
         result,
-        /<div class="root ww-coded-inline-style" :style="\$wwCodedStyleEnvelope\.inlineStyle\(&quot;color:red; width: calc\(100% - 2px\)&quot;\)"/
+        /<div class="root" v-bind="\$wwCodedStyleEnvelope\.inlineBindings\(&quot;color:red; width: calc\(100% - 2px\)&quot;\)"/
     );
     assert.match(
         result,
-        /<span :class="classes" :style="\$wwCodedStyleEnvelope\.inlineStyle\(\[baseStyle, \{ backgroundColor: color \}\]\)" class="ww-coded-inline-style"/
+        /<span :class="classes" v-bind="\$wwCodedStyleEnvelope\.inlineBindings\(\[baseStyle, \{ backgroundColor: color \}\]\)"/
     );
-    assert.match(result, /:style="\$wwCodedStyleEnvelope\.inlineStyle\(styleObject\)"/);
+    assert.match(result, /v-bind="\$wwCodedStyleEnvelope\.inlineBindings\(styleObject\)"/);
     assert.match(result, /const untouched = '<div style="color:blue">'/);
     assert.equal(transformVueTemplateInlineStyles(result), result);
 });

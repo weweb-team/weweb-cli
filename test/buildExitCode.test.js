@@ -81,7 +81,7 @@ test('build exits successfully after producing the component artifact', (t) => {
     assert.match(artifact, /wwCodedStyleEnvelope/);
     assert.match(artifact, /WW_CODED_STYLE_ENVELOPE_RUNTIME_REQUIRED/);
     assert.match(artifact, /\.html\(/);
-    assert.match(artifact, /\.inlineStyle\(/);
+    assert.match(artifact, /\.inlineBindings\(/);
     assert.match(artifact, /ww-coded-inline-style/);
 });
 

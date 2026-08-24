@@ -2,7 +2,6 @@ const path = require('path');
 
 const adapterPath = path.resolve(__dirname, '../runtime/codedComponentStyleEnvelopeAdapter.js');
 const inlineStyleLoaderPath = path.resolve(__dirname, '../loaders/codedComponentInlineStyleLoader.js');
-const INLINE_STYLE_CLASS = 'ww-coded-inline-style';
 const TEMPLATE_ENVELOPE = '$wwCodedStyleEnvelope';
 
 function withStyleEnvelopeAdapterEntry(entry) {
@@ -69,30 +68,11 @@ function transformVueTemplateInlineStyles(source) {
             const expression = style.name === 'style'
                 ? JSON.stringify(decodeHtmlAttribute(style.value))
                 : decodeHtmlAttribute(style.value);
-            if (!expression.includes(`${TEMPLATE_ENVELOPE}.inlineStyle(`)) {
+            if (!expression.includes(`${TEMPLATE_ENVELOPE}.inlineBindings(`)) {
                 replacements.push({
                     start: open.start + style.start,
                     end: open.start + style.end,
-                    value: `:style="${escapeHtmlAttribute(`${TEMPLATE_ENVELOPE}.inlineStyle(${expression})`)}"`,
-                });
-            }
-
-            const classAttribute = attributes.find(attribute => attribute.name === 'class' && attribute.hasValue);
-            if (classAttribute) {
-                const classValue = decodeHtmlAttribute(classAttribute.value);
-                if (!classValue.split(/\s+/).includes(INLINE_STYLE_CLASS)) {
-                    replacements.push({
-                        start: open.start + classAttribute.valueStart,
-                        end: open.start + classAttribute.valueEnd,
-                        value: escapeHtmlAttribute(`${classValue} ${INLINE_STYLE_CLASS}`.trim()),
-                    });
-                }
-            } else {
-                const insertion = tag.search(/\/?>\s*$/);
-                replacements.push({
-                    start: open.start + insertion,
-                    end: open.start + insertion,
-                    value: ` class="${INLINE_STYLE_CLASS}"`,
+                    value: `v-bind="${escapeHtmlAttribute(`${TEMPLATE_ENVELOPE}.inlineBindings(${expression})`)}"`,
                 });
             }
         }
