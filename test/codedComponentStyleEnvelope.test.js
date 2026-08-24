@@ -45,8 +45,29 @@ test('preserves spread-binding order while moving every style declaration', () =
 
     assert.match(
         result,
-        /_mergeProps\(_ctx\.\$wwCodedStyleEnvelope\.inlineBindings\(\{"color":"red"\}\), _ctx\.attrs, _ctx\.\$wwCodedStyleEnvelope\.inlineBindings\(_ctx\.dynamicStyle\)\)/
+        /_mergeProps\(_ctx\.\$wwCodedStyleEnvelope\.inlineBindings\(\{"color":"red"\}\), _ctx\.\$wwCodedStyleEnvelope\.inlineProps\(_ctx\.attrs\), _ctx\.\$wwCodedStyleEnvelope\.inlineBindings\(_ctx\.dynamicStyle\)\)/
     );
+});
+
+test('moves style declarations from native Vue v-bind objects behind layered variables', () => {
+    const result = compileTemplate(
+        '<div v-bind="attrs"></div><span v-bind="{ style: dynamicStyle, class: classes }"></span>'
+    );
+
+    assert.match(result, /_ctx\.\$wwCodedStyleEnvelope\.inlineProps\(_ctx\.attrs\)/);
+    assert.match(
+        result,
+        /_ctx\.\$wwCodedStyleEnvelope\.inlineProps\(\{ style: _ctx\.dynamicStyle, class: _ctx\.classes \}\)/
+    );
+});
+
+test('preserves style props on Vue components while transforming native elements', () => {
+    const result = compileTemplate('<Widget :style="configuration" v-bind="props"/><div :style="configuration"/>');
+
+    assert.match(result, /style: _ctx\.configuration/);
+    assert.match(result, /_ctx\.props/);
+    assert.equal((result.match(/\$wwCodedStyleEnvelope\.inlineBindings\(/g) || []).length, 1);
+    assert.doesNotMatch(result, /inlineProps\(_ctx\.props\)/);
 });
 
 test('supports Vue same-name style shorthand', () => {

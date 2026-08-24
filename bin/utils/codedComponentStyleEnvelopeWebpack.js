@@ -24,7 +24,7 @@ function createStyleEnvelopeProvidePlugin(webpack) {
 }
 
 function transformVueTemplateNode(node) {
-    if (node.type !== 1) return;
+    if (node.type !== 1 || node.tagType !== 0) return;
 
     for (const property of node.props || []) {
         if (property.type !== 7) continue;
@@ -32,7 +32,12 @@ function transformVueTemplateNode(node) {
             property.exp = createRuntimeExpression('html', property.exp);
             continue;
         }
-        if (property.name !== 'bind' || !isStaticStyleArgument(property.arg)) continue;
+        if (property.name !== 'bind') continue;
+        if (!property.arg && property.exp) {
+            property.exp = createRuntimeExpression('inlineProps', property.exp);
+            continue;
+        }
+        if (!isStaticStyleArgument(property.arg)) continue;
 
         property.arg = undefined;
         property.exp = createRuntimeExpression('inlineBindings', property.exp || createContextExpression('style'));
