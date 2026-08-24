@@ -16,7 +16,11 @@ function wewebCssLayerPlugin(options = {}) {
                     return;
                 }
                 if (isTopLevelImportBoundary(node)) return;
-                nodesToWrap.push(node);
+                if (isExactTargetLayerStatement(node, layerName)) return;
+                nodesToWrap.push({
+                    node,
+                    flatten: isExactTargetLayerBlock(node, layerName),
+                });
             });
 
             if (!nodesToWrap.length) return;
@@ -26,7 +30,13 @@ function wewebCssLayerPlugin(options = {}) {
                 params: layerName,
             });
 
-            for (const node of nodesToWrap) {
+            for (const { node, flatten } of nodesToWrap) {
+                if (flatten) {
+                    for (const child of [...node.nodes])
+                        layerRule.append(child);
+                    node.remove();
+                    continue;
+                }
                 node.remove();
                 layerRule.append(node);
             }
@@ -49,7 +59,8 @@ function shouldProcess(filePath, include) {
 
     if (include instanceof RegExp) return include.test(filePath);
     if (typeof include === 'function') return include(filePath);
-    if (Array.isArray(include)) return include.some(entry => shouldProcess(filePath, entry));
+    if (Array.isArray(include))
+        return include.some(entry => shouldProcess(filePath, entry));
 
     return false;
 }
@@ -62,9 +73,11 @@ function namespaceImportLayer(node, layerName, postcss) {
         params.splice(1, 0, `layer(${layerName})`);
     } else {
         const importedLayer = getImportedLayerName(params[layerIndex]);
-        params[layerIndex] = importedLayer?.startsWith(`${layerName}.`) || importedLayer === layerName
-            ? `layer(${importedLayer})`
-            : `layer(${importedLayer ? `${layerName}.${importedLayer}` : layerName})`;
+        params[layerIndex] =
+            importedLayer?.startsWith(`${layerName}.`) ||
+            importedLayer === layerName
+                ? `layer(${importedLayer})`
+                : `layer(${importedLayer ? `${layerName}.${importedLayer}` : layerName})`;
     }
 
     node.params = params.join(' ');
@@ -80,7 +93,26 @@ function isTopLevelImport(node) {
 }
 
 function isTopLevelImportBoundary(node) {
-    return node.type === 'atrule' && ['charset', 'import'].includes(node.name.toLowerCase());
+    return (
+        node.type === 'atrule' &&
+        ['charset', 'import'].includes(node.name.toLowerCase())
+    );
+}
+
+function isExactTargetLayerStatement(node, layerName) {
+    return isExactTargetLayer(node, layerName) && !node.nodes;
+}
+
+function isExactTargetLayerBlock(node, layerName) {
+    return isExactTargetLayer(node, layerName) && Array.isArray(node.nodes);
+}
+
+function isExactTargetLayer(node, layerName) {
+    return (
+        node.type === 'atrule' &&
+        node.name.toLowerCase() === 'layer' &&
+        node.params.trim() === layerName
+    );
 }
 
 function getLastTopLevelImportBoundary(root) {
