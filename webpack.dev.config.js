@@ -4,6 +4,11 @@ const { VueLoaderPlugin } = require("vue-loader");
 const fs = require("fs");
 const webpack = require("webpack");
 const createCssLoaders = require("./bin/utils/createCssLoaders");
+const {
+    createStyleEnvelopeProvidePlugin,
+    createVueLoader,
+    withStyleEnvelopeEntry,
+} = require("./bin/utils/codedComponentStyleEnvelopeWebpack");
 
 const wewebClientVersion = "1.0.40";
 
@@ -47,7 +52,7 @@ module.exports = function () {
     const configManager = {
         name: "manager",
         entry: {
-            manager: "./assets/index.js",
+            manager: withStyleEnvelopeEntry("./assets/index.js"),
         },
         mode: "development",
         externals: {
@@ -107,7 +112,7 @@ module.exports = function () {
                 {
                     test: /\.vue$/,
                     use: [
-                        "vue-loader",
+                        createVueLoader(),
                         {
                             loader: "weweb-strip-block",
                             options: {
@@ -170,6 +175,7 @@ module.exports = function () {
             filename: "[name].js",
         },
         plugins: [
+            createStyleEnvelopeProvidePlugin(webpack),
             new webpack.DefinePlugin({
                 __VUE_OPTIONS_API__: "true",
                 __VUE_PROD_DEVTOOLS__: "false",

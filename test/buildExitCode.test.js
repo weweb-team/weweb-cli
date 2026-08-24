@@ -69,12 +69,18 @@ test('build exits with an error when webpack rejects the component', (t) => {
 
 test('build exits successfully after producing the component artifact', (t) => {
     const root = createComponentFixture(t);
-    fs.writeFileSync(path.join(root, 'src/wwElement.vue'), '<template><div>Valid</div></template>');
+    fs.writeFileSync(
+        path.join(root, 'src/wwElement.vue'),
+        '<template><div v-html="source"></div></template><script>export default { data: () => ({ source: "<style>.child{color:red}</style>" }) }</script>'
+    );
 
     const result = runBuild(root);
 
     assert.equal(result.status, 0, result.stdout + result.stderr);
-    assert.equal(fs.existsSync(path.join(root, 'dist/manager.js')), true);
+    const artifact = fs.readFileSync(path.join(root, 'dist/manager.js'), 'utf8');
+    assert.match(artifact, /__wwCodedStyleEnvelope/);
+    assert.match(artifact, /WW_STYLE_ENVELOPE_PARSE_FAILED/);
+    assert.match(artifact, /\.html\(/);
 });
 
 test('build ignores optional server-only modules in browser component dependencies', (t) => {
