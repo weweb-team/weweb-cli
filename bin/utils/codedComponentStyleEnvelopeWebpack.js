@@ -65,21 +65,30 @@ function transformVueTemplateInlineStyles(source) {
         if (!open) break;
         const tag = source.slice(open.start, open.end);
         const attributes = parseAttributeTokens(tag);
-        const style = attributes.find(attribute => ['style', ':style', 'v-bind:style'].includes(attribute.name));
-        if (style?.hasValue) {
-            const expression = style.name === 'style'
-                ? JSON.stringify(decodeHtmlAttribute(style.value))
-                : decodeHtmlAttribute(style.value);
-            if (!expression.includes(`${TEMPLATE_ENVELOPE}.inlineBindings(`)) {
+        const styles = attributes.filter(
+            attribute => attribute.hasValue && ['style', ':style', 'v-bind:style'].includes(attribute.name)
+        );
+        const expressions = styles.map(style =>
+            style.name === 'style' ? JSON.stringify(decodeHtmlAttribute(style.value)) : decodeHtmlAttribute(style.value)
+        );
+        if (expressions.length) {
+            const expression = expressions.length === 1 ? expressions[0] : `[${expressions.join(',')}]`;
+            replacements.push({
+                start: open.start + styles[0].start,
+                end: open.start + styles[0].end,
+                value: `v-bind="${escapeHtmlAttribute(`${TEMPLATE_ENVELOPE}.inlineBindings(${expression})`)}"`,
+            });
+            for (const style of styles.slice(1)) {
                 replacements.push({
                     start: open.start + style.start,
                     end: open.start + style.end,
-                    value: `v-bind="${escapeHtmlAttribute(`${TEMPLATE_ENVELOPE}.inlineBindings(${expression})`)}"`,
+                    value: '',
                 });
             }
         }
         cursor = open.end;
-        if ((open.name === 'style' || open.name === 'script') && !open.selfClosing) {
+        if (isRawTextElement(open.name) && !open.selfClosing) {
+            if (open.name === 'plaintext') break;
             const close = source.toLowerCase().indexOf(`</${open.name}`, cursor);
             if (close === -1) break;
             const closeEnd = source.indexOf('>', close);
@@ -87,6 +96,10 @@ function transformVueTemplateInlineStyles(source) {
         }
     }
     return applyReplacements(source, replacements);
+}
+
+function isRawTextElement(name) {
+    return ['style', 'script', 'textarea', 'title', 'xmp', 'iframe', 'noembed', 'noframes', 'plaintext'].includes(name);
 }
 
 function findNextOpeningTag(source, from, limit) {

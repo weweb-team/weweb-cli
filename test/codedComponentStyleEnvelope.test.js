@@ -50,6 +50,32 @@ test('moves Vue static and bound style declarations behind the host runtime help
     assert.equal(transformVueTemplateInlineStyles(result), result);
 });
 
+test('moves every style declaration on the same Vue element behind the host runtime helper', () => {
+    const source = '<template><div style="color:red" :style="dynamicStyle"></div></template>';
+
+    const result = transformVueTemplateInlineStyles(source);
+
+    assert.equal((result.match(/\$wwCodedStyleEnvelope\.inlineBindings\(/g) || []).length, 1);
+    assert.doesNotMatch(result, /:style=/);
+    assert.match(result, /inlineBindings\(\[&quot;color:red&quot;,dynamicStyle\]\)/);
+});
+
+test('does not rewrite markup-like text inside Vue raw-text elements', () => {
+    const source = [
+        '<template>',
+        '<textarea><span style="color:red"></span></textarea>',
+        '<title><span :style="dynamicStyle"></span></title>',
+        '<div style="color:blue"></div>',
+        '</template>',
+    ].join('');
+
+    const result = transformVueTemplateInlineStyles(source);
+
+    assert.match(result, /<textarea><span style="color:red"><\/span><\/textarea>/);
+    assert.match(result, /<title><span :style="dynamicStyle"><\/span><\/title>/);
+    assert.match(result, /<div v-bind="\$wwCodedStyleEnvelope\.inlineBindings/);
+});
+
 test('forwards CSSOM globals to wwLib without embedding the runtime implementation', async t => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'weweb-style-envelope-webpack-'));
     t.after(() => fs.rmSync(root, { recursive: true, force: true }));
@@ -84,7 +110,10 @@ test('the webpack adapter resolves the current host helper lazily', t => {
     const hostDocument = { head: {} };
     const HostCSSStyleSheet = function HostCSSStyleSheet() {};
     globalThis.wwLib = {
-        wwCodedStyleEnvelope: { document: hostDocument, CSSStyleSheet: HostCSSStyleSheet },
+        wwCodedStyleEnvelope: {
+            document: hostDocument,
+            CSSStyleSheet: HostCSSStyleSheet,
+        },
     };
     delete require.cache[adapterPath];
 
