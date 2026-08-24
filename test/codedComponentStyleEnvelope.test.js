@@ -56,7 +56,7 @@ test('forwards CSSOM globals to wwLib without embedding the runtime implementati
     const entry = path.join(root, 'entry.js');
     fs.writeFileSync(
         entry,
-        'export const create = () => [document.createElement("style"), new CSSStyleSheet(), window.document.head];\n'
+        'export const create = () => [document.createElement("style"), new CSSStyleSheet(), window.document.head, window.CSSStyleSheet, globalThis.CSSStyleSheet];\n'
     );
 
     const stats = await runWebpack({
@@ -71,6 +71,8 @@ test('forwards CSSOM globals to wwLib without embedding the runtime implementati
     assert.ok(modules.some(name => name.includes('codedComponentStyleEnvelopeAdapter.js')));
     assert.match(artifact, /wwCodedStyleEnvelope/);
     assert.doesNotMatch(artifact, /createCodedComponentStyleEnvelope/);
+    assert.doesNotMatch(artifact, /window\.CSSStyleSheet/);
+    assert.doesNotMatch(artifact, /globalThis\.CSSStyleSheet/);
 });
 
 test('the webpack adapter resolves the current host helper lazily', t => {

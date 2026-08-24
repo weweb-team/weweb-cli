@@ -35,7 +35,9 @@ test('build uses an unambiguous root Vue file as a legacy component entry', (t) 
 
     assert.equal(result.status, 0, result.stdout + result.stderr);
     assert.match(result.stdout, /Component Path : "\.\/legacy\.vue"/);
-    assert.equal(fs.existsSync(path.join(root, 'dist/manager.js')), true);
+    const artifact = fs.readFileSync(path.join(root, 'dist/manager.js'), 'utf8');
+    assert.match(artifact, /WW_CODED_STYLE_ENVELOPE_INLINE_BINDINGS_REQUIRED/);
+    assert.doesNotMatch(artifact, /\.inlineBindings\(/);
 });
 
 test('build rejects ambiguous root Vue component entries', (t) => {
@@ -80,6 +82,7 @@ test('build exits successfully after producing the component artifact', (t) => {
     const artifact = fs.readFileSync(path.join(root, 'dist/manager.js'), 'utf8');
     assert.match(artifact, /wwCodedStyleEnvelope/);
     assert.match(artifact, /WW_CODED_STYLE_ENVELOPE_RUNTIME_REQUIRED/);
+    assert.match(artifact, /WW_CODED_STYLE_ENVELOPE_INLINE_BINDINGS_REQUIRED/);
     assert.match(artifact, /\.html\(/);
     assert.match(artifact, /\.inlineBindings\(/);
     assert.match(artifact, /ww-coded-inline-style/);

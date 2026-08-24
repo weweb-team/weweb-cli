@@ -19,6 +19,8 @@ function createStyleEnvelopeProvidePlugin(webpack) {
         CSSStyleSheet: [adapterPath, 'CSSStyleSheet'],
         'window.document': [adapterPath, 'document'],
         'globalThis.document': [adapterPath, 'document'],
+        'window.CSSStyleSheet': [adapterPath, 'CSSStyleSheet'],
+        'globalThis.CSSStyleSheet': [adapterPath, 'CSSStyleSheet'],
     });
 }
 
