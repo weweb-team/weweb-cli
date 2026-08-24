@@ -71,7 +71,7 @@ test('build exits successfully after producing the component artifact', (t) => {
     const root = createComponentFixture(t);
     fs.writeFileSync(
         path.join(root, 'src/wwElement.vue'),
-        '<template><div v-html="source"></div></template><script>export default { data: () => ({ source: "<style>.child{color:red}</style>" }) }</script>'
+        '<template><div><div v-html="source" style="color:red"></div><span :style="dynamicStyle"></span></div></template><script>export default { data: () => ({ source: "<style>.child{color:red}</style>", dynamicStyle: { width: "20px" } }) }</script>'
     );
 
     const result = runBuild(root);
@@ -81,6 +81,8 @@ test('build exits successfully after producing the component artifact', (t) => {
     assert.match(artifact, /__wwCodedStyleEnvelope/);
     assert.match(artifact, /WW_STYLE_ENVELOPE_PARSE_FAILED/);
     assert.match(artifact, /\.html\(/);
+    assert.match(artifact, /\.inlineStyle\(/);
+    assert.match(artifact, /ww-coded-inline-style/);
 });
 
 test('build ignores optional server-only modules in browser component dependencies', (t) => {

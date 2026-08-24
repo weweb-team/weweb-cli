@@ -8,6 +8,7 @@ const {
     createStyleEnvelopeProvidePlugin,
     runtimePath,
     transformVHtml,
+    transformVueTemplateInlineStyles,
     withStyleEnvelopeEntry,
 } = require('../bin/utils/codedComponentStyleEnvelopeWebpack');
 
@@ -67,7 +68,8 @@ test('transforms style tags and simple stylesheet links in v-html', async () => 
         '<div style="color:red"><style>.child{color:blue}</style><link rel="stylesheet" href="https://cdn.test/theme.css" media="screen"><link rel="stylesheet" href="secure.css" integrity="sha256-test"><script src="https://cdn.test/library.js"></script></div>'
     );
 
-    assert.match(result, /style="color:red"/);
+    assert.match(result, /class="ww-coded-inline-style"/);
+    assert.match(result, /style="--ww-inline-[^"]+:red"/);
     assert.match(result, /<style>@layer ww-style-component \{\.child\{color:blue\}\}<\/style>/);
     assert.match(
         result,
@@ -81,7 +83,7 @@ test('transforms style tags and simple stylesheet links in v-html', async () => 
     );
 });
 
-test('wraps Vue v-html expressions without changing inline style attributes', () => {
+test('wraps Vue v-html expressions', () => {
     const node = {
         type: 1,
         props: [
@@ -92,8 +94,58 @@ test('wraps Vue v-html expressions without changing inline style attributes', ()
 
     transformVHtml(node);
 
-    assert.equal(node.props[0].exp.content, 'globalThis.__wwCodedStyleEnvelope.html(source)');
+    assert.equal(node.props[0].exp.content, 'Object[Symbol.for("ww-coded-style-envelope")].html(source)');
     assert.equal(node.props[1].value.content, 'color:red');
+});
+
+test('moves Vue static and bound style declarations behind layered variables', () => {
+    const source = `<template>
+        <div class="root" style="color:red; width: calc(100% - 2px)"></div>
+        <span :class="classes" :style="[baseStyle, { backgroundColor: color }]"></span>
+        <template v-if="ok"><p v-bind:style="styleObject">Text</p></template>
+    </template>
+    <script setup>const untouched = '<div style="color:blue">'</script>`;
+
+    const result = transformVueTemplateInlineStyles(source);
+
+    assert.match(
+        result,
+        /<div class="root ww-coded-inline-style" :style="Object\[Symbol\.for\(&quot;ww-coded-style-envelope&quot;\)\]\.inlineStyle\(&quot;color:red; width: calc\(100% - 2px\)&quot;\)"/
+    );
+    assert.match(
+        result,
+        /<span :class="classes" :style="Object\[Symbol\.for\(&quot;ww-coded-style-envelope&quot;\)\]\.inlineStyle\(\[baseStyle, \{ backgroundColor: color \}\]\)" class="ww-coded-inline-style"/
+    );
+    assert.match(result, /:style="Object\[Symbol\.for\(&quot;ww-coded-style-envelope&quot;\)\]\.inlineStyle\(styleObject\)"/);
+    assert.match(result, /const untouched = '<div style="color:blue">'/);
+    assert.equal(transformVueTemplateInlineStyles(result), result);
+});
+
+test('normalizes Vue style strings, objects, arrays, fallbacks, removals, and important values', async () => {
+    const { createCodedComponentStyleEnvelope } = await import(runtimePath);
+    const appended = [];
+    const document = {
+        head: { appendChild: node => appended.push(node) },
+        createElement: () => ({ setAttribute(name) { this[name] = ''; } }),
+        querySelector: () => null,
+    };
+    const envelope = createCodedComponentStyleEnvelope({ globalObject: {}, document, report() {} });
+
+    const result = envelope.inlineStyle([
+        'color:blue; --accent: rgb(1, 2, 3)',
+        { color: 'red !important', backgroundColor: ['red', 'linear-gradient(black, white)'], width: null },
+    ]);
+
+    assert.equal(appended.length, 1);
+    assert.equal(Object.values(result).includes('red'), true);
+    assert.equal(Object.values(result).includes('rgb(1, 2, 3)'), true);
+    assert.equal(Object.values(result).includes('linear-gradient(black, white)'), true);
+    assert.equal(Object.values(result).includes(null), false);
+    assert.match(appended[0].textContent, /@property --ww-inline-[^{]+\{syntax:"\*";inherits:false;\}/);
+    assert.match(appended[0].textContent, /@layer ww-style-component \{\.ww-coded-inline-style\{/);
+    assert.match(appended[0].textContent, /color:var\(--ww-inline-[^)]+\)!important;/);
+    assert.match(appended[0].textContent, /background-color:var\(--ww-inline-[^)]+\);/);
+    assert.match(appended[0].textContent, /--accent:var\(--ww-inline-[^)]+\);/);
 });
 
 test('injects the runtime before the component entry and rewrites free browser globals', async t => {

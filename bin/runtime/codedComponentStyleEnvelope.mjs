@@ -1,5 +1,7 @@
 // This browser runtime is also shipped by weweb-editor for extracted Vite fronts. Keep both copies identical.
 const DEFAULT_LAYER = 'ww-style-component';
+const INLINE_STYLE_CLASS = 'ww-coded-inline-style';
+const TEMPLATE_ENVELOPE_SYMBOL = Symbol.for('ww-coded-style-envelope');
 
 export const STYLE_ENVELOPE_DIAGNOSTICS = Object.freeze({
     PARSE_FAILED: 'WW_STYLE_ENVELOPE_PARSE_FAILED',
@@ -17,6 +19,9 @@ export function createCodedComponentStyleEnvelope(options = {}) {
     const patchedSheets = new WeakSet();
     const decoratedStyles = new WeakSet();
     const containerProxies = new WeakMap();
+    const inlineDeclarations = new Map();
+    const inlineProperties = new Set();
+    let inlineRegistryStyle;
 
     const report = (code, details = {}) => {
         const key = `${code}:${details.reason || ''}`;
@@ -60,6 +65,55 @@ export function createCodedComponentStyleEnvelope(options = {}) {
             output.push(`@layer ${layerName} {${rulesToLayer.join('')}}`);
         }
         return output.join('');
+    };
+
+    const renderInlineStyleRegistry = () => {
+        if (!nativeDocument?.head || !inlineDeclarations.size) return;
+        if (!inlineRegistryStyle) {
+            inlineRegistryStyle = nativeDocument.createElement('style');
+            inlineRegistryStyle.setAttribute('data-ww-inline-style-envelope', '');
+            const nonce = discoverNonce(nativeDocument);
+            if (nonce) inlineRegistryStyle.nonce = nonce;
+            nativeDocument.head.appendChild(inlineRegistryStyle);
+        }
+        const registrations = Array.from(
+            inlineProperties,
+            property => `@property ${property}{syntax:"*";inherits:false;}`
+        ).join('');
+        const declarations = Array.from(inlineDeclarations.values()).join('');
+        inlineRegistryStyle.textContent = `${registrations}@layer ${layerName} {.${INLINE_STYLE_CLASS}{${declarations}}}`;
+    };
+
+    const inlineStyle = value => {
+        const normalized = normalizeStyleRecord(value);
+        if (!normalized) {
+            report(STYLE_ENVELOPE_DIAGNOSTICS.PARSE_FAILED, { reason: 'unsupported-inline-style' });
+            return value;
+        }
+
+        const output = {};
+        for (const [rawProperty, rawValues] of normalized) {
+            const property = normalizeStyleProperty(rawProperty);
+            if (!isSafeStyleProperty(property)) {
+                report(STYLE_ENVELOPE_DIAGNOSTICS.PARSE_FAILED, { reason: 'unsupported-inline-property' });
+                output[rawProperty] = rawValues.at(-1);
+                continue;
+            }
+            for (let index = 0; index < rawValues.length; index += 1) {
+                const parsed = extractImportant(rawValues[index]);
+                if (parsed.value == null) continue;
+                const variable = getInlineStyleVariable(property, parsed.important, index);
+                output[variable] = parsed.value;
+                inlineProperties.add(variable);
+                const key = `${property}\u0000${parsed.important}\u0000${index}`;
+                inlineDeclarations.set(
+                    key,
+                    `${property}:var(${variable})${parsed.important ? '!important' : ''};`
+                );
+            }
+        }
+        renderInlineStyleRegistry();
+        return output;
     };
 
     const patchSheet = sheet => {
@@ -237,6 +291,9 @@ export function createCodedComponentStyleEnvelope(options = {}) {
 
     const documentProxy = nativeDocument
         ? new Proxy(nativeDocument, {
+              set(target, property, value) {
+                  return Reflect.set(target, property, value, target);
+              },
               get(target, property) {
                   if (property === 'head' || property === 'body') return proxyContainer(target[property]);
                   if (property === 'createElement') {
@@ -273,14 +330,279 @@ export function createCodedComponentStyleEnvelope(options = {}) {
         StyleSheetConstructor.prototype = NativeCSSStyleSheet.prototype;
     }
 
-    const html = value => transformHtml(value, { layerCss, layerName, report });
+    const html = value => transformHtmlInlineStyles(transformHtml(value, { layerCss, layerName, report }), inlineStyle);
 
     return {
         CSSStyleSheet: StyleSheetConstructor,
         document: documentProxy,
         html,
+        inlineStyle,
         layerCss,
     };
+}
+
+function normalizeStyleRecord(value) {
+    const declarations = new Map();
+    if (value == null || value === false) return declarations;
+
+    const merge = entry => {
+        if (entry == null || entry === false) return true;
+        if (Array.isArray(entry)) {
+            for (const item of entry) {
+                if (!merge(item)) return false;
+            }
+            return true;
+        }
+        if (typeof entry === 'string') {
+            const parsed = splitStyleDeclarations(entry);
+            if (!parsed) return false;
+            for (const [property, styleValue] of parsed) declarations.set(property, [styleValue]);
+            return true;
+        }
+        if (typeof entry !== 'object') return false;
+        for (const [property, styleValue] of Object.entries(entry)) {
+            if (Array.isArray(styleValue)) {
+                declarations.set(property, styleValue);
+            } else {
+                declarations.set(property, [styleValue]);
+            }
+        }
+        return true;
+    };
+
+    return merge(value) ? declarations : null;
+}
+
+function splitStyleDeclarations(value) {
+    const declarations = [];
+    let start = 0;
+    let parentheses = 0;
+    let quote = null;
+    let comment = false;
+
+    for (let index = 0; index <= value.length; index += 1) {
+        const character = value[index];
+        const next = value[index + 1];
+        if (comment) {
+            if (character === '*' && next === '/') {
+                comment = false;
+                index += 1;
+            }
+            continue;
+        }
+        if (quote) {
+            if (character === '\\') index += 1;
+            else if (character === quote) quote = null;
+            continue;
+        }
+        if (character === '/' && next === '*') {
+            comment = true;
+            index += 1;
+        } else if (character === '"' || character === "'") {
+            quote = character;
+        } else if (character === '(') {
+            parentheses += 1;
+        } else if (character === ')') {
+            parentheses -= 1;
+        } else if ((!parentheses && character === ';') || index === value.length) {
+            const declaration = value.slice(start, index).trim();
+            start = index + 1;
+            if (!declaration) continue;
+            const colon = findDeclarationColon(declaration);
+            if (colon === -1) return null;
+            declarations.push([declaration.slice(0, colon).trim(), declaration.slice(colon + 1).trim()]);
+        }
+        if (parentheses < 0) return null;
+    }
+    return comment || quote || parentheses ? null : declarations;
+}
+
+function findDeclarationColon(value) {
+    let parentheses = 0;
+    let quote = null;
+    for (let index = 0; index < value.length; index += 1) {
+        const character = value[index];
+        if (quote) {
+            if (character === '\\') index += 1;
+            else if (character === quote) quote = null;
+        } else if (character === '"' || character === "'") {
+            quote = character;
+        } else if (character === '(') {
+            parentheses += 1;
+        } else if (character === ')') {
+            parentheses -= 1;
+        } else if (!parentheses && character === ':') {
+            return index;
+        }
+    }
+    return -1;
+}
+
+function normalizeStyleProperty(property) {
+    const value = String(property).trim();
+    if (value.startsWith('--')) return value;
+    if (value === 'cssFloat') return 'float';
+    return value
+        .replace(/^ms-/, '-ms-')
+        .replace(/^(Webkit|Moz|O)(?=[A-Z])/, match => `-${match.toLowerCase()}-`)
+        .replace(/[A-Z]/g, character => `-${character.toLowerCase()}`);
+}
+
+function isSafeStyleProperty(property) {
+    return /^--[a-zA-Z0-9_-]+$/.test(property) || /^-?[a-zA-Z][a-zA-Z0-9-]*$/.test(property);
+}
+
+function extractImportant(value) {
+    if (value == null || value === false) return { value: null, important: false };
+    const normalized = String(value);
+    const match = normalized.match(/\s*!important\s*$/i);
+    return {
+        value: match ? normalized.slice(0, match.index).trimEnd() : normalized,
+        important: Boolean(match),
+    };
+}
+
+function getInlineStyleVariable(property, important, index) {
+    const encoded = Array.from(`${property}|${important ? 1 : 0}|${index}`, character =>
+        character.codePointAt(0).toString(36)
+    ).join('-');
+    return `--ww-inline-${encoded}`;
+}
+
+function transformHtmlInlineStyles(value, inlineStyle) {
+    if (typeof value !== 'string' || !value) return value;
+
+    let output = '';
+    let cursor = 0;
+    while (cursor < value.length) {
+        const open = findNextOpeningTag(value, cursor);
+        if (!open) {
+            output += value.slice(cursor);
+            break;
+        }
+        output += value.slice(cursor, open.start);
+        output += transformInlineStyleTag(value.slice(open.start, open.end), inlineStyle);
+        cursor = open.end;
+
+        if ((open.name === 'style' || open.name === 'script') && !open.selfClosing) {
+            const close = findClosingTag(value, open.name, cursor);
+            if (!close) {
+                output += value.slice(cursor);
+                break;
+            }
+            output += value.slice(cursor, close.end);
+            cursor = close.end;
+        }
+    }
+    return output;
+}
+
+function findNextOpeningTag(html, from) {
+    let cursor = from;
+    while (cursor < html.length) {
+        const start = html.indexOf('<', cursor);
+        if (start === -1) return null;
+        if (html.startsWith('<!--', start)) {
+            const commentEnd = html.indexOf('-->', start + 4);
+            cursor = commentEnd === -1 ? html.length : commentEnd + 3;
+            continue;
+        }
+        const match = html.slice(start).match(/^<([a-zA-Z][\w:-]*)\b/);
+        if (!match) {
+            cursor = start + 1;
+            continue;
+        }
+        const end = findTagEnd(html, start + match[0].length);
+        if (end === -1) return null;
+        return {
+            start,
+            end: end + 1,
+            name: match[1].toLowerCase(),
+            selfClosing: /\/\s*>$/.test(html.slice(start, end + 1)),
+        };
+    }
+    return null;
+}
+
+function transformInlineStyleTag(tag, inlineStyle) {
+    const attributes = parseHtmlAttributeTokens(tag);
+    const styleAttribute = attributes.find(attribute => attribute.name.toLowerCase() === 'style' && attribute.hasValue);
+    if (!styleAttribute) return tag;
+
+    const transformed = inlineStyle(decodeHtmlAttribute(styleAttribute.value));
+    if (!transformed || typeof transformed !== 'object' || Array.isArray(transformed)) return tag;
+
+    const serializedStyle = Object.entries(transformed)
+        .filter(([, value]) => value != null && value !== false)
+        .map(([property, value]) => `${property}:${value}`)
+        .join(';');
+    const replacements = [
+        { start: styleAttribute.valueStart, end: styleAttribute.valueEnd, value: escapeHtmlAttribute(serializedStyle) },
+    ];
+    const classAttribute = attributes.find(attribute => attribute.name.toLowerCase() === 'class' && attribute.hasValue);
+    if (classAttribute) {
+        const classes = decodeHtmlAttribute(classAttribute.value).split(/\s+/);
+        if (!classes.includes(INLINE_STYLE_CLASS)) {
+            replacements.push({
+                start: classAttribute.valueStart,
+                end: classAttribute.valueEnd,
+                value: escapeHtmlAttribute(`${decodeHtmlAttribute(classAttribute.value)} ${INLINE_STYLE_CLASS}`.trim()),
+            });
+        }
+    } else {
+        const insertion = tag.search(/\/?>\s*$/);
+        replacements.push({ start: insertion, end: insertion, value: ` class="${INLINE_STYLE_CLASS}"` });
+    }
+    return applyStringReplacements(tag, replacements);
+}
+
+function parseHtmlAttributeTokens(tag) {
+    const attributes = [];
+    let cursor = tag.indexOf(' ');
+    if (cursor === -1) return attributes;
+
+    while (cursor < tag.length) {
+        while (/\s/.test(tag[cursor])) cursor += 1;
+        if (tag[cursor] === '>' || tag[cursor] === '/' || cursor >= tag.length) break;
+        const nameStart = cursor;
+        while (cursor < tag.length && !/[\s=/>]/.test(tag[cursor])) cursor += 1;
+        const name = tag.slice(nameStart, cursor);
+        while (/\s/.test(tag[cursor])) cursor += 1;
+        if (tag[cursor] !== '=') {
+            attributes.push({ name, hasValue: false });
+            continue;
+        }
+        cursor += 1;
+        while (/\s/.test(tag[cursor])) cursor += 1;
+        const quote = tag[cursor] === '"' || tag[cursor] === "'" ? tag[cursor++] : null;
+        const valueStart = cursor;
+        if (quote) {
+            while (cursor < tag.length && tag[cursor] !== quote) cursor += 1;
+        } else {
+            while (cursor < tag.length && !/[\s>]/.test(tag[cursor])) cursor += 1;
+        }
+        const valueEnd = cursor;
+        if (quote) cursor += 1;
+        attributes.push({ name, hasValue: true, value: tag.slice(valueStart, valueEnd), valueStart, valueEnd });
+    }
+    return attributes;
+}
+
+function decodeHtmlAttribute(value) {
+    return value
+        .replace(/&quot;/gi, '"')
+        .replace(/&#39;|&apos;/gi, "'")
+        .replace(/&lt;/gi, '<')
+        .replace(/&gt;/gi, '>')
+        .replace(/&amp;/gi, '&');
+}
+
+function applyStringReplacements(value, replacements) {
+    let output = value;
+    for (const replacement of replacements.sort((left, right) => right.start - left.start)) {
+        output = output.slice(0, replacement.start) + replacement.value + output.slice(replacement.end);
+    }
+    return output;
 }
 
 function transformHtml(value, { layerCss, layerName, report }) {
@@ -613,10 +935,16 @@ function escapeCssString(value) {
 }
 
 function escapeHtmlAttribute(value) {
-    return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 const envelope = createCodedComponentStyleEnvelope();
+if (!Object.hasOwn(Object, TEMPLATE_ENVELOPE_SYMBOL)) {
+    Object.defineProperty(Object, TEMPLATE_ENVELOPE_SYMBOL, {
+        configurable: true,
+        value: envelope,
+    });
+}
 if (!globalThis.__wwCodedStyleEnvelope) {
     Object.defineProperty(globalThis, '__wwCodedStyleEnvelope', {
         configurable: true,
@@ -627,5 +955,6 @@ if (!globalThis.__wwCodedStyleEnvelope) {
 export const CSSStyleSheet = envelope.CSSStyleSheet;
 export const document = envelope.document;
 export const html = envelope.html;
+export const inlineStyle = envelope.inlineStyle;
 export const layerCss = envelope.layerCss;
 export default envelope;
