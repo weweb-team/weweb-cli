@@ -17,7 +17,8 @@ test('namespaces local, remote, and explicitly layered imports', async () => {
             @import "./local.css";
             @import url("https://example.com/remote.css") layer(theme) supports(display: grid) screen;
             @import "./already-layered.css" layer(ww-style-component.utilities);
-            .component { color: red; }
+            @namespace svg url(http://www.w3.org/2000/svg);
+            svg|a { color: red; }
         `,
         { from: 'component.css' }
     );
@@ -36,11 +37,17 @@ test('namespaces local, remote, and explicitly layered imports', async () => {
     );
     assert.match(
         result.css,
-        /@layer ww-style-component\s*\{[\s\S]*\.component \{ color: red; \}[\s\S]*\}/
+        /@layer ww-style-component\s*\{[\s\S]*svg\|a \{ color: red; \}[\s\S]*\}/
     );
+    const root = postcss.parse(result.css);
+    const namespace = root.nodes.find(
+        node => node.type === 'atrule' && node.name === 'namespace'
+    );
+    assert.ok(namespace);
+    assert.equal(namespace.parent, root);
     assert.ok(result.css.indexOf('@charset') < result.css.indexOf('@import'));
     assert.ok(
-        result.css.lastIndexOf('@import') <
+        result.css.indexOf('@namespace') <
             result.css.search(/@layer ww-style-component\s*\{/)
     );
 });

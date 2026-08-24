@@ -24,35 +24,71 @@ function createStyleEnvelopeProvidePlugin(webpack) {
 }
 
 function transformVueTemplateNode(node) {
-    if (node.type !== 1 || node.tagType !== 0) return;
+    if (node.type !== 1) return;
+
+    const dynamicType = getDynamicComponentType(node);
+    if (node.tagType !== 0 && !dynamicType) return;
 
     for (const property of node.props || []) {
         if (property.type !== 7) continue;
         if (property.name === 'html' && !property.arg && property.exp) {
-            property.exp = createRuntimeExpression('html', property.exp);
+            property.exp = createRuntimeExpression('html', property.exp, dynamicType);
             continue;
         }
         if (property.name !== 'bind') continue;
         if (!property.arg && property.exp) {
-            property.exp = createRuntimeExpression('inlineProps', property.exp);
+            property.exp = createRuntimeExpression('inlineProps', property.exp, dynamicType);
             continue;
         }
         if (!isStaticStyleArgument(property.arg)) continue;
 
         property.arg = undefined;
-        property.exp = createRuntimeExpression('inlineBindings', property.exp || createContextExpression('style'));
+        property.exp = createRuntimeExpression(
+            'inlineBindings',
+            property.exp || createContextExpression('style'),
+            dynamicType
+        );
     }
 }
 
-function isStaticStyleArgument(argument) {
-    return argument?.type === 4 && argument.isStatic && argument.content === 'style';
+function getDynamicComponentType(node) {
+    if (node.tagType !== 1 || node.tag.toLowerCase() !== 'component') return null;
+
+    for (const property of node.props || []) {
+        if (property.type === 6 && property.name === 'is' && property.value) {
+            return createStaticExpression(JSON.stringify(property.value.content), property.value.loc);
+        }
+        if (property.type !== 7 || property.name !== 'bind' || !isStaticArgument(property.arg, 'is')) continue;
+        return property.exp || createContextExpression('is');
+    }
+    return null;
 }
 
-function createRuntimeExpression(method, expression) {
+function isStaticStyleArgument(argument) {
+    return isStaticArgument(argument, 'style');
+}
+
+function isStaticArgument(argument, name) {
+    return argument?.type === 4 && argument.isStatic && argument.content === name;
+}
+
+function createRuntimeExpression(method, expression, dynamicType) {
     return {
         type: 8,
         loc: expression.loc,
-        children: [`_ctx.${TEMPLATE_ENVELOPE}.${method}(`, expression, ')'],
+        children: dynamicType
+            ? [`_ctx.${TEMPLATE_ENVELOPE}.dynamic(`, dynamicType, `).${method}(`, expression, ')']
+            : [`_ctx.${TEMPLATE_ENVELOPE}.${method}(`, expression, ')'],
+    };
+}
+
+function createStaticExpression(content, loc) {
+    return {
+        type: 4,
+        loc,
+        content,
+        isStatic: false,
+        constType: 3,
     };
 }
 

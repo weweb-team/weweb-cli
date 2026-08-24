@@ -95,7 +95,7 @@ function isTopLevelImport(node) {
 function isTopLevelImportBoundary(node) {
     return (
         node.type === 'atrule' &&
-        ['charset', 'import'].includes(node.name.toLowerCase())
+        ['charset', 'import', 'namespace'].includes(node.name.toLowerCase())
     );
 }
 

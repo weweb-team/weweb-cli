@@ -70,6 +70,18 @@ test('preserves style props on Vue components while transforming native elements
     assert.doesNotMatch(result, /inlineProps\(_ctx\.props\)/);
 });
 
+test('defers dynamic component style handling to the resolved runtime type', () => {
+    const result = compileTemplate(
+        '<component :is="tag" v-html="html" :style="style" v-bind="props"/>'
+    );
+    const staticResult = compileTemplate('<component is="div" :style="style"/>');
+
+    assert.match(result, /\$wwCodedStyleEnvelope\.dynamic\(_ctx\.tag\)\.html\(_ctx\.html\)/);
+    assert.match(result, /\$wwCodedStyleEnvelope\.dynamic\(_ctx\.tag\)\.inlineBindings\(_ctx\.style\)/);
+    assert.match(result, /\$wwCodedStyleEnvelope\.dynamic\(_ctx\.tag\)\.inlineProps\(_ctx\.props\)/);
+    assert.match(staticResult, /\$wwCodedStyleEnvelope\.dynamic\("div"\)\.inlineBindings\(_ctx\.style\)/);
+});
+
 test('supports Vue same-name style shorthand', () => {
     const result = compileTemplate('<div :style></div>');
 
