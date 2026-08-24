@@ -3,77 +3,65 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
+const { compile } = require('@vue/compiler-dom');
 const webpack = require('webpack');
 const {
     adapterPath,
     createStyleEnvelopeProvidePlugin,
-    transformVHtml,
-    transformVueTemplateInlineStyles,
+    createVueLoader,
     withStyleEnvelopeAdapterEntry,
 } = require('../bin/utils/codedComponentStyleEnvelopeWebpack');
 
 test('wraps Vue v-html expressions with the host runtime helper', () => {
-    const node = {
-        type: 1,
-        props: [
-            { type: 7, name: 'html', exp: { content: 'source' } },
-            { type: 6, name: 'style', value: { content: 'color:red' } },
-        ],
-    };
+    const result = compileTemplate('<div v-html="source"></div>');
 
-    transformVHtml(node);
-
-    assert.equal(node.props[0].exp.content, '$wwCodedStyleEnvelope.html(source)');
-    assert.equal(node.props[1].value.content, 'color:red');
+    assert.match(result, /innerHTML: _ctx\.\$wwCodedStyleEnvelope\.html\(_ctx\.source\)/);
 });
 
-test('moves Vue static and bound style declarations behind the host runtime helper', () => {
-    const source = `<template>
+test('moves Vue style declarations behind the host runtime helper in compiler order', () => {
+    const source = `
         <div class="root" style="color:red; width: calc(100% - 2px)"></div>
         <span :class="classes" :style="[baseStyle, { backgroundColor: color }]"></span>
         <template v-if="ok"><p v-bind:style="styleObject">Text</p></template>
-    </template>
-    <script setup>const untouched = '<div style="color:blue">'</script>`;
+    `;
 
-    const result = transformVueTemplateInlineStyles(source);
+    const result = compileTemplate(source);
 
     assert.match(
         result,
-        /<div class="root" v-bind="\$wwCodedStyleEnvelope\.inlineBindings\(&quot;color:red; width: calc\(100% - 2px\)&quot;\)"/
+        /_ctx\.\$wwCodedStyleEnvelope\.inlineBindings\(\{"color":"red","width":"calc\(100% - 2px\)"\}\)/
     );
     assert.match(
         result,
-        /<span :class="classes" v-bind="\$wwCodedStyleEnvelope\.inlineBindings\(\[baseStyle, \{ backgroundColor: color \}\]\)"/
+        /_ctx\.\$wwCodedStyleEnvelope\.inlineBindings\(\[_ctx\.baseStyle, \{ backgroundColor: _ctx\.color \}\]\)/
     );
-    assert.match(result, /v-bind="\$wwCodedStyleEnvelope\.inlineBindings\(styleObject\)"/);
-    assert.match(result, /const untouched = '<div style="color:blue">'/);
-    assert.equal(transformVueTemplateInlineStyles(result), result);
+    assert.match(result, /_ctx\.\$wwCodedStyleEnvelope\.inlineBindings\(_ctx\.styleObject\)/);
 });
 
-test('moves every style declaration on the same Vue element behind the host runtime helper', () => {
-    const source = '<template><div style="color:red" :style="dynamicStyle"></div></template>';
+test('preserves spread-binding order while moving every style declaration', () => {
+    const source = '<div style="color:red" v-bind="attrs" :style="dynamicStyle"></div>';
 
-    const result = transformVueTemplateInlineStyles(source);
+    const result = compileTemplate(source);
 
+    assert.match(
+        result,
+        /_mergeProps\(_ctx\.\$wwCodedStyleEnvelope\.inlineBindings\(\{"color":"red"\}\), _ctx\.attrs, _ctx\.\$wwCodedStyleEnvelope\.inlineBindings\(_ctx\.dynamicStyle\)\)/
+    );
+});
+
+test('supports Vue same-name style shorthand', () => {
+    const result = compileTemplate('<div :style></div>');
+
+    assert.match(result, /_ctx\.\$wwCodedStyleEnvelope\.inlineBindings\(_ctx\.style\)/);
+});
+
+test('does not rewrite markup-like text after raw-text closing-tag prefixes', () => {
+    const result = compileTemplate(
+        '<textarea></textarea-fake><span style="color:red"></span></textarea><div style="color:blue"></div>'
+    );
+
+    assert.match(result, /"<\/textarea-fake><span style=\\"color:red\\"><\/span>"/);
     assert.equal((result.match(/\$wwCodedStyleEnvelope\.inlineBindings\(/g) || []).length, 1);
-    assert.doesNotMatch(result, /:style=/);
-    assert.match(result, /inlineBindings\(\[&quot;color:red&quot;,dynamicStyle\]\)/);
-});
-
-test('does not rewrite markup-like text inside Vue raw-text elements', () => {
-    const source = [
-        '<template>',
-        '<textarea><span style="color:red"></span></textarea>',
-        '<title><span :style="dynamicStyle"></span></title>',
-        '<div style="color:blue"></div>',
-        '</template>',
-    ].join('');
-
-    const result = transformVueTemplateInlineStyles(source);
-
-    assert.match(result, /<textarea><span style="color:red"><\/span><\/textarea>/);
-    assert.match(result, /<title><span :style="dynamicStyle"><\/span><\/title>/);
-    assert.match(result, /<div v-bind="\$wwCodedStyleEnvelope\.inlineBindings/);
 });
 
 test('forwards CSSOM globals to wwLib without embedding the runtime implementation', async t => {
@@ -131,4 +119,11 @@ function runWebpack(config) {
             resolve(stats);
         });
     });
+}
+
+function compileTemplate(source) {
+    return compile(source, {
+        mode: 'module',
+        nodeTransforms: createVueLoader().options.compilerOptions.nodeTransforms,
+    }).code;
 }

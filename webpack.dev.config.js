@@ -6,7 +6,6 @@ const webpack = require("webpack");
 const createCssLoaders = require("./bin/utils/createCssLoaders");
 const {
     createStyleEnvelopeProvidePlugin,
-    createInlineStyleLoader,
     createVueLoader,
     withStyleEnvelopeAdapterEntry,
 } = require("./bin/utils/codedComponentStyleEnvelopeWebpack");
@@ -114,7 +113,6 @@ module.exports = function () {
                     test: /\.vue$/,
                     use: [
                         createVueLoader(),
-                        createInlineStyleLoader(),
                         {
                             loader: "weweb-strip-block",
                             options: {
