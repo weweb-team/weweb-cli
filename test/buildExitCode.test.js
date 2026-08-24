@@ -78,8 +78,8 @@ test('build exits successfully after producing the component artifact', (t) => {
 
     assert.equal(result.status, 0, result.stdout + result.stderr);
     const artifact = fs.readFileSync(path.join(root, 'dist/manager.js'), 'utf8');
-    assert.match(artifact, /__wwCodedStyleEnvelope/);
-    assert.match(artifact, /WW_STYLE_ENVELOPE_PARSE_FAILED/);
+    assert.match(artifact, /wwCodedStyleEnvelope/);
+    assert.match(artifact, /WW_CODED_STYLE_ENVELOPE_RUNTIME_REQUIRED/);
     assert.match(artifact, /\.html\(/);
     assert.match(artifact, /\.inlineStyle\(/);
     assert.match(artifact, /ww-coded-inline-style/);

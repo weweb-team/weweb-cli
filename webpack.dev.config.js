@@ -8,7 +8,7 @@ const {
     createStyleEnvelopeProvidePlugin,
     createInlineStyleLoader,
     createVueLoader,
-    withStyleEnvelopeEntry,
+    withStyleEnvelopeAdapterEntry,
 } = require("./bin/utils/codedComponentStyleEnvelopeWebpack");
 
 const wewebClientVersion = "1.0.40";
@@ -53,7 +53,7 @@ module.exports = function () {
     const configManager = {
         name: "manager",
         entry: {
-            manager: withStyleEnvelopeEntry("./assets/index.js"),
+            manager: withStyleEnvelopeAdapterEntry("./assets/index.js"),
         },
         mode: "development",
         externals: {

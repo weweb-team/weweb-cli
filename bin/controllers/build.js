@@ -11,7 +11,7 @@ const {
     createStyleEnvelopeProvidePlugin,
     createInlineStyleLoader,
     createVueLoader,
-    withStyleEnvelopeEntry,
+    withStyleEnvelopeAdapterEntry,
 } = require('../utils/codedComponentStyleEnvelopeWebpack');
 
 const markBuildFailed = () => {
@@ -81,7 +81,7 @@ exports.build = (name, type) => {
 
         const webpackConfig = {
             name: 'manager',
-            entry: withStyleEnvelopeEntry(TMP_INDEX_PATH),
+            entry: withStyleEnvelopeAdapterEntry(TMP_INDEX_PATH),
             mode: 'production',
             externals: {
                 vue: 'Vue',

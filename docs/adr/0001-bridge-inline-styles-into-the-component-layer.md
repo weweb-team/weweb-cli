@@ -8,4 +8,6 @@ Coded component `style` and Vue `:style` declarations are represented by a gener
 
 Bridge variables are registered with `@property` and `inherits: false` so a styled descendant cannot accidentally consume a value owned by its parent. This makes support for the CSS Properties and Values API part of the new artifact compatibility contract.
 
+The implementation lives once in `wwFront` as a TypeScript module and is exposed through `wwLib.wwCodedStyleEnvelope`. The CLI only compiles Vue directives and forwards free CSSOM globals to that interface. Extracted Vite fronts import the same singleton for module-evaluation-time CSSOM access, before Vue global properties exist. Embedding a second runtime in CLI artifacts was rejected because it duplicated ownership, tests, and fixes across release units.
+
 Imperative mutations through `element.style` remain outside this compatibility contract because intercepting the full CSSOM surface would be fragile and would change browser object semantics.
