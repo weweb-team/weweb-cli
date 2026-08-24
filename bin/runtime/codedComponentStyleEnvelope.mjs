@@ -459,33 +459,113 @@ function splitTopLevelRules(css) {
 }
 
 function getAtRuleName(rule) {
-    const withoutLeadingComments = rule.replace(/^(?:\s|\/\*[\s\S]*?\*\/)+/, '');
+    const withoutLeadingComments = rule.slice(skipCssTrivia(rule));
     return withoutLeadingComments.match(/^@([\w-]+)/)?.[1]?.toLowerCase() || null;
 }
 
 function isExactLayerRule(rule, layerName) {
-    const withoutLeadingComments = rule.replace(/^(?:\s|\/\*[\s\S]*?\*\/)+/, '');
+    const withoutLeadingComments = rule.slice(skipCssTrivia(rule));
     const match = withoutLeadingComments.match(/^@layer\s+([^\s{]+)\s*\{/i);
     return match?.[1] === layerName;
 }
 
 function namespaceImportLayer(rule, layerName) {
-    const match = rule.match(/^(\s*(?:\/\*[\s\S]*?\*\/\s*)*@import\s+)(url\((?:[^)'"\\]|\\.|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')*\)|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')([\s\S]*?;)\s*$/i);
-    if (!match) return rule;
+    const contentEnd = rule.trimEnd().length;
+    if (rule[contentEnd - 1] !== ';') return rule;
 
-    const tail = match[3];
-    const layerMatch = tail.match(/\blayer(?:\s*\(\s*([^)]*)\s*\))?/i);
-    let nextTail;
-    if (!layerMatch) {
-        nextTail = ` layer(${layerName})${tail}`;
-    } else {
-        const importedLayer = layerMatch[1]?.trim();
+    let cursor = skipCssTrivia(rule);
+    if (rule.slice(cursor, cursor + 7).toLowerCase() !== '@import') return rule;
+    cursor = skipCssTrivia(rule, cursor + 7);
+    const resourceEnd = consumeImportResource(rule, cursor);
+    if (resourceEnd === -1 || resourceEnd > contentEnd) return rule;
+
+    const tail = rule.slice(resourceEnd, contentEnd);
+    const layerQualifier = parseImportLayerQualifier(tail);
+    let nextTail = ` layer(${layerName})${tail}`;
+    if (layerQualifier) {
+        const importedLayer = layerQualifier.name;
         const namespaced = !importedLayer || importedLayer === layerName || importedLayer.startsWith(`${layerName}.`)
             ? importedLayer || layerName
             : `${layerName}.${importedLayer}`;
-        nextTail = tail.slice(0, layerMatch.index) + `layer(${namespaced})` + tail.slice(layerMatch.index + layerMatch[0].length);
+        nextTail =
+            tail.slice(0, layerQualifier.start) +
+            `layer(${namespaced})` +
+            tail.slice(layerQualifier.end);
     }
-    return `${match[1]}${match[2]}${nextTail}`;
+    return rule.slice(0, resourceEnd) + nextTail + rule.slice(contentEnd);
+}
+
+function skipCssTrivia(value, from = 0) {
+    let cursor = from;
+    while (cursor < value.length) {
+        while (/\s/.test(value[cursor])) cursor += 1;
+        if (value[cursor] !== '/' || value[cursor + 1] !== '*') break;
+        const commentEnd = value.indexOf('*/', cursor + 2);
+        if (commentEnd === -1) return value.length;
+        cursor = commentEnd + 2;
+    }
+    return cursor;
+}
+
+function consumeImportResource(value, from) {
+    if (value[from] === '"' || value[from] === "'") return consumeQuotedValue(value, from);
+    if (value.slice(from, from + 4).toLowerCase() !== 'url(') return -1;
+    return consumeBalancedParentheses(value, from + 3);
+}
+
+function consumeQuotedValue(value, from) {
+    const quote = value[from];
+    for (let cursor = from + 1; cursor < value.length; cursor += 1) {
+        if (value[cursor] === '\\') {
+            cursor += 1;
+        } else if (value[cursor] === quote) {
+            return cursor + 1;
+        }
+    }
+    return -1;
+}
+
+function consumeBalancedParentheses(value, openingParenthesis) {
+    let depth = 0;
+    let quote = null;
+    let comment = false;
+    for (let cursor = openingParenthesis; cursor < value.length; cursor += 1) {
+        const character = value[cursor];
+        const next = value[cursor + 1];
+        if (comment) {
+            if (character === '*' && next === '/') {
+                comment = false;
+                cursor += 1;
+            }
+        } else if (quote) {
+            if (character === '\\') cursor += 1;
+            else if (character === quote) quote = null;
+        } else if (character === '/' && next === '*') {
+            comment = true;
+            cursor += 1;
+        } else if (character === '"' || character === "'") {
+            quote = character;
+        } else if (character === '(') {
+            depth += 1;
+        } else if (character === ')') {
+            depth -= 1;
+            if (!depth) return cursor + 1;
+        }
+    }
+    return -1;
+}
+
+function parseImportLayerQualifier(tail) {
+    const start = skipCssTrivia(tail);
+    if (tail.slice(start, start + 5).toLowerCase() !== 'layer') return null;
+    const boundary = tail[start + 5];
+    if (boundary && !/[\s(;]/.test(boundary)) return null;
+
+    const afterName = skipCssTrivia(tail, start + 5);
+    if (tail[afterName] !== '(') return { start, end: start + 5, name: '' };
+    const end = consumeBalancedParentheses(tail, afterName);
+    if (end === -1) return null;
+    return { start, end, name: tail.slice(afterName + 1, end - 1).trim() };
 }
 
 function findPropertyDescriptor(value, property) {

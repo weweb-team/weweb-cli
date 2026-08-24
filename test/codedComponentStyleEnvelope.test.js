@@ -45,6 +45,16 @@ test('fails open on invalid CSS and deduplicates diagnostics', async () => {
     ]);
 });
 
+test('parses comment-heavy imports in linear time', async () => {
+    const { createCodedComponentStyleEnvelope } = await import(runtimePath);
+    const envelope = createCodedComponentStyleEnvelope({ globalObject: {}, report() {} });
+    const comments = '/*x*/'.repeat(10_000);
+
+    const result = envelope.layerCss(`${comments}@import "theme.css";`);
+
+    assert.match(result, /@import "theme\.css" layer\(ww-style-component\);$/);
+});
+
 test('transforms style tags and simple stylesheet links in v-html', async () => {
     const { createCodedComponentStyleEnvelope, STYLE_ENVELOPE_DIAGNOSTICS } = await import(runtimePath);
     const diagnostics = [];
