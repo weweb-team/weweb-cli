@@ -1,9 +1,12 @@
 {
     "name": "@weweb/cli",
-    "version": "3.8.14",
+    "version": "3.8.15",
     "description": "WeWeb CLI",
     "bin": {
         "weweb": "bin/weweb.js"
+    },
+    "scripts": {
+        "test": "node --test test/*.test.js"
     },
     "repository": {
         "type": "git",
@@ -22,9 +25,6 @@
     ],
     "author": "WeWeb",
     "license": "MIT",
-    "scripts": {
-        "test": "node --test"
-    },
     "bugs": {
         "url": "https://github.com/getweweb/weweb-cli/issues"
     },
@@ -33,14 +33,16 @@
         "@babel/core": "7.22.1",
         "@vue/compiler-sfc": "3.5.13",
         "@weweb/drizzle-kit": "0.32.0-weweb.6",
-        "autoprefixer": "9.8.6",
+        "autoprefixer": "10.5.4",
         "babel-loader": "9.1.2",
         "css-loader": "6.8.1",
         "file-loader": "6.2.0",
         "pg": "8.21.0",
         "pgsql-parser": "17.9.15",
         "postcss": "8.4.24",
+        "postcss-import": "15.1.0",
         "postcss-loader": "7.3.3",
+        "postcss-value-parser": "4.2.0",
         "prompts": "2.4.2",
         "sass": "1.63.3",
         "sass-loader": "13.3.2",

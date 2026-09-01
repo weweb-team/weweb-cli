@@ -57,6 +57,22 @@ exports.prebuild = (mode, options = {}) => {
         }
     }
 
+    if (!componentPath && ['wwobject', 'section'].includes(type)) {
+        const rootVueFiles = fs
+            .readdirSync(PACKAGE_DIRECTORY, { withFileTypes: true })
+            .filter(entry => entry.isFile() && path.extname(entry.name).toLowerCase() === '.vue')
+            .map(entry => entry.name)
+            .sort();
+
+        if (rootVueFiles.length > 1) {
+            console.log(
+                `\x1b[41m Multiple root Vue files found (${rootVueFiles.join(', ')}). Please set "weweb.componentPath" in "./package.json". \x1b[0m`
+            );
+            return false;
+        }
+        if (rootVueFiles.length === 1) componentPath = `./${rootVueFiles[0]}`;
+    }
+
     console.log(`\x1b[44m Component Path : "${componentPath}" \x1b[0m`);
 
     if (!fs.existsSync(componentPath)) {
