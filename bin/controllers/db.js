@@ -2,10 +2,15 @@ const fs = require("fs");
 const path = require("path");
 const { Pool } = require("pg");
 const { introspectPostgres, generateMigration, ConflictNeedsResolutionError, originUUID } = require("@weweb/drizzle-kit/api");
+const {
+    generateMigrationInteractively,
+    shouldUseInteractiveMode,
+} = require("../utils/migrationConflictResolver.js");
 
 const SCHEMA_FILTERS = ["public", "auth", "storage"];
 const USAGE = {
-    generate: "Usage: weweb db:generate --source-db-url <url> --target-db-url <url> --output-file <file>",
+    generate:
+        "Usage: weweb db:generate --source-db-url <url> --target-db-url <url> --output-file <file> [--non-interactive]",
     execute: "Usage: weweb db:execute --db-url <url> --sql-file <file> [--dry-run]",
 };
 
@@ -127,7 +132,13 @@ exports.generate = async args => {
 
         const sourceSchema = { id: originUUID, prevId: "", ...sourceSchemaInternal };
         const targetSchema = { id: originUUID, prevId: "", ...targetSchemaInternal };
-        const dbSqlMigration = await generateMigration(targetSchema, sourceSchema);
+        const dbSqlMigration = shouldUseInteractiveMode(args)
+            ? await generateMigrationInteractively({
+                  generateMigration,
+                  targetSchema,
+                  sourceSchema,
+              })
+            : await generateMigration(targetSchema, sourceSchema);
         const sql = dbSqlMigration
             .map(statement => statement.trim())
             .filter(Boolean)
@@ -140,6 +151,11 @@ exports.generate = async args => {
 
         return 0;
     } catch (error) {
+        if (error?.code === "MIGRATION_GENERATION_CANCELLED") {
+            console.error(error.message);
+            return error.exitCode;
+        }
+
         if (error instanceof ConflictNeedsResolutionError || error?.code === "CONFLICT_NEEDS_RESOLUTION") {
             console.error(
                 JSON.stringify(

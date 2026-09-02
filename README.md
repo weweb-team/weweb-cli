@@ -20,6 +20,9 @@ Generate a PostgreSQL migration from a source database to a target database:
 
 `npx @weweb/cli@latest db:generate --source-db-url "$SOURCE_DB_URL" --target-db-url "$TARGET_DB_URL" --output-file ./migration.sql`
 
+When a terminal is attached, ambiguous renames and schema moves are resolved through an interactive menu. Use
+`--non-interactive` to keep the JSON conflict response for scripts and CI.
+
 Execute a generated migration:
 
 `npx @weweb/cli@latest db:execute --db-url "$TARGET_DB_URL" --sql-file ./migration.sql`

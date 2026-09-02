@@ -71,7 +71,7 @@ async function main() {
         default:
             process.exitCode = 1;
             console.log(
-                `Command not recognized or no specified.\nUse 'serve [--port=port]', 'build --name=name --type=type', 'db:generate --source-db-url url --target-db-url url --output-file file', or 'db:execute --db-url url --sql-file file'.`
+                `Command not recognized or no specified.\nUse 'serve [--port=port]', 'build --name=name --type=type', 'db:generate --source-db-url url --target-db-url url --output-file file [--non-interactive]', or 'db:execute --db-url url --sql-file file'.`
             );
     }
 }
