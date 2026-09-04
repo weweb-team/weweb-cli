@@ -1,6 +1,6 @@
 {
     "name": "@weweb/cli",
-    "version": "3.8.15",
+    "version": "3.8.16",
     "description": "WeWeb CLI",
     "bin": {
         "weweb": "bin/weweb.js"
@@ -39,7 +39,7 @@
         "file-loader": "6.2.0",
         "pg": "8.21.0",
         "pgsql-parser": "17.9.15",
-        "postcss": "8.4.24",
+        "postcss": "8.5.26",
         "postcss-import": "15.1.0",
         "postcss-loader": "7.3.3",
         "postcss-value-parser": "4.2.0",
@@ -56,5 +56,10 @@
         "webpack-cli": "5.1.4",
         "webpack-dev-server": "4.15.1",
         "weweb-strip-block": "0.0.2"
+    },
+    "overrides": {
+        "nanoid": "3.3.18",
+        "postcss": "8.5.26",
+        "qs": "6.16.0"
     }
 }
