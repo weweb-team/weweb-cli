@@ -1,6 +1,6 @@
 {
     "name": "@weweb/cli",
-    "version": "3.8.16",
+    "version": "4.0.0",
     "engines": {
         "node": ">=22.15.0"
     },
