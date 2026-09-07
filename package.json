@@ -1,6 +1,6 @@
 {
     "name": "@weweb/cli",
-    "version": "3.8.15",
+    "version": "3.8.16",
     "description": "WeWeb CLI",
     "bin": {
         "weweb": "bin/weweb.js"
@@ -33,13 +33,13 @@
         "@babel/core": "7.22.1",
         "@vue/compiler-sfc": "3.5.13",
         "@weweb/drizzle-kit": "0.32.0-weweb.6",
-        "autoprefixer": "10.5.4",
+        "autoprefixer": "10.5.5",
         "babel-loader": "9.1.2",
         "css-loader": "6.8.1",
         "file-loader": "6.2.0",
         "pg": "8.21.0",
         "pgsql-parser": "17.9.15",
-        "postcss": "8.4.24",
+        "postcss": "8.5.28",
         "postcss-import": "15.1.0",
         "postcss-loader": "7.3.3",
         "postcss-value-parser": "4.2.0",
